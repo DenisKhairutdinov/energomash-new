@@ -1,14 +1,17 @@
-{# Вопросы и ответы. Одновременно открыт один ответ: общий атрибут name у <details> (нативно, без скриптов) #}
-<section class="faq container" aria-labelledby="faq-title">
-  <div class="faq__layout">
-    <div class="faq__intro">
-      <h2 class="section-title" id="faq-title">Вопросы<br />и ответы</h2>
-      <p class="section-head__text">Коротко о сроках, лизинге, гарантии и документах. Остальное расскажет менеджер.</p>
-      <button class="button button--ink" type="button" data-modal-open="consult">Получить консультацию</button>
+{# Вопросы и ответы. Одновременно открыт один ответ: общий атрибут name у <details> (нативно, без скриптов). Карточки на стекле поверх фото. #}
+<section class="faq" aria-labelledby="faq-title" data-chapter="Вопросы">
+  <div class="faq__bg" data-frame>
+    <img src="/src/assets/models/IMG_4431.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.08" />
+  </div>
+  <div class="faq__layout container">
+    <div class="faq__intro glass glass--strong">
+      <h2 class="section-title" id="faq-title" data-split>Вопросы<br />и ответы</h2>
+      <p class="faq__lead">Коротко о сроках, лизинге, гарантии и документах. Остальное расскажет менеджер.</p>
+      <button class="button" type="button" data-modal-open="consult">Получить консультацию</button>
     </div>
     <div class="faq__list">
       {% for item in home.faq %}
-        <details class="faq__item" name="faq">
+        <details class="faq__item glass" name="faq">
           <summary class="faq__question">
             <span class="faq__text">{{ item.question }}</span>
             <span class="faq__mark" aria-hidden="true"></span>

@@ -1,0 +1,283 @@
+// География поставок. Отображение карты перенесено со старого сайта: серые регионы с границами цвета фона,
+// регионы с поставками залиты акцентом (при появлении секции наливаются по очереди с запада на восток),
+// при наведении всплывает стеклянная карточка, у завода пульсирующая метка.
+@use 'mixins' as *;
+
+@layer sections {
+  .geography {
+    // Цвет регионов без поставок заметно светлее фона секции, чтобы карта не сливалась с ним
+    --map-base: oklch(36% 0.014 282deg);
+
+    padding-block: var(--section-y);
+
+    @include theme-dark;
+
+    background:
+      radial-gradient(45% 55% at 78% 40%, oklch(61% 0.145 40deg / 14%), transparent), var(--ink);
+  }
+
+  .geography__layout {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+
+  .geography__text {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+
+  .geography__text .section-title {
+    font-size: var(--fs-title-s);
+  }
+
+  // Легенда карты: квадрат цвета региона и подпись
+  .geography__legend {
+    display: grid;
+    gap: 0.75rem;
+    font-size: var(--fs-s);
+  }
+
+  .geography__legend-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .geography__legend-item::before {
+    inline-size: 1rem;
+    block-size: 1rem;
+    content: '';
+    background: var(--map-base);
+  }
+
+  .geography__legend-item--delivered::before {
+    background: var(--accent);
+  }
+
+  // Итоги: числа акцентным цветом, подпись под числом
+  .geography__totals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+  }
+
+  .geography__total {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .geography__total dt {
+    order: 2;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--fg-2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .geography__total dd {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1rem + 2.8vw, 4.5rem);
+    font-weight: 200;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.9;
+    color: var(--accent);
+  }
+
+  // Сцена повторяет пропорции viewBox: SVG, метка завода и карточка считаются от её размера
+  .geography__stage {
+    position: relative;
+    inline-size: 100%;
+    aspect-ratio: 1440 / 900;
+  }
+
+  .geography__svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .geography__region {
+    cursor: default;
+    fill: var(--map-base);
+    stroke: var(--ink);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    transition: fill 0.15s var(--ease-out);
+    vector-effect: non-scaling-stroke;
+  }
+
+  .geography__region:hover,
+  .geography__region.is-active {
+    fill: color-mix(in oklch, var(--map-base), var(--fg) 16%);
+  }
+
+  .geography__region.is-delivered {
+    cursor: pointer;
+    fill: var(--accent);
+  }
+
+  .geography__region.is-delivered:hover,
+  .geography__region.is-delivered.is-active {
+    fill: color-mix(in oklch, var(--accent) 80%, transparent);
+  }
+
+  .geography__region:focus-visible {
+    outline: none;
+    stroke: var(--fg);
+    stroke-width: 2;
+  }
+
+  // Разрезанные линией перемены дат регионы (Чукотка) не обводятся сами, чтобы не было шва внутри
+  .geography__region[data-seam] {
+    stroke: none;
+  }
+
+  .geography__borders {
+    pointer-events: none;
+  }
+
+  .geography__border {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  // Завод: прямоугольная метка с пульсирующей рамкой и подписью
+  .geography__hub {
+    position: absolute;
+    inset-block-start: var(--y);
+    inset-inline-start: var(--x);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    translate: -50% -50%;
+  }
+
+  .geography__hub-dot {
+    position: relative;
+    inline-size: 0.75rem;
+    block-size: 0.75rem;
+    background: var(--fg);
+  }
+
+  .geography__hub-dot::before {
+    position: absolute;
+    inset: -50%;
+    content: '';
+    border: 1px solid var(--fg);
+    animation: geography-pulse 2.4s ease-out infinite;
+  }
+
+  .geography__hub-name {
+    position: absolute;
+    inset-inline-start: calc(100% + 0.5rem);
+    padding: 0.25rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--bg);
+    text-transform: uppercase;
+    white-space: nowrap;
+    background: var(--fg);
+  }
+
+  // Карточка региона: стеклянная плашка у курсора, положение задаёт geography.ts через translate
+  .geography__tooltip {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-inline-size: 16rem;
+    max-inline-size: 21rem;
+    padding: 1.25rem 1.5rem;
+    color: var(--paper);
+    pointer-events: none;
+    background: oklch(17.5% 0.012 282deg / 70%);
+    backdrop-filter: var(--glass-blur-strong);
+  }
+
+  .geography__tooltip[hidden] {
+    display: none;
+  }
+
+  .geography__tooltip-label {
+    color: var(--accent);
+  }
+
+  // Названия длинные («Ханты-Мансийский автономный округ — Югра»), поэтому не заглавными и не крупно
+  .geography__tooltip-name {
+    font-size: var(--fs-l);
+    font-weight: 500;
+    line-height: 1.25;
+  }
+
+  .geography__tooltip-units {
+    font-size: var(--fs-l);
+    font-weight: 600;
+  }
+
+  .geography__tooltip-cities {
+    font-size: var(--fs-s);
+    color: oklch(96.9% 0.003 107deg / 70%);
+  }
+
+  .geography__tooltip-units:empty,
+  .geography__tooltip-cities:empty {
+    display: none;
+  }
+
+  // Появление секции (geography.ts): регионы с поставками наливаются акцентом по очереди с запада на восток.
+  // До появления эти регионы серые; анимация, а не переход, чтобы наведение потом работало без задержки
+  @media (prefers-reduced-motion: no-preference) {
+    .geography:not(.is-revealed) .geography__region.is-delivered {
+      fill: var(--map-base);
+    }
+
+    .geography.is-revealed .geography__region.is-delivered {
+      animation: geography-region-in 0.9s var(--ease-out) var(--delay, 0s) backwards;
+    }
+  }
+
+  @media (width >= 1000px) {
+    .geography__layout {
+      grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.6fr);
+    }
+  }
+}
+
+@keyframes geography-region-in {
+  from {
+    fill: var(--map-base);
+  }
+
+  to {
+    fill: var(--accent);
+  }
+}
+
+@keyframes geography-pulse {
+  from {
+    opacity: 0.9;
+    scale: 0.6;
+  }
+
+  to {
+    opacity: 0;
+    scale: 2.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .geography__hub-dot::before {
+    animation: none;
+  }
+}

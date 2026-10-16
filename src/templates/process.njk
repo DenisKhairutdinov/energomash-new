@@ -1,16 +1,21 @@
-{# Путь заказа: 5 шагов. Это последовательность, поэтому нумерация оправдана. #}
-<section class="process container" aria-labelledby="process-title">
-  <div class="section-head">
-    <h2 class="section-title" id="process-title">Как<br />купить</h2>
-    <p class="section-head__text">От звонка до передачи техники. Менеджер ведёт сделку на каждом шаге.</p>
+{# Путь заказа: 5 шагов (последовательность, поэтому нумерация оправдана). Стеклянные карточки лесенкой поверх фото. #}
+<section class="process" aria-labelledby="process-title" data-process data-chapter="Заказ">
+  <div class="process__bg" data-frame>
+    <img src="/src/assets/models/IMG_4974.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.08" />
   </div>
-  <ol class="process__list">
-    {% for step in home.process %}
-      <li class="process__item">
-        <span class="process__number" aria-hidden="true">{{ loop.index }}</span>
-        <h3 class="process__title">{{ step.title }}</h3>
-        <p class="process__text">{{ step.text }}</p>
-      </li>
-    {% endfor %}
-  </ol>
+  <div class="process__layout container">
+    <div class="section-head">
+      <h2 class="section-title" id="process-title" data-split>Как<br />купить</h2>
+      <p class="section-head__text">От звонка до передачи техники. Менеджер ведёт сделку на каждом шаге.</p>
+    </div>
+    <ol class="process__list">
+      {% for step in home.process %}
+        <li class="process__item glass glass--strong" data-depth="{{ (loop.index % 2) * 18 + 8 }}">
+          <span class="process__number" aria-hidden="true">{{ loop.index }}</span>
+          <h3 class="process__title">{{ step.title }}</h3>
+          <p class="process__text">{{ step.text }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
 </section>

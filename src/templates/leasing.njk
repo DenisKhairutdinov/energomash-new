@@ -5,16 +5,18 @@
   id="leasing"
   aria-labelledby="leasing-title"
   data-leasing
+  data-chapter="Лизинг"
   data-subsidy-share="{{ home.leasing.subsidyShare }}"
   data-subsidy-cap="{{ home.leasing.subsidyCap }}"
 >
+  <img class="leasing__bg" src="/src/assets/models/IMG_2119.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.08" />
   <div class="leasing__layout container">
     <div class="leasing__intro">
-      <h2 class="section-title section-title--light" id="leasing-title">Лизинг<br />и субсидия</h2>
+      <h2 class="section-title" id="leasing-title" data-split>Лизинг<br />и субсидия</h2>
       <p class="leasing__lead">
         Выберите лизинговую компанию и посчитайте платёж за минуту. Все партнёры аккредитованы по программе Минпромторга.
       </p>
-      <label class="switch">
+      <label class="switch glass">
         <input class="switch__input" type="checkbox" checked data-subsidy />
         <span class="switch__track" aria-hidden="true"></span>
         <span class="switch__body">
@@ -27,7 +29,7 @@
       </label>
     </div>
 
-    <form class="leasing__form" action="#" novalidate data-leasing-form>
+    <form class="leasing__form glass" action="#" novalidate data-leasing-form>
       <fieldset class="leasing__partners">
         <legend class="leasing__legend">Лизинговый партнёр</legend>
         <div class="leasing__chips">
@@ -72,7 +74,7 @@
       </div>
     </form>
 
-    <div class="leasing__result" aria-live="polite">
+    <div class="leasing__result glass glass--strong" aria-live="polite">
       <p class="leasing__payment-label">Платёж в месяц</p>
       <p class="leasing__payment" data-payment>—</p>
       <dl class="leasing__summary">

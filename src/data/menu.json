@@ -30,7 +30,7 @@
       },
       {
         "id": "chassis",
-        "title": "Цистерны на шасси",
+        "title": "Автоцистерны",
         "url": "/catalog.html?type=chassis",
         "children": [
           {
@@ -91,10 +91,26 @@
         "title": "Условия",
         "url": "/terms.html",
         "children": [
-          { "id": "leasing", "title": "Лизинг", "url": "/leasing.html" },
-          { "id": "subsidies", "title": "Субсидии", "url": "/subsidies.html" },
-          { "id": "dealers", "title": "Дилерам", "url": "/dealers.html" },
-          { "id": "tenders", "title": "Тендеры", "url": "/tenders.html" }
+          {
+            "id": "leasing",
+            "title": "Лизинг",
+            "url": "/leasing.html"
+          },
+          {
+            "id": "subsidies",
+            "title": "Субсидии",
+            "url": "/subsidies.html"
+          },
+          {
+            "id": "dealers",
+            "title": "Дилерам",
+            "url": "/dealers.html"
+          },
+          {
+            "id": "tenders",
+            "title": "Тендеры",
+            "url": "/tenders.html"
+          }
         ]
       },
       {
@@ -102,15 +118,51 @@
         "title": "О заводе",
         "url": "/about.html",
         "children": [
-          { "id": "company", "title": "О компании / география поставок", "url": "/company.html" },
-          { "id": "manufacture", "title": "Производство", "url": "/manufacture.html" },
-          { "id": "guide", "title": "Как выбрать цистерну", "url": "/guide.html" },
-          { "id": "shipments", "title": "Наши отгрузки", "url": "/shipments.html" },
-          { "id": "services", "title": "Сервис и запчасти", "url": "/services.html" },
-          { "id": "docs", "title": "Сертификаты и документы", "url": "/docs.html" },
-          { "id": "faq", "title": "Вопросы и ответы", "url": "/faq.html" },
-          { "id": "company-details", "title": "Реквизиты", "url": "/company-details.html" },
-          { "id": "job", "title": "Вакансии", "url": "/job.html" }
+          {
+            "id": "company",
+            "title": "О компании / география поставок",
+            "url": "/company.html"
+          },
+          {
+            "id": "manufacture",
+            "title": "Производство",
+            "url": "/manufacture.html"
+          },
+          {
+            "id": "guide",
+            "title": "Как выбрать цистерну",
+            "url": "/guide.html"
+          },
+          {
+            "id": "shipments",
+            "title": "Наши отгрузки",
+            "url": "/shipments.html"
+          },
+          {
+            "id": "services",
+            "title": "Сервис и запчасти",
+            "url": "/services.html"
+          },
+          {
+            "id": "docs",
+            "title": "Сертификаты и документы",
+            "url": "/docs.html"
+          },
+          {
+            "id": "faq",
+            "title": "Вопросы и ответы",
+            "url": "/faq.html"
+          },
+          {
+            "id": "company-details",
+            "title": "Реквизиты",
+            "url": "/company-details.html"
+          },
+          {
+            "id": "job",
+            "title": "Вакансии",
+            "url": "/job.html"
+          }
         ]
       },
       {
@@ -143,17 +195,42 @@
             "title": "Транспортная безопасность",
             "url": "/blog-dopog-i-reglamenty.html"
           },
-          { "id": "factory-rhythm", "title": "Заводской ритм", "url": "/blog-put-zakaza.html" },
-          { "id": "events", "title": "Мероприятия", "url": "/blog-kak-stat-dilerom.html" },
-          { "id": "experience", "title": "Опыт эксплуатации", "url": "/blog-grsi-i-arshin.html" }
+          {
+            "id": "factory-rhythm",
+            "title": "Заводской ритм",
+            "url": "/blog-put-zakaza.html"
+          },
+          {
+            "id": "events",
+            "title": "Мероприятия",
+            "url": "/blog-kak-stat-dilerom.html"
+          },
+          {
+            "id": "experience",
+            "title": "Опыт эксплуатации",
+            "url": "/blog-grsi-i-arshin.html"
+          }
         ]
       },
-      { "id": "contacts", "title": "Контакты", "url": "/contacts.html" }
+      {
+        "id": "contacts",
+        "title": "Контакты",
+        "url": "/contacts.html"
+      }
     ],
     "legal": [
-      { "title": "Политика конфиденциальности", "url": "/privacy.html" },
-      { "title": "Пользовательское соглашение", "url": "/agreement.html" },
-      { "title": "Политика использования cookie", "url": "/cookies.html" }
+      {
+        "title": "Политика конфиденциальности",
+        "url": "/privacy.html"
+      },
+      {
+        "title": "Пользовательское соглашение",
+        "url": "/agreement.html"
+      },
+      {
+        "title": "Политика использования cookie",
+        "url": "/cookies.html"
+      }
     ]
   }
 }

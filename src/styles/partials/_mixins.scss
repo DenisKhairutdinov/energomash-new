@@ -1,0 +1,61 @@
+// Темы секций. Цвет секции задаётся переменными, поэтому компоненты внутри (кнопки, линии, поля) подстраиваются сами.
+@mixin theme-dark {
+  --bg: var(--ink);
+  --bg-2: oklch(22% 0.014 282deg);
+  --fg: var(--paper);
+  --fg-2: oklch(96.9% 0.003 107deg / 68%);
+  --line: var(--line-dark);
+  --btn-ink: var(--paper);
+  --btn-ink-fg: var(--ink);
+
+  color: var(--fg);
+  background: var(--bg);
+}
+
+@mixin theme-light {
+  --bg: var(--paper);
+  --bg-2: var(--grey);
+  --fg: var(--ink);
+  --fg-2: oklch(17.5% 0.012 282deg / 66%);
+  --line: var(--line-light);
+  --btn-ink: var(--ink);
+  --btn-ink-fg: var(--paper);
+
+  color: var(--fg);
+  background: var(--bg);
+}
+
+// Стекло: полупрозрачная подложка с размытием. Размытие не анимируем (только прозрачность и transform).
+// Родитель стеклянного элемента не должен иметь opacity, filter, mask или clip-path: иначе размытие не видит фон.
+// «Морозное» стекло: тёмная подложка, мягкий диагональный блик, размытие с насыщением.
+@mixin glass($strength: 'dark') {
+  background:
+    linear-gradient(135deg, oklch(100% 0 0deg / 11%), oklch(100% 0 0deg / 1%) 55%),
+    var(--glass-dark);
+  border: 1px solid oklch(100% 0 0deg / 12%);
+  backdrop-filter: var(--glass-blur) saturate(1.35);
+
+  @if $strength == 'strong' {
+    background:
+      linear-gradient(135deg, oklch(100% 0 0deg / 10%), oklch(100% 0 0deg / 1%) 55%),
+      var(--glass-dark-strong);
+    backdrop-filter: blur(22px) saturate(1.45);
+  }
+
+  @if $strength == 'clear' {
+    background:
+      linear-gradient(135deg, oklch(100% 0 0deg / 12%), oklch(100% 0 0deg / 2%) 55%),
+      var(--glass-clear);
+    border-color: transparent;
+    backdrop-filter: var(--glass-blur-strong);
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-dark-strong);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background: var(--ink);
+    backdrop-filter: none;
+  }
+}

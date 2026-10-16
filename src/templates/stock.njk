@@ -1,26 +1,13 @@
-{# Техника в наличии: одна модель крупно. Панель внизу справа с названием; при наведении или фокусе раскрывает характеристики. #}
-{# Слайды листаются сами (data-autoplay, секунд на слайд), стрелками и индикатором на самом слайде (scripts/modules/slider.ts). #}
-{# Данные: src/data/home.json, ключ stock. Последний слайд ведёт в каталог наличия. #}
+{# Техника в наличии (механика старой главной): 5 моделей и финальный слайд «Ещё N моделей», всего 6 слайдов. #}
+{# Один кадр на весь экран; заголовок и стрелки лежат на стекле поверх кадра; панель с названием слева внизу раскрывает характеристики по наведению. #}
+{# Слайды листаются сами (data-autoplay, секунд на слайд) и стрелками (scripts/modules/slider.ts). Данные: src/data/home.json, ключ stock. #}
 {% from "icons.njk" import icon %}
+{% set slides = home.stock.length + 1 %}
 {% set restCount = home.catalogTotals.inStock - home.stock.length %}
-<section class="stock" id="stock" aria-labelledby="stock-title" data-slider data-autoplay="6">
-  <div class="stock__head container">
-    <h2 class="section-title" id="stock-title">Техника<br />в наличии</h2>
-    <div class="stock__intro">
-      <p class="stock__count"><strong>{{ home.catalogTotals.inStock }}</strong> единицы на складе в Мисяше</p>
-      <p class="stock__lead">Готовые полуприцепы и цистерны. Отгружаем в течение нескольких дней.</p>
-      <a class="button button--ink" href="/catalog.html?in-stock=1">Смотреть всё наличие</a>
-    </div>
-  </div>
+<section class="stock" id="stock" aria-labelledby="stock-title" data-slider data-autoplay="6" data-chapter="Наличие">
   <div class="stock__viewport" role="group" aria-roledescription="карусель" aria-label="Техника в наличии">
-    <div class="stock__nav">
-      <button class="stock__arrow" type="button" aria-label="Предыдущая модель" data-prev>{{ icon("arrow-left") }}</button>
-      <button class="stock__arrow" type="button" aria-label="Следующая модель" data-next>{{ icon("arrow") }}</button>
-      <span class="stock__progress" aria-hidden="true"><span class="stock__progress-bar" data-progress></span></span>
-      <span class="stock__position" aria-live="off"><span data-current>1</span> / {{ home.stock.length + 1 }}</span>
-    </div>
     {% for item in home.stock %}
-      <article class="stock__slide{{ ' is-active' if loop.first }}" data-slide aria-roledescription="слайд" aria-label="{{ loop.index }} из {{ home.stock.length + 1 }}">
+      <article class="stock__slide{{ ' is-active' if loop.first }}" data-slide aria-roledescription="слайд" aria-label="{{ loop.index }} из {{ slides }}">
         <img
           class="stock__image"
           src="/src/assets/models/{{ item.photo }}"
@@ -30,8 +17,8 @@
           {% if not loop.first %}loading="lazy"{% endif %}
           decoding="async"
         />
-        <span class="stock__badge">В наличии</span>
-        <a class="stock__panel" href="/product.html" aria-label="{{ item.type }} {{ item.model }}: подробнее">
+        <a class="stock__panel glass glass--strong" href="/product.html" aria-label="{{ item.type }} {{ item.model }}: подробнее">
+          <span class="stock__badge mono">{{ item.badge }}</span>
           <span class="stock__panel-head">
             <span class="stock__type">{{ item.type }}</span>
             <span class="stock__model">{{ item.model }}</span>
@@ -41,7 +28,7 @@
             <span class="stock__specs">
               {% for spec in item.specs %}
                 <span class="stock__spec">
-                  <span class="stock__spec-label">{{ spec[0] }}</span>
+                  <span class="stock__spec-label mono">{{ spec[0] }}</span>
                   <span class="stock__spec-value">{{ spec[1] }}</span>
                 </span>
               {% endfor %}
@@ -50,12 +37,25 @@
         </a>
       </article>
     {% endfor %}
-    <article class="stock__slide stock__slide--rest" data-slide aria-roledescription="слайд" aria-label="{{ home.stock.length + 1 }} из {{ home.stock.length + 1 }}">
+    <article class="stock__slide stock__slide--rest" data-slide aria-roledescription="слайд" aria-label="{{ slides }} из {{ slides }}">
       <a class="stock__rest" href="/catalog.html?in-stock=1">
-        <span class="stock__rest-label">Вся техника на складе</span>
+        <span class="stock__rest-label mono">Вся техника на складе</span>
         <span class="stock__rest-title">Ещё {{ restCount }} моделей</span>
         {{ icon("arrow", "stock__rest-icon") }}
       </a>
     </article>
+
+    <div class="stock__head glass glass--strong">
+      <h2 class="stock__title" id="stock-title" data-split>Техника<br />в наличии</h2>
+      <p class="stock__count"><strong>{{ home.catalogTotals.inStock }}</strong> единицы на складе в Мисяше</p>
+      <p class="stock__lead">Готовые полуприцепы и автоцистерны. Отгружаем в течение нескольких дней.</p>
+      <a class="button" href="/catalog.html?in-stock=1">Смотреть всё наличие</a>
+    </div>
+
+    <div class="stock__nav glass glass--strong">
+      <button class="stock__arrow" type="button" aria-label="Предыдущая модель" data-prev>{{ icon("arrow-left") }}</button>
+      <span class="stock__position mono" aria-live="off"><span data-current>1</span> / {{ slides }}</span>
+      <button class="stock__arrow" type="button" aria-label="Следующая модель" data-next>{{ icon("arrow") }}</button>
+    </div>
   </div>
 </section>

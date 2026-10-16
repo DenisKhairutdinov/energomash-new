@@ -1,9 +1,10 @@
-// Шрифты (Oswald Variable, Golos Text Variable) подключаются в scripts/main.ts
+// Шрифты (Oswald, Golos Text, JetBrains Mono) и стили Lenis подключаются в scripts/main.ts
 @layer reset {
   *,
   *::before,
   *::after {
     box-sizing: border-box;
+    border-radius: 0;
   }
 
   * {
@@ -11,7 +12,8 @@
   }
 
   img,
-  svg {
+  svg,
+  canvas {
     display: block;
     max-inline-size: 100%;
   }
@@ -26,6 +28,7 @@
   textarea {
     font: inherit;
     color: inherit;
+    border-radius: 0;
   }
 
   button {
@@ -45,7 +48,6 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
     scroll-padding-block-start: var(--header-h);
     text-size-adjust: 100%;
   }
@@ -53,8 +55,8 @@
   body {
     min-block-size: 100svh;
     font: 400 var(--fs-m) / 1.55 var(--font-text);
-    color: var(--ink);
-    background: var(--paper);
+    color: var(--fg);
+    background: var(--bg);
     text-rendering: optimizelegibility;
     -webkit-font-smoothing: antialiased;
   }
@@ -67,24 +69,28 @@
     text-wrap: balance;
   }
 
+  // Заголовки первого уровня везде одного тонкого веса
+  h1 {
+    font-weight: 200;
+  }
+
   p {
     text-wrap: pretty;
   }
 
   :focus-visible {
-    outline: 3px solid var(--focus);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
 
   ::selection {
-    color: var(--on-accent);
-    background: var(--accent);
+    color: var(--paper);
+    background: var(--accent-deep);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
+  // Диалог и панели внутри себя прокручиваются сами, плавный скролл Lenis на них не действует
+  [data-lenis-prevent] {
+    overscroll-behavior: contain;
   }
 }
 
@@ -107,9 +113,9 @@
     position: fixed;
     inset-block-start: 0.5rem;
     inset-inline-start: 0.5rem;
-    z-index: 100;
+    z-index: 200;
     padding: 0.75rem 1rem;
-    color: var(--on-accent);
+    color: var(--paper);
     background: var(--ink);
     transform: translateY(-200%);
   }
@@ -118,30 +124,36 @@
     transform: none;
   }
 
+  // Заголовок секции: высокий тонкий Oswald капсом
   .section-title {
     font-size: var(--fs-title);
-    font-weight: 250;
+    font-weight: 200;
     line-height: 0.98;
     text-transform: uppercase;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
   }
 
-  .section-title--light {
-    color: var(--on-steel);
+  // Мелкая техническая подпись: данные, метки, номера
+  .mono {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
 
   .section-head {
     display: grid;
     gap: var(--gap);
     align-items: end;
-    margin-block-end: clamp(2rem, 4vw, 4rem);
+    margin-block-end: clamp(2rem, 4vw, 4.5rem);
   }
 
   .section-head__text {
     max-inline-size: 34rem;
     font-size: var(--fs-l);
     line-height: 1.45;
-    color: var(--ink-2);
+    color: var(--fg-2);
   }
 
   .section-head > .button {
@@ -150,11 +162,22 @@
 
   @media (width >= 900px) {
     .section-head {
-      grid-template-columns: 1.2fr 1fr auto;
+      grid-template-columns: 1.3fr 1fr auto;
     }
 
     .section-head > .button {
       justify-self: end;
     }
+  }
+
+  // Маска для вылета строк заголовков (SplitText): хвостики Ц, Д и точки Ё не обрезаются
+  .split-line-mask {
+    padding-block: 0.14em;
+    margin-block: -0.14em;
+  }
+
+  // text-wrap: balance мешает SplitText разбивать строки
+  [data-split] {
+    text-wrap: wrap;
   }
 }

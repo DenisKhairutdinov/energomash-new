@@ -1,24 +1,28 @@
+{# Документы и допуски: мозаика из стеклянных блоков поверх фото. #}
 {% from "icons.njk" import icon %}
-<section class="docs container" aria-labelledby="docs-title">
-  <div class="docs__layout">
-    <div class="docs__intro">
-      <h2 class="section-title" id="docs-title">Документы<br />и допуски</h2>
-      <p class="section-head__text">Техника выходит с завода с полным пакетом документов для регистрации и перевозки.</p>
-      <a class="button button--ink" href="/docs.html">Сертификаты и документы</a>
+<section class="docs" aria-labelledby="docs-title" data-chapter="Документы">
+  <div class="docs__bg" data-frame>
+    <img src="/src/assets/models/IMG_0550.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.08" />
+  </div>
+  <div class="docs__layout container">
+    <div class="docs__intro glass glass--strong">
+      <h2 class="section-title" id="docs-title" data-split>Документы<br />и допуски</h2>
+      <p class="docs__lead">Техника выходит с завода с полным пакетом документов для регистрации и перевозки.</p>
+      <a class="button" href="/docs.html">Сертификаты и документы</a>
     </div>
     <ul class="docs__list">
       {% for doc in home.docs %}
-        <li class="docs__item">
+        <li class="docs__item glass" data-depth="{{ loop.index * 6 }}">
           <span class="docs__mark" aria-hidden="true">{{ icon("check") }}</span>
           <h3 class="docs__title">{{ doc.title }}</h3>
           <p class="docs__text">{{ doc.text }}</p>
         </li>
       {% endfor %}
     </ul>
+    <aside class="service glass glass--strong">
+      <h3 class="service__title">{{ home.service.title }}</h3>
+      <p class="service__text">{{ home.service.text }}</p>
+      <a class="button button--glass" href="{{ home.service.url }}">Сервис и запчасти</a>
+    </aside>
   </div>
-  <aside class="service">
-    <h3 class="service__title">{{ home.service.title }}</h3>
-    <p class="service__text">{{ home.service.text }}</p>
-    <a class="service__link" href="{{ home.service.url }}">Сервис и запчасти {{ icon("arrow", "service__icon") }}</a>
-  </aside>
 </section>

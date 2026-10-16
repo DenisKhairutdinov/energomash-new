@@ -1,0 +1,408 @@
+@use 'mixins' as *;
+
+// Наличие и каталог по назначению: полноэкранные главы. Без линий и полосок: разделение только пространством, стеклом и фоном.
+@layer sections {
+  // Наличие: кадр на весь экран, поверх стекло (заголовок, стрелки, название модели)
+  .stock {
+    position: relative;
+
+    @include theme-dark;
+  }
+
+  .stock__viewport {
+    position: relative;
+    inline-size: 100%;
+    block-size: 100svh;
+    min-block-size: 40rem;
+    overflow: clip;
+    background: var(--ink);
+    isolation: isolate;
+  }
+
+  // Слайды лежат стопкой; новый выезжает шторкой справа налево, ушедший держится до конца выезда
+  .stock__slide {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+    clip-path: inset(0 0 0 100%);
+    transition:
+      clip-path 0s 1.1s,
+      visibility 0s 1.1s;
+  }
+
+  .stock__slide.is-active {
+    z-index: 2;
+    visibility: visible;
+    clip-path: inset(0);
+    transition: clip-path 1.1s var(--ease-io);
+  }
+
+  .stock__slide::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: '';
+    background:
+      linear-gradient(to bottom, oklch(17.5% 0.012 282deg / 70%), transparent 40%),
+      linear-gradient(to top, oklch(17.5% 0.012 282deg / 65%), transparent 42%);
+  }
+
+  .stock__image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transform: scale(1.14);
+    transition: transform 2.8s var(--ease-out);
+  }
+
+  .stock__slide.is-active .stock__image {
+    transform: scale(1);
+  }
+
+  .stock__head {
+    position: absolute;
+    inset-block-start: calc(var(--header-h) + 1rem);
+    inset-inline-start: var(--gutter);
+    z-index: 5;
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    max-inline-size: min(30rem, calc(100% - 2 * var(--gutter)));
+    padding: 1.5rem 1.75rem 1.75rem;
+  }
+
+  .stock__title {
+    font-size: clamp(2.25rem, 1rem + 3.4vw, 4.75rem);
+    font-weight: 200;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .stock__count {
+    font-size: var(--fs-m);
+  }
+
+  .stock__count strong {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    font-weight: 300;
+    color: var(--accent);
+  }
+
+  .stock__lead {
+    display: none;
+    font-size: var(--fs-s);
+    color: var(--fg-2);
+  }
+
+  .stock__nav {
+    position: absolute;
+    inset-block-start: calc(var(--header-h) + 1rem);
+    inset-inline-end: var(--gutter);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+  }
+
+  .stock__arrow {
+    display: grid;
+    place-items: center;
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    color: var(--paper);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    transition: background-color 0.3s;
+  }
+
+  .stock__arrow:hover,
+  .stock__arrow:focus-visible {
+    background: var(--accent-deep);
+  }
+
+  .stock__arrow svg {
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
+  }
+
+  .stock__position {
+    padding-inline: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg-2);
+  }
+
+  // Панель с названием модели: слева внизу, по наведению раскрывает характеристики
+  .stock__panel {
+    position: absolute;
+    inset-block-end: clamp(1rem, 3vw, 2.5rem);
+    inset-inline-start: var(--gutter);
+    z-index: 3;
+    display: grid;
+    gap: 0.9rem;
+    inline-size: min(34rem, calc(100% - 2 * var(--gutter)));
+    padding: 1.25rem 1.5rem 1.5rem;
+    color: var(--paper);
+    text-decoration: none;
+  }
+
+  .stock__badge {
+    justify-self: start;
+    padding: 0.3rem 0.6rem;
+    color: var(--paper);
+    background: var(--glass-accent);
+  }
+
+  .stock__panel-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.2rem 1rem;
+    align-items: end;
+  }
+
+  .stock__type {
+    grid-column: 1;
+    font-size: var(--fs-s);
+    color: var(--fg-2);
+  }
+
+  .stock__model {
+    grid-column: 1;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1rem + 2.6vw, 3.5rem);
+    font-weight: 200;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .stock__panel-icon {
+    grid-row: 1 / 3;
+    grid-column: 2;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    color: var(--accent);
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .stock__panel:hover .stock__panel-icon {
+    transform: translateX(0.4rem);
+  }
+
+  .stock__details {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.6s var(--ease-out);
+  }
+
+  .stock__specs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem 1.5rem;
+    min-block-size: 0;
+    overflow: hidden;
+  }
+
+  .stock__panel:hover .stock__details,
+  .stock__panel:focus-visible .stock__details {
+    grid-template-rows: 1fr;
+  }
+
+  @media (hover: none) {
+    .stock__details {
+      grid-template-rows: 1fr;
+    }
+  }
+
+  .stock__spec {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .stock__spec-label {
+    color: var(--fg-2);
+  }
+
+  .stock__spec-value {
+    font-weight: 500;
+  }
+
+  .stock__slide--rest {
+    display: grid;
+    background:
+      radial-gradient(60% 70% at 30% 40%, oklch(61% 0.145 40deg / 28%), transparent), var(--ink);
+  }
+
+  .stock__rest {
+    display: grid;
+    gap: 1rem;
+    place-content: center;
+    padding: 2rem;
+    color: var(--paper);
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .stock__rest-label {
+    color: var(--fg-2);
+  }
+
+  .stock__rest-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-title);
+    font-weight: 200;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .stock__rest-icon {
+    inline-size: 3rem;
+    block-size: 3rem;
+    margin-inline: auto;
+    color: var(--accent);
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .stock__rest:hover .stock__rest-icon {
+    transform: translateX(0.75rem);
+  }
+
+  @media (width >= 900px) {
+    .stock__lead {
+      display: block;
+    }
+  }
+
+  // Каталог по назначению: фон главы меняется за строкой, список лежит на стеклянной панели
+  .purposes {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-block-size: 100svh;
+    padding-block: calc(var(--section-y) * 0.7);
+    overflow: clip;
+    isolation: isolate;
+
+    @include theme-dark;
+  }
+
+  .purposes__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .purposes__media::after {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    content: '';
+    background:
+      linear-gradient(
+        to right,
+        oklch(17.5% 0.012 282deg / 80%),
+        oklch(17.5% 0.012 282deg / 15%) 75%
+      ),
+      linear-gradient(to top, oklch(17.5% 0.012 282deg / 55%), transparent 45%);
+  }
+
+  .purposes__img {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    clip-path: inset(0 0 100%);
+    transition:
+      clip-path 0s 1.2s,
+      visibility 0s 1.2s;
+  }
+
+  .purposes__img.is-active {
+    z-index: 2;
+    visibility: visible;
+    clip-path: inset(0);
+    transition: clip-path 1.2s var(--ease-io);
+  }
+
+  .purposes__panel {
+    display: grid;
+    gap: 1.75rem;
+    justify-items: start;
+    max-inline-size: 46rem;
+    padding: clamp(1.5rem, 3vw, 2.75rem);
+  }
+
+  .purposes__head {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .purposes__head .section-title {
+    font-size: var(--fs-title-s);
+  }
+
+  .purposes__text {
+    max-inline-size: 28rem;
+    color: var(--fg-2);
+  }
+
+  .purposes__list {
+    display: grid;
+    gap: 0.25rem;
+    inline-size: 100%;
+  }
+
+  .purposes__link {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    color: inherit;
+    text-decoration: none;
+    transition:
+      background-color 0.5s var(--ease-out),
+      padding-inline 0.6s var(--ease-out);
+  }
+
+  .purposes__name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 0.8rem + 2.1vw, 2.75rem);
+    font-weight: 200;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .purposes__count {
+    color: var(--fg-2);
+    transition: color 0.3s;
+  }
+
+  .purposes__icon {
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
+    color: var(--accent);
+    transition:
+      transform 0.5s var(--ease-out),
+      color 0.3s;
+  }
+
+  .purposes__link:hover,
+  .purposes__link:focus-visible,
+  .purposes__link.is-active {
+    padding-inline: 1.6rem 1rem;
+    background: var(--glass-accent);
+  }
+
+  .purposes__link:hover .purposes__count,
+  .purposes__link.is-active .purposes__count {
+    color: var(--paper);
+  }
+
+  .purposes__link:hover .purposes__icon,
+  .purposes__link.is-active .purposes__icon {
+    color: var(--paper);
+    transform: translateX(0.35rem);
+  }
+}

@@ -1,0 +1,131 @@
+@use 'mixins' as *;
+
+@layer sections {
+  .footer {
+    position: relative;
+    overflow: clip;
+
+    @include theme-dark;
+
+    background: oklch(14% 0.012 282deg);
+  }
+
+  // Огромное слово и чертёж цистерны над реквизитами
+  .footer__mega {
+    position: relative;
+    padding-block: clamp(3rem, 8vw, 8rem) 0;
+    padding-inline: var(--gutter);
+    overflow: clip;
+  }
+
+  .footer__word {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--fs-mega);
+    font-weight: 200;
+    line-height: 0.82;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+
+  .footer__drawing {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-end: var(--gutter);
+    inline-size: min(52%, 46rem);
+    color: var(--accent);
+    opacity: 0.9;
+  }
+
+  .footer__grid {
+    display: grid;
+    gap: 2.5rem var(--gap);
+    padding-block: clamp(3rem, 6vw, 5rem);
+  }
+
+  .footer__brand {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+    justify-items: start;
+  }
+
+  .footer__logo img {
+    inline-size: 11rem;
+  }
+
+  .footer__lead {
+    max-inline-size: 18rem;
+    color: var(--fg-2);
+  }
+
+  .footer__phone {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    font-weight: 200;
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  .footer__mail {
+    color: var(--fg-2);
+  }
+
+  .footer__title {
+    margin-block-end: 1rem;
+    color: var(--accent);
+  }
+
+  .footer__list {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .footer__details {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .footer__details dt {
+    color: var(--fg-2);
+  }
+
+  .footer__details dd {
+    color: var(--fg);
+  }
+
+  .footer__more {
+    margin-block-start: 1rem;
+  }
+
+  .footer__legal {
+    display: grid;
+    gap: 0.75rem 2rem;
+    padding-block: 1.5rem 5rem;
+    font-size: var(--fs-s);
+    color: var(--fg-2);
+  }
+
+  .footer__legal ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+  }
+
+  @media (width >= 700px) {
+    .footer__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (width >= 1100px) {
+    .footer__grid {
+      grid-template-columns: 1.3fr repeat(3, 1fr);
+    }
+
+    .footer__legal {
+      grid-template-columns: 1fr auto;
+    }
+  }
+}

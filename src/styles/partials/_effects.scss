@@ -1,0 +1,186 @@
+@use 'mixins' as *;
+
+// Переходы между страницами (MPA View Transitions). Правило @view-transition должно стоять вне слоёв.
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root) {
+    animation: vt-out 0.55s var(--ease-io) both;
+  }
+
+  ::view-transition-new(root) {
+    animation: vt-in 0.8s var(--ease-out) both;
+  }
+
+  @keyframes vt-out {
+    to {
+      opacity: 0.4;
+      transform: translateY(-3rem);
+    }
+  }
+
+  @keyframes vt-in {
+    from {
+      clip-path: inset(100% 0 0);
+    }
+
+    to {
+      clip-path: inset(0);
+    }
+  }
+}
+
+@layer components {
+  // Чертежи техники со старого сайта: силуэты красятся цветом секции через mask
+  .drawing {
+    display: block;
+    aspect-ratio: var(--ratio, 3 / 1);
+    background: currentcolor;
+    mask: var(--drawing) center / contain no-repeat;
+  }
+
+  .drawing--ppc {
+    --drawing: url('/src/assets/icons/ppc.svg');
+    --ratio: 304 / 100;
+  }
+
+  .drawing--chassis {
+    --drawing: url('/src/assets/icons/shassi.svg');
+    --ratio: 260 / 100;
+  }
+
+  // Зерно: статичный шум поверх страницы, без анимации
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 0.055;
+  }
+
+  // Прелоадер: чертёж «вычерчивается» слева направо, счётчик идёт до 100
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    grid-template-rows: 1fr auto;
+    color: var(--paper);
+    background: var(--ink);
+    clip-path: inset(0);
+  }
+
+  .has-loader .loader {
+    display: grid;
+  }
+
+  .loader__stage {
+    display: grid;
+    place-items: center;
+    padding: var(--gutter);
+  }
+
+  .loader__drawing {
+    position: relative;
+    inline-size: min(88vw, 62rem);
+    color: var(--accent);
+  }
+
+  .loader__drawing .drawing {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  .loader__foot {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    justify-content: space-between;
+    padding: var(--gutter);
+  }
+
+  .loader__logo {
+    inline-size: clamp(8rem, 14vw, 12rem);
+  }
+
+  .loader__count {
+    font-family: var(--font-display);
+    font-size: var(--fs-number);
+    font-weight: 200;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.8;
+  }
+
+  // Индикатор глав: вертикальный список справа, текущая глава отмечена квадратом
+  .chapters {
+    position: fixed;
+    inset-block-start: 50%;
+    inset-inline-end: clamp(0.75rem, 1.6vw, 1.75rem);
+    z-index: 700;
+    display: none;
+    gap: 0.9rem;
+    color: var(--paper);
+    mix-blend-mode: difference;
+    transform: translateY(-50%);
+  }
+
+  .chapters__item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: flex-end;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    opacity: 0.45;
+    transition: opacity 0.4s;
+  }
+
+  .chapters__name {
+    max-inline-size: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition:
+      max-inline-size 0.5s var(--ease-out),
+      opacity 0.4s;
+  }
+
+  .chapters__item::after {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    content: '';
+    background: currentcolor;
+    transition:
+      inline-size 0.4s var(--ease-out),
+      block-size 0.4s var(--ease-out);
+  }
+
+  .chapters__item.is-active {
+    opacity: 1;
+  }
+
+  .chapters__item.is-active::after {
+    inline-size: 0.8rem;
+    block-size: 0.8rem;
+    background: var(--accent);
+  }
+
+  .chapters:hover .chapters__name,
+  .chapters__item.is-active .chapters__name {
+    max-inline-size: 14rem;
+    opacity: 1;
+  }
+
+  @media (width >= 1100px) {
+    .chapters {
+      display: grid;
+    }
+  }
+}

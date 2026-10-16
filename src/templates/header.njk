@@ -1,3 +1,4 @@
+{# Шапка: логотип, мега-меню, инструменты (поиск, почта, Max, VK), телефон и звонок. Ссылки Max и VK в home.json, ключ contacts: заменить адресами страниц завода. #}
 {% from "icons.njk" import icon %}
 <header class="header" data-header>
   <div class="header__bar container">
@@ -17,9 +18,45 @@
     <div class="header__panel" id="site-menu" data-menu-panel>
       {% include "menu.njk" %}
       <div class="header__contacts">
+        <div class="header__tools">
+          <button
+            class="header__tool"
+            type="button"
+            aria-expanded="false"
+            aria-controls="site-search"
+            aria-label="Поиск по каталогу"
+            data-search-toggle
+          >
+            {{ icon("search", "header__tool-icon") }}
+          </button>
+          <a class="header__tool" href="mailto:{{ home.contacts.email }}" aria-label="Написать на почту {{ home.contacts.email }}">
+            <span class="mask-icon mask-icon--mail" aria-hidden="true"></span>
+          </a>
+          <a class="header__tool" href="{{ home.contacts.max }}" target="_blank" rel="noopener noreferrer" aria-label="Мы в Max">
+            <span class="mask-icon mask-icon--max" aria-hidden="true"></span>
+          </a>
+          <a class="header__tool" href="{{ home.contacts.vk }}" target="_blank" rel="noopener noreferrer" aria-label="Мы во ВКонтакте">
+            <span class="mask-icon mask-icon--vk" aria-hidden="true"></span>
+          </a>
+        </div>
         <a class="header__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
-        <button class="button button--accent button--compact" type="button" data-modal-open="call">Заказать звонок</button>
+        <button class="button button--compact" type="button" data-modal-open="call">Заказать звонок</button>
       </div>
     </div>
   </div>
+  <form class="header__search" id="site-search" action="/catalog.html" method="get" role="search" data-search>
+    <div class="header__search-inner container">
+      <label class="visually-hidden" for="site-search-input">Поиск по каталогу</label>
+      {{ icon("search", "header__search-icon") }}
+      <input
+        class="header__search-input"
+        id="site-search-input"
+        type="search"
+        name="q"
+        placeholder="Модель, назначение, объём"
+        autocomplete="off"
+      />
+      <button class="button button--compact" type="submit">Найти</button>
+    </div>
+  </form>
 </header>

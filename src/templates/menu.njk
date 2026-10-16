@@ -1,4 +1,6 @@
-{# currentPage задаётся на странице как «раздел» или «раздел/подраздел» #}
+{# currentPage задаётся на странице как «раздел» или «раздел/подраздел». #}
+{# Мега-меню как на старом сайте: панель на всю ширину; у каталога подразделы идут группами (заголовок «Все модели» и плитки), --i задаёт очерёдность появления ячеек. #}
+{% from "icons.njk" import icon %}
 {% set currentPath = (currentPage or "").split("/") %}
 <nav class="menu" aria-label="Основное меню">
   <ul class="menu__list">
@@ -11,20 +13,48 @@
           {% if item.id == currentPage %}aria-current="page"{% endif %}
         >{{ item.title }}</a>
         {% if children %}
-          <ul class="menu__dropdown">
-            {% for child in children %}
-              <li class="menu__subitem">
-                <a class="menu__sublink{{ ' menu__sublink--active' if child.id == currentPath[1] }}" href="{{ child.url }}{{ item.urlSuffix }}">{{ child.title }}</a>
-                {% if child.children %}
-                  <ul class="menu__group">
-                    {% for leaf in child.children %}
-                      <li><a class="menu__sublink" href="{{ leaf.url }}{{ item.urlSuffix }}">{{ leaf.title }}</a></li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
+          <div class="menu__dropdown">
+            <div class="menu__inner container{{ '' if item.catalog else ' menu__inner--plain' }}">
+              {% if item.catalog %}
+                <div class="menu__groups">
+                  {% for group in children %}
+                    <div class="menu__group">
+                      <a class="menu__group-head menu__cell" style="--i: {{ loop.index0 }}" href="{{ group.url }}{{ item.urlSuffix }}">
+                        <span>{{ group.title }}</span>
+                        <span class="menu__group-all">Все модели {{ icon("arrow", "menu__arrow") }}</span>
+                      </a>
+                      <ul class="menu__tiles">
+                        {% for leaf in group.children %}
+                          <li class="menu__cell" style="--i: {{ loop.index + 1 }}">
+                            <a class="menu__tile" href="{{ leaf.url }}{{ item.urlSuffix }}">
+                              <span>{{ leaf.title }}</span>{{ icon("arrow", "menu__arrow") }}
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% endfor %}
+                </div>
+                <a class="menu__feature" href="/catalog.html?in-stock=1" tabindex="-1" aria-hidden="true">
+                  <img src="/src/assets/models/IMG_4530.webp" width="2400" height="1600" alt="" loading="lazy" />
+                  <span class="menu__feature-caption">
+                    <span class="mono">На складе</span>
+                    <span class="menu__feature-title">{{ home.catalogTotals.inStock }} единицы</span>
+                  </span>
+                </a>
+              {% else %}
+                <ul class="menu__tiles">
+                  {% for child in children %}
+                    <li class="menu__cell" style="--i: {{ loop.index0 }}">
+                      <a class="menu__tile{{ ' is-current' if child.id == currentPath[1] }}" href="{{ child.url }}{{ item.urlSuffix }}">
+                        <span>{{ child.title }}</span>{{ icon("arrow", "menu__arrow") }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          </div>
         {% endif %}
       </li>
     {% endfor %}

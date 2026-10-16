@@ -1,23 +1,48 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru"{% if pageClass %} data-page="{{ pageClass }}"{% endif %}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ pageTitleFull or (pageTitle + " — Энергомаш") }}</title>
     {% if pageDescription %}<meta name="description" content="{{ pageDescription }}" />{% endif %}
-    <meta name="theme-color" content="#1b2430" />
+    <meta name="theme-color" content="#0d0e13" />
     <link rel="icon" href="/src/assets/favicon.svg" type="image/svg+xml" />
-    <script>document.documentElement.classList.add('js')</script>
+    {# Прелоадер показываем на главной один раз за сессию #}
+    <script>
+      ;(function () {
+        var root = document.documentElement
+        root.classList.add('js')
+        try {
+          if (root.dataset.page === 'home' && !sessionStorage.getItem('loaded')) root.classList.add('has-loader')
+        } catch (error) {
+          /* без sessionStorage прелоадер не показываем */
+        }
+      })()
+    </script>
     <link rel="stylesheet" href="/src/styles/main.scss" />
     <script type="module" src="/src/scripts/main.ts"></script>
   </head>
   <body class="page{% if pageClass %} page--{{ pageClass }}{% endif %}">
     <a class="skip-link" href="#main">Перейти к содержимому</a>
+    {% if pageClass == "home" %}
+      <div class="loader" data-loader aria-hidden="true">
+        <div class="loader__stage">
+          <div class="loader__drawing">
+            <span class="drawing drawing--ppc" data-loader-drawing></span>
+          </div>
+        </div>
+        <div class="loader__foot">
+          <img class="loader__logo" src="/src/assets/images/logo.svg" width="176" height="27" alt="" />
+          <span class="loader__count" data-loader-count>000</span>
+        </div>
+      </div>
+    {% endif %}
     {% include "header.njk" %}
     <main id="main">
       {% block content %}{% endblock %}
     </main>
     {% include "footer.njk" %}
     {% include "modal-request.njk" %}
+    <div class="grain" aria-hidden="true"></div>
   </body>
 </html>

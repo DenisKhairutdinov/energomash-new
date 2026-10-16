@@ -1,28 +1,38 @@
+{# Каталог по назначению: фон главы меняется за строкой списка (наведение или фокус). Без наведения (касание) остаётся первое фото. #}
+{# Скрипт: scripts/modules/purposes.ts. Чертежи в подкатегориях не используем. #}
 {% from "icons.njk" import icon %}
-<section class="purposes container" aria-labelledby="purposes-title">
-  <div class="section-head">
-    <h2 class="section-title" id="purposes-title">Каталог<br />по назначению</h2>
-    <p class="section-head__text">{{ home.catalogTotals.total }} моделей. Выберите груз, а подходящую цистерну найдём в каталоге.</p>
-  </div>
-  <ul class="purposes__grid">
+<section class="purposes" aria-labelledby="purposes-title" data-purposes data-chapter="Назначение">
+  <div class="purposes__media" aria-hidden="true">
     {% for item in home.purposes %}
-      <li class="purposes__item{{ ' purposes__item--wide' if item.wide }}">
-        <a class="purposes__link" href="{{ item.url }}">
-          <img
-            class="purposes__image"
-            src="/src/assets/models/{{ item.photo }}"
-            width="2400"
-            height="1600"
-            alt=""
-            loading="lazy"
-            decoding="async"
-          />
-          <span class="purposes__caption">
-            <span class="purposes__name">{{ item.title }}</span>
-            <span class="purposes__count">{{ item.count }} моделей {{ icon("arrow", "purposes__icon") }}</span>
-          </span>
-        </a>
-      </li>
+      <img
+        class="purposes__img{{ ' is-active' if loop.first }}"
+        src="/src/assets/models/{{ item.photo }}"
+        width="2400"
+        height="1600"
+        alt=""
+        {% if not loop.first %}loading="lazy"{% endif %}
+        data-purposes-img
+      />
     {% endfor %}
-  </ul>
+  </div>
+  <div class="purposes__inner container">
+    <div class="purposes__panel glass glass--strong">
+      <div class="purposes__head">
+        <h2 class="section-title" id="purposes-title" data-split>Каталог<br />по назначению</h2>
+        <p class="purposes__text">{{ home.catalogTotals.total }} моделей. Выберите груз, а подходящую технику найдём в каталоге.</p>
+      </div>
+      <ul class="purposes__list">
+        {% for item in home.purposes %}
+          <li class="purposes__item">
+            <a class="purposes__link" href="{{ item.url }}" data-purposes-item>
+              <span class="purposes__name">{{ item.title }}</span>
+              <span class="purposes__count mono">{{ item.count }}</span>
+              {{ icon("arrow", "purposes__icon") }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+      <a class="button" href="/catalog.html">Весь каталог</a>
+    </div>
+  </div>
 </section>

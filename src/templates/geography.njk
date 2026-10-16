@@ -1,8 +1,10 @@
-{# География поставок. Разметку карты (регионы и метка завода) отдаёт geography-map.njk, регионы и цифры в ней — данные-заглушки #}
-<section class="geography" aria-labelledby="geography-title" data-geography>
+{# География поставок. Отображение карты как на старом сайте: серые регионы, регионы с поставками наливаются акцентом по очереди (с запада на восток), #}
+{# при наведении на любой регион всплывает стеклянная карточка у курсора. Разметку карты (регионы и метка завода) отдаёт geography-map.njk, #}
+{# регионы и цифры в ней — данные-заглушки. Скрипт: scripts/modules/geography.ts #}
+<section class="geography" aria-labelledby="geography-title" data-geography data-chapter="География">
   <div class="geography__layout container">
     <div class="geography__text">
-      <h2 class="section-title" id="geography-title">География<br />поставок</h2>
+      <h2 class="section-title" id="geography-title" data-split>География<br />поставок</h2>
       <p class="section-head__text">
         Техника «Энергомаш» работает от Урала до Дальнего Востока. Наведите на регион, чтобы увидеть детали.
       </p>
@@ -24,6 +26,7 @@
     <div class="geography__stage" data-geography-stage>
       {% include "geography-map.njk" %}
       <div class="geography__tooltip" role="status" hidden data-geography-tooltip>
+        <span class="geography__tooltip-label mono" data-geography-tooltip-label></span>
         <strong class="geography__tooltip-name" data-geography-tooltip-name></strong>
         <span class="geography__tooltip-units" data-geography-tooltip-units></span>
         <span class="geography__tooltip-cities" data-geography-tooltip-cities></span>

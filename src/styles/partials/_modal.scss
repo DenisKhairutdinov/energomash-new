@@ -1,0 +1,113 @@
+@layer components {
+  // Окно заявки: прямоугольное, слева акцентная панель, справа форма
+  .modal {
+    inline-size: min(100% - 2rem, 62rem);
+    max-block-size: calc(100svh - 2rem);
+    padding: 0;
+    overflow: auto;
+    color: var(--fg);
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+
+  .modal::backdrop {
+    background: oklch(17.5% 0.012 282deg / 72%);
+    backdrop-filter: blur(6px);
+  }
+
+  .modal[open] {
+    animation: modal-in 0.7s var(--ease-out);
+  }
+
+  @keyframes modal-in {
+    from {
+      clip-path: inset(100% 0 0);
+    }
+
+    to {
+      clip-path: inset(0);
+    }
+  }
+
+  .modal__panel {
+    position: relative;
+    display: grid;
+  }
+
+  .modal__close {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--line);
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+
+  .modal__close:hover {
+    color: var(--paper);
+    background: var(--accent-deep);
+    border-color: var(--accent-deep);
+  }
+
+  .modal__close svg {
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
+  }
+
+  .modal__aside {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    color: var(--paper);
+    background: var(--accent-deep);
+  }
+
+  .modal__title {
+    font-size: var(--fs-xl);
+    font-weight: 200;
+    text-transform: uppercase;
+  }
+
+  .modal__text {
+    color: oklch(96.9% 0.003 107deg / 85%);
+  }
+
+  .modal__model strong {
+    font-weight: 500;
+  }
+
+  .modal__phone {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    font-weight: 200;
+    color: var(--paper);
+    text-decoration: none;
+  }
+
+  .modal__form {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    padding: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .modal__done {
+    padding: 1rem;
+    background: var(--line);
+  }
+
+  @media (width >= 800px) {
+    .modal__panel {
+      grid-template-columns: 0.9fr 1.1fr;
+    }
+  }
+}

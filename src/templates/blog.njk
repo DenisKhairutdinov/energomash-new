@@ -1,31 +1,50 @@
+{# Блог: мозаика. Главная статья на весь кадр со стеклянной подписью, остальные тремя стеклянными карточками с фото. #}
 {% from "icons.njk" import icon %}
-<section class="blog container" aria-labelledby="blog-title">
-  <div class="section-head">
-    <h2 class="section-title" id="blog-title">Блог</h2>
-    <p class="section-head__text">Статьи завода о цистернах, сервисе и эксплуатации техники.</p>
-    <a class="button button--ink" href="/blog.html">Смотреть все</a>
+<section class="blog" aria-labelledby="blog-title" data-chapter="Блог">
+  <div class="blog__layout container">
+    <div class="section-head">
+      <h2 class="section-title" id="blog-title" data-split>Блог</h2>
+      <p class="section-head__text">Статьи завода о цистернах, сервисе и эксплуатации техники.</p>
+      <a class="button" href="/blog.html">Все статьи</a>
+    </div>
+    <div class="blog__mosaic">
+      {% for post in home.posts %}
+        {% if loop.first %}
+          <a class="news news--lead" href="{{ post.url }}">
+            <span class="news__frame">
+              <img class="news__image" src="/src/assets/images/{{ post.image }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
+            </span>
+            <span class="news__caption glass glass--strong">
+              <span class="news__meta mono">
+                <time datetime="{{ post.datetime }}">{{ post.date }}</time>
+                <span>{{ post.rubric }}</span>
+              </span>
+              <span class="news__title">{{ post.title }}</span>
+              <span class="news__excerpt">{{ post.excerpt }}</span>
+              {{ icon("arrow", "news__arrow") }}
+            </span>
+          </a>
+        {% endif %}
+      {% endfor %}
+      <div class="blog__side">
+        {% for post in home.posts %}
+          {% if not loop.first %}
+            <a class="news news--row glass" href="{{ post.url }}">
+              <span class="news__thumb">
+                <img class="news__image" src="/src/assets/images/{{ post.image }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
+              </span>
+              <span class="news__body">
+                <span class="news__meta mono">
+                  <time datetime="{{ post.datetime }}">{{ post.date }}</time>
+                  <span>{{ post.rubric }}</span>
+                </span>
+                <span class="news__title">{{ post.title }}</span>
+              </span>
+              {{ icon("arrow", "news__arrow") }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
   </div>
-  <ul class="blog__grid">
-    {% for post in home.posts %}
-      <li class="blog__item{{ ' blog__item--lead' if loop.first }}">
-        <a class="blog__link" href="{{ post.url }}">
-          <img
-            class="blog__image"
-            src="/src/assets/images/{{ post.image }}"
-            width="1024"
-            height="768"
-            alt=""
-            loading="lazy"
-            decoding="async"
-          />
-          <span class="blog__meta">
-            <time datetime="{{ post.datetime }}">{{ post.date }}</time>
-            <span>{{ post.rubric }}</span>
-          </span>
-          <span class="blog__title">{{ post.title }}</span>
-          {% if loop.first %}<span class="blog__excerpt">{{ post.excerpt }}</span>{% endif %}
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
 </section>

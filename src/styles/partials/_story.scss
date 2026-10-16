@@ -1,0 +1,352 @@
+@use 'mixins' as *;
+
+// Цифры, отгрузки, путь заказа. Фон секций с фото: слой .xxx__bg раскрывается рамкой при прокрутке (scripts/modules/reveal.ts),
+// стеклянные карточки лежат отдельно от него, поэтому размытие видит фото.
+@layer sections {
+  .facts__bg,
+  .process__bg,
+  .docs__bg,
+  .faq__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: var(--ink);
+  }
+
+  .facts__bg img,
+  .process__bg img,
+  .docs__bg img,
+  .faq__bg img {
+    position: absolute;
+    inset: -10% 0;
+    inline-size: 100%;
+    block-size: 120%;
+    object-fit: cover;
+  }
+
+  .facts__bg::after,
+  .process__bg::after,
+  .docs__bg::after,
+  .faq__bg::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background: linear-gradient(
+      to top,
+      oklch(17.5% 0.012 282deg / 82%),
+      oklch(17.5% 0.012 282deg / 45%)
+    );
+  }
+
+  // Цифры: стеклянные карточки со смещением по высоте
+  .facts {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-block-size: 90svh;
+    padding-block: var(--section-y);
+    overflow: clip;
+    isolation: isolate;
+
+    @include theme-dark;
+  }
+
+  .facts__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .facts__item {
+    display: grid;
+    gap: 1.25rem;
+    align-content: space-between;
+    min-block-size: 13rem;
+    padding: 1.25rem 1.4rem 1.5rem;
+  }
+
+  .facts__label {
+    max-inline-size: 14rem;
+    color: var(--fg-2);
+  }
+
+  .facts__value {
+    font-family: var(--font-display);
+    font-size: clamp(3.25rem, 1.2rem + 5.2vw, 7.5rem);
+    font-weight: 200;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.9;
+  }
+
+  .facts__suffix {
+    font-size: 0.4em;
+  }
+
+  @media (width >= 900px) {
+    .facts__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .facts__item {
+      min-block-size: 18rem;
+    }
+
+    .facts__item:nth-child(even) {
+      margin-block-start: clamp(2rem, 6vw, 6rem);
+    }
+  }
+
+  // Отгрузки
+  .shipments {
+    position: relative;
+    padding-block: var(--section-y);
+
+    @include theme-dark;
+
+    background:
+      radial-gradient(50% 60% at 85% 20%, oklch(61% 0.145 40deg / 18%), transparent),
+      radial-gradient(45% 55% at 10% 85%, oklch(55% 0.04 250deg / 22%), transparent), var(--ink);
+  }
+
+  .shipments__head {
+    display: grid;
+    gap: var(--gap);
+    align-items: end;
+    margin-block-end: clamp(2rem, 4vw, 4rem);
+  }
+
+  .shipments__head > .button {
+    justify-self: start;
+  }
+
+  .shipments__viewport {
+    inline-size: min(100% - 2 * var(--gutter), var(--max));
+    margin-inline: auto;
+  }
+
+  .shipments__grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .shipments__link {
+    position: relative;
+    display: block;
+    block-size: 100%;
+    overflow: hidden;
+    color: var(--paper);
+    text-decoration: none;
+    background: var(--ink);
+  }
+
+  .shipments__frame {
+    display: block;
+    block-size: 100%;
+    overflow: hidden;
+  }
+
+  .shipments__image {
+    inline-size: 100%;
+    block-size: 100%;
+    min-block-size: 18rem;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .shipments__where {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 0.75rem;
+    padding: 0.5rem 0.8rem;
+    color: var(--paper);
+  }
+
+  .shipments__info {
+    position: absolute;
+    inset-block-end: 0.75rem;
+    inset-inline-start: 0.75rem;
+    display: grid;
+    gap: 0.2rem;
+    inline-size: min(calc(100% - 1.5rem), 30rem);
+    padding: 1.1rem 1.4rem 1.3rem;
+    color: var(--paper);
+  }
+
+  .shipments__type {
+    color: var(--fg-2);
+  }
+
+  .shipments__model {
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    font-weight: 200;
+    text-transform: uppercase;
+  }
+
+  .shipments__details {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.6s var(--ease-out);
+  }
+
+  .shipments__specs {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 0.5rem 1.5rem;
+    justify-content: start;
+    min-block-size: 0;
+    overflow: hidden;
+  }
+
+  .shipments__link:hover .shipments__details,
+  .shipments__link:focus-visible .shipments__details {
+    grid-template-rows: 1fr;
+  }
+
+  .shipments__link:hover .shipments__specs {
+    padding-block-start: 0.85rem;
+  }
+
+  @media (hover: none) {
+    .shipments__details {
+      grid-template-rows: 1fr;
+    }
+
+    .shipments__specs {
+      padding-block-start: 0.85rem;
+    }
+  }
+
+  .shipments__spec {
+    display: grid;
+    gap: 0.05rem;
+    font-size: var(--fs-s);
+  }
+
+  .shipments__spec .mono {
+    color: var(--fg-2);
+  }
+
+  @media (width >= 900px) {
+    .shipments__head {
+      grid-template-columns: 1.3fr 1fr auto;
+    }
+
+    .shipments__head > .button {
+      justify-self: end;
+    }
+  }
+
+  // Горизонтальная «киноплёнка» отгрузок: пин и сдвиг в cinema.ts, на телефоне обычная колонка
+  @media (width >= 900px) {
+    .shipments {
+      padding-block: 0;
+    }
+
+    .shipments__pin {
+      display: grid;
+      align-content: center;
+      min-block-size: 100svh;
+      padding-block: calc(var(--header-h) + 1rem) 2rem;
+      overflow: clip;
+    }
+
+    .shipments__head {
+      inline-size: min(100% - 2 * var(--gutter), var(--max));
+      margin-block-end: 2rem;
+      margin-inline: auto;
+    }
+
+    .shipments__viewport {
+      inline-size: 100%;
+      max-inline-size: none;
+      margin: 0;
+      overflow: clip;
+    }
+
+    .shipments__grid {
+      display: flex;
+      gap: 1rem;
+      inline-size: max-content;
+      padding-inline: var(--gutter);
+      will-change: transform;
+    }
+
+    .shipments__item {
+      flex: none;
+      block-size: min(54svh, 36rem);
+      aspect-ratio: 4 / 3;
+    }
+
+    .shipments__image {
+      min-block-size: 0;
+      aspect-ratio: auto;
+    }
+  }
+
+  // Путь заказа: стеклянные карточки лесенкой
+  .process {
+    position: relative;
+    padding-block: var(--section-y);
+    overflow: clip;
+    isolation: isolate;
+
+    @include theme-dark;
+  }
+
+  .process__list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .process__item {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: 1.4rem 1.4rem 1.6rem;
+  }
+
+  .process__number {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 1.5rem + 3vw, 5rem);
+    font-weight: 200;
+    line-height: 0.9;
+    color: var(--accent);
+  }
+
+  .process__title {
+    font-family: var(--font-text);
+    font-size: var(--fs-m);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .process__text {
+    font-size: var(--fs-s);
+    line-height: 1.6;
+    color: var(--fg-2);
+  }
+
+  @media (width >= 700px) {
+    .process__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 1200px) {
+    .process__list {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .process__item:nth-child(even) {
+      margin-block-start: 4rem;
+    }
+
+    .process__item:nth-child(3) {
+      margin-block-start: 8rem;
+    }
+  }
+}
