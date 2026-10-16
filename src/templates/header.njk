@@ -29,6 +29,9 @@
           >
             {{ icon("search", "header__tool-icon") }}
           </button>
+          <button class="header__tool" type="button" aria-pressed="false" aria-label="Светлая тема" data-theme-toggle>
+            <span class="mask-icon mask-icon--theme" aria-hidden="true"></span>
+          </button>
           <a class="header__tool" href="mailto:{{ home.contacts.email }}" aria-label="Написать на почту {{ home.contacts.email }}">
             <span class="mask-icon mask-icon--mail" aria-hidden="true"></span>
           </a>
@@ -50,13 +53,20 @@
       {{ icon("search", "header__search-icon") }}
       <input
         class="header__search-input"
+        data-search-input
         id="site-search-input"
         type="search"
         name="q"
         placeholder="Модель, назначение, объём"
         autocomplete="off"
+        role="combobox"
+        aria-expanded="false"
+        aria-controls="search-results"
+        aria-autocomplete="list"
       />
       <button class="button button--compact" type="submit">Найти</button>
     </div>
+    {# Подсказки: до восьми моделей и строка «все результаты» (scripts/modules/search.ts) #}
+    <div class="search__results" id="search-results" role="listbox" aria-label="Подсказки поиска" hidden data-search-results></div>
   </form>
 </header>

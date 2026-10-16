@@ -4,10 +4,10 @@
 // поиск, почта, Max, VK, телефон и звонок. Цвета берутся из переменных варианта: --hdr-bg, --hdr-fg, --hdr-fg-2, --hdr-cell, --hdr-hover.
 @layer sections {
   .header {
-    --hdr-bg: #0f0f10b3;
-    --hdr-bg-solid: #0f0f10e6;
+    --hdr-bg: #110f0db3;
+    --hdr-bg-solid: #110f0de6;
     --hdr-fg: var(--paper);
-    --hdr-fg-2: #f5f5f3b3;
+    --hdr-fg-2: #f7f6f3b3;
     --hdr-cell: #ffffff0f;
     --hdr-hover: var(--accent-deep);
 
@@ -16,6 +16,9 @@
     inset-inline: var(--gutter);
     z-index: 600;
     color: var(--hdr-fg);
+
+    @include theme-dark-vars;
+
     transition: transform 0.7s var(--ease-out);
   }
 
@@ -38,7 +41,7 @@
     padding: 0.3rem 0.5rem 0.3rem 1.25rem;
     margin-inline: auto;
     background: var(--hdr-bg);
-    box-shadow: 0 14px 44px rgb(15 15 16 / 16%);
+    box-shadow: 0 14px 44px rgb(17 15 13 / 16%);
     backdrop-filter: blur(14px) saturate(1.5);
     transition: background-color 0.4s;
   }
@@ -140,6 +143,10 @@
     mask: var(--icon) center / contain no-repeat;
   }
 
+  .mask-icon--theme {
+    --icon: url('/src/assets/icons/theme.svg');
+  }
+
   .mask-icon--mail {
     --icon: url('/src/assets/icons/mail.svg');
   }
@@ -177,9 +184,10 @@
       visibility 0s 0.6s;
   }
 
+  // Открытая панель не обрезает подсказки, которые выпадают ниже неё
   .header.is-searching .header__search {
     visibility: visible;
-    clip-path: inset(0);
+    clip-path: inset(0 0 -32rem);
     transition:
       clip-path 0.6s var(--ease-out),
       visibility 0s;
@@ -196,7 +204,7 @@
     flex: none;
     inline-size: 1.25rem;
     block-size: 1.25rem;
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .header__search-input {
@@ -221,6 +229,67 @@
     color: var(--hdr-fg-2);
   }
 
+  // Подсказки поиска: список моделей под строкой, выбранная строка подсвечена
+  .search__results {
+    position: absolute;
+    inset-block-start: calc(100% + 0.5rem);
+    inset-inline: 0;
+    max-block-size: min(26rem, 70svh);
+    padding: 0.4rem;
+    overflow-y: auto;
+    background: #110f0df2;
+    box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 35%);
+    backdrop-filter: blur(14px) saturate(1.4);
+  }
+
+  .search__item,
+  .search__all {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1rem;
+    color: var(--hdr-fg);
+    text-decoration: none;
+    transition: background-color 0.25s;
+  }
+
+  .search__item:hover,
+  .search__all:hover,
+  .search__item[aria-selected='true'],
+  .search__all[aria-selected='true'] {
+    background: var(--hdr-cell);
+  }
+
+  .search__row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    min-inline-size: 0;
+  }
+
+  .search__name {
+    font-family: var(--font-display);
+    font-size: var(--fs-l);
+    font-weight: 300;
+    text-transform: uppercase;
+  }
+
+  .search__code,
+  .search__type {
+    font-size: var(--fs-xs);
+    color: var(--hdr-fg-2);
+  }
+
+  .search__all {
+    color: var(--accent-text);
+  }
+
+  .search__empty {
+    padding: 1rem;
+    color: var(--hdr-fg-2);
+  }
+
   // Меню
   .menu__list {
     display: grid;
@@ -239,7 +308,7 @@
 
   .menu__link--accent,
   .menu__link--active {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .menu__dropdown {
@@ -285,7 +354,7 @@
     align-items: center;
     font-size: var(--fs-xs);
     font-weight: 500;
-    color: var(--accent);
+    color: var(--accent-text);
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
@@ -342,7 +411,7 @@
 
     .menu__item:hover > .menu__link,
     .menu__item:focus-within > .menu__link {
-      color: var(--accent);
+      color: var(--accent-text);
     }
 
     // Панель мега-меню плавает под таблеткой и появляется мягко: прозрачность и сдвиг на несколько пикселей
@@ -352,7 +421,7 @@
       inset-inline: 0;
       visibility: hidden;
       padding: 0;
-      background: #0f0f10f2;
+      background: #110f0df2;
       box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 35%);
       opacity: 0;
       backdrop-filter: blur(14px) saturate(1.4);
@@ -466,7 +535,7 @@
     }
 
     .menu__tile.is-current {
-      color: var(--accent);
+      color: var(--accent-text);
     }
 
     .menu__group-head:hover .menu__arrow {

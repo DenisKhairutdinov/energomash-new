@@ -37,8 +37,8 @@
     inset: 0;
     z-index: -2;
     background:
-      linear-gradient(to bottom, rgb(15 15 16 / 80%), rgb(15 15 16 / 0%) 50%),
-      linear-gradient(to top, rgb(15 15 16 / 78%), rgb(15 15 16 / 0%) 52%);
+      linear-gradient(to bottom, rgb(17 15 13 / 80%), rgb(17 15 13 / 0%) 50%),
+      linear-gradient(to top, rgb(17 15 13 / 78%), rgb(17 15 13 / 0%) 52%);
   }
 
   .hero__window {
@@ -99,7 +99,7 @@
     max-inline-size: 32rem;
     font-size: var(--fs-m);
     line-height: 1.6;
-    color: rgb(245 245 243 / 88%);
+    color: rgb(247 246 243 / 88%);
   }
 
   .hero__actions {

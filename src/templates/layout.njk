@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ pageTitleFull or (pageTitle + " — Энергомаш") }}</title>
     {% if pageDescription %}<meta name="description" content="{{ pageDescription }}" />{% endif %}
-    <meta name="theme-color" content="#0f0f10" />
+    <meta name="theme-color" content="#110f0d" />
     <link rel="icon" href="/src/assets/favicon.svg" type="image/svg+xml" />
     {# Прелоадер показываем на главной один раз за сессию #}
     <script>
       ;(function () {
         var root = document.documentElement
         root.classList.add('js')
+        try {
+          var theme = localStorage.getItem('theme')
+          if (theme === 'light' || theme === 'dark') root.dataset.theme = theme
+        } catch (error) {
+          /* без localStorage остаётся тёмная тема */
+        }
         try {
           if (root.dataset.page === 'home' && !sessionStorage.getItem('loaded')) root.classList.add('has-loader')
         } catch (error) {

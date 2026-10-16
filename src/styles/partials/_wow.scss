@@ -28,7 +28,7 @@
   }
 
   .statement__text .word--accent {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .fill {
@@ -61,7 +61,7 @@
     font-weight: 200;
     font-variant-numeric: tabular-nums;
     line-height: 0.85;
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .fill__label {
@@ -98,7 +98,7 @@
   }
 
   .fill__level {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   @media (width >= 1000px) {

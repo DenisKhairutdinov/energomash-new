@@ -6,7 +6,7 @@
   .stock {
     padding-block: var(--section-y);
 
-    @include theme-dark;
+    @include theme-site;
   }
 
   .stock__top {
@@ -33,7 +33,7 @@
     font-family: var(--font-display);
     font-size: var(--fs-xl);
     font-weight: 300;
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .stock__controls {
@@ -54,7 +54,7 @@
     place-items: center;
     inline-size: 3.5rem;
     block-size: 3.5rem;
-    color: var(--paper);
+    color: var(--fg);
     cursor: pointer;
     background: var(--field-hover);
     border: 0;
@@ -216,7 +216,7 @@
     inset-inline-end: 1.25rem;
     inline-size: 1.5rem;
     block-size: 1.5rem;
-    color: var(--accent);
+    color: var(--accent-text);
     transition: transform 0.5s var(--ease-out);
   }
 
@@ -255,7 +255,7 @@
     inline-size: 3rem;
     block-size: 3rem;
     margin-inline: auto;
-    color: var(--accent);
+    color: var(--accent-text);
     transition: transform 0.6s var(--ease-out);
   }
 
@@ -280,7 +280,7 @@
   .purposes {
     padding-block: var(--section-y) 0;
 
-    @include theme-dark;
+    @include theme-site;
   }
 
   .purposes__head {
@@ -329,12 +329,12 @@
     position: absolute;
     inset: 0;
     content: '';
-    background: rgb(15 15 16 / 38%);
+    background: rgb(17 15 13 / 38%);
     transition: background-color 0.8s var(--ease-io);
   }
 
   .purposes__link.is-active::after {
-    background: rgb(15 15 16 / 22%);
+    background: rgb(17 15 13 / 22%);
   }
 
   .purposes__img {

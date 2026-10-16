@@ -1,0 +1,186 @@
+{# Каталог: двухтоновый заголовок и выбор типа техники, ряд чипов по назначению, боковая панель остальных фильтров, #}
+{# плавающая плашка со счётчиком и сетка крупных фото-карточек. #}
+{# Данные: src/data/catalog.json (переменная catalog: типы и описание фильтров) и public/data/catalog.json (модели). #}
+{# Фильтрация, чтение параметров из адреса и порционный вывод карточек: scripts/modules/catalog.ts #}
+{% from "icons.njk" import icon %}
+
+{# Список значений чипами. Значения, которых нет у выбранного типа техники, скрывает скрипт #}
+{% macro chips(group) %}
+  <div class="cfilter__options">
+    {% for option in group.options %}
+      <label class="chip" data-catalog-option>
+        <input class="chip__input" type="checkbox" name="{{ group.name }}" value="{{ option.value }}" />
+        <span class="chip__label">{{ option.label }}</span>
+      </label>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{# Группа с types относится к одному типу техники и показывается, когда он выбран #}
+{% macro group(group) %}
+  {% set groupTypes = group.types | join(" ") %}
+  {% if group.kind == "range" %}
+    <fieldset class="cfilter__block">
+      <legend class="cfilter__label">{{ group.label }}</legend>
+      <div class="cfilter__range">
+        <label class="cfilter__range-field">
+          <span class="cfilter__range-prefix">от</span>
+          <input
+            class="cfilter__range-input"
+            type="text"
+            name="{{ group.name }}-from"
+            inputmode="numeric"
+            maxlength="3"
+            autocomplete="off"
+            placeholder="{{ group.min }}"
+            aria-label="{{ group.label }}, от"
+          />
+        </label>
+        <label class="cfilter__range-field">
+          <span class="cfilter__range-prefix">до</span>
+          <input
+            class="cfilter__range-input"
+            type="text"
+            name="{{ group.name }}-to"
+            inputmode="numeric"
+            maxlength="3"
+            autocomplete="off"
+            placeholder="{{ group.max }}"
+            aria-label="{{ group.label }}, до"
+          />
+          <span class="cfilter__range-unit">{{ group.unit }}</span>
+        </label>
+      </div>
+    </fieldset>
+  {% else %}
+    <fieldset
+      class="cfilter__block"
+      data-catalog-group
+      {% if groupTypes %}data-catalog-types="{{ groupTypes }}" hidden disabled{% endif %}
+    >
+      <legend class="cfilter__label">{{ group.label }}</legend>
+      {{ chips(group) }}
+    </fieldset>
+  {% endif %}
+{% endmacro %}
+
+<div class="catalog">
+  <header class="catalog__head container">
+    <h1 class="catalog__title">
+      Каталог.
+      <span class="catalog__title-muted">{{ catalog.total }} модели техники</span>
+    </h1>
+    {# Тип техники: две крупные вкладки, рядом большой силуэт выбранного типа (показ стилями через :has) #}
+    <div class="catalog__types" role="radiogroup" aria-label="Тип техники">
+      {% for type in catalog.types %}
+        <label class="catalog__type">
+          <input
+            class="catalog__type-input"
+            type="radio"
+            name="type"
+            value="{{ type.id }}"
+            form="catalog-filter"
+            {% if loop.first %}checked{% endif %}
+          />
+          <span class="catalog__type-body">
+            <span class="catalog__type-title">{{ type.label }}</span>
+            <span class="catalog__type-count" data-type-count="{{ type.id }}">{{ type.count }} моделей</span>
+          </span>
+        </label>
+      {% endfor %}
+    </div>
+    <div class="catalog__stage" aria-hidden="true">
+      <span class="drawing drawing--ppc catalog__stage-drawing catalog__stage-drawing--semitrailer"></span>
+      <span class="drawing drawing--chassis catalog__stage-drawing catalog__stage-drawing--chassis"></span>
+    </div>
+  </header>
+
+  <form class="cfilter" id="catalog-filter" action="/catalog.html" data-catalog-filter>
+    <div class="cfilter__bar container" data-filter-bar>
+      <div class="cfilter__quick">
+        {% for item in catalog.filters %}
+          {% if item.name == "purpose" or item.name == "stock" %}{{ group(item) }}{% endif %}
+        {% endfor %}
+      </div>
+      <button class="cfilter__open" type="button" data-filter-open>
+        Все фильтры
+        <span class="cfilter__badge" hidden data-filter-badge></span>
+      </button>
+    </div>
+
+    {# Боковая панель на стекле: объём, секции и технические параметры #}
+    <dialog class="cfilter__drawer" aria-labelledby="filter-title" data-filter-drawer data-lenis-prevent>
+      <div class="cfilter__drawer-head">
+        <h2 class="cfilter__drawer-title" id="filter-title">Фильтры</h2>
+        <button class="cfilter__close" type="button" aria-label="Закрыть фильтры" data-filter-close>{{ icon("close") }}</button>
+      </div>
+      <div class="cfilter__drawer-body">
+        {% for item in catalog.filters %}
+          {% if item.name != "purpose" and item.name != "stock" %}{{ group(item) }}{% endif %}
+        {% endfor %}
+      </div>
+      <div class="cfilter__drawer-foot">
+        <button class="cfilter__reset" type="reset" disabled data-catalog-reset>Сбросить</button>
+        <button class="button" type="button" data-filter-close>Показать <span data-catalog-count>{{ catalog.total }} моделей</span></button>
+      </div>
+    </dialog>
+  </form>
+
+  <div class="catalog__results container">
+    <ul class="catalog__list" data-catalog-list>
+      {# Карточки выводит скрипт: загружает public/data/catalog.json и добавляет порциями по мере прокрутки #}
+    </ul>
+    {# Метка конца списка: когда она подходит к краю экрана, добавляется следующая порция #}
+    <div class="catalog__sentinel" aria-hidden="true" data-catalog-sentinel></div>
+    <p class="catalog__empty" hidden data-catalog-empty>
+      По этим параметрам техники нет. Измените условия или сбросьте фильтры.
+    </p>
+    <p class="catalog__empty" hidden data-catalog-error>Не удалось загрузить каталог. Обновите страницу.</p>
+  </div>
+
+  {# Плавающая плашка: появляется, когда верхняя панель фильтров ушла с экрана. Счётчик, фильтры, сброс #}
+  <div class="cdock glass glass--strong" data-filter-dock>
+    <p class="cdock__count" aria-live="polite">
+      Найдено: <strong data-catalog-count>{{ catalog.total }} моделей</strong>
+    </p>
+    <button class="cdock__button" type="button" data-filter-open>
+      Фильтры
+      <span class="cfilter__badge" hidden data-filter-badge></span>
+    </button>
+    <button class="cdock__button" type="reset" form="catalog-filter" disabled data-catalog-reset>Сбросить</button>
+  </div>
+
+  {# Заготовка карточки: скрипт копирует её и подставляет данные модели #}
+  <template data-catalog-template>
+    <li class="ccard">
+      <article class="ccard__inner">
+        <a class="ccard__media" href="/product.html" tabindex="-1" aria-hidden="true" data-card-link>
+          <span class="drawing ccard__drawing" role="img" data-card-icon></span>
+          <span class="ccard__soon" hidden data-card-soon>Фото скоро появится</span>
+          <span class="ccard__code" hidden data-card-code></span>
+          <span class="ccard__badge" data-card-badge></span>
+        </a>
+        <div class="ccard__plate glass">
+          <p class="ccard__type" data-card-type></p>
+          <h3 class="ccard__title">
+            <a class="ccard__link" href="/product.html" data-card-link><span data-card-model></span></a>
+          </h3>
+          <div class="ccard__details">
+            <div class="ccard__details-in">
+              <ul class="ccard__specs" data-card-specs>
+                <li class="ccard__spec" data-card-spec>
+                  <span class="ccard__spec-label mono" data-card-spec-label></span>
+                  <span class="ccard__spec-value" data-card-spec-value></span>
+                </li>
+              </ul>
+              <button class="button button--compact ccard__price" type="button" data-modal-open="price" data-modal-model>
+                Узнать стоимость
+              </button>
+            </div>
+          </div>
+          <span class="ccard__arrow" aria-hidden="true">{{ icon("arrow") }}</span>
+        </div>
+      </article>
+    </li>
+  </template>
+</div>

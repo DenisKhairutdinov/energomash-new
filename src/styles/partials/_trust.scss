@@ -27,7 +27,7 @@
     inset: 0;
     z-index: -1;
     content: '';
-    background: rgb(15 15 16 / 68%);
+    background: rgb(17 15 13 / 68%);
   }
 
   .leasing__layout {
@@ -265,7 +265,7 @@
     overflow: clip;
     interpolate-size: allow-keywords;
 
-    @include theme-dark;
+    @include theme-site;
 
     background: var(--bg-2);
   }
@@ -287,7 +287,7 @@
 
   .faq__lead {
     max-inline-size: 26rem;
-    color: rgb(245 245 243 / 88%);
+    color: var(--fg-2);
   }
 
   .faq__list {
@@ -349,14 +349,14 @@
 
   .faq__question:hover,
   .faq__item[open] .faq__question {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .faq__mark {
     position: relative;
     inline-size: 1.75rem;
     block-size: 1.75rem;
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .faq__mark::before,
@@ -387,7 +387,7 @@
     max-inline-size: 52rem;
     font-size: var(--fs-l);
     line-height: 1.6;
-    color: rgb(245 245 243 / 88%);
+    color: var(--fg-2);
   }
 
   @media (width >= 900px) {
@@ -404,14 +404,14 @@
   .blog {
     padding-block: var(--section-y);
 
-    @include theme-dark;
+    @include theme-site;
   }
 
   .news {
     display: grid;
     gap: 0.75rem;
     align-content: start;
-    color: var(--paper);
+    color: var(--fg);
     text-decoration: none;
   }
 
@@ -465,6 +465,10 @@
     justify-items: start;
     inline-size: min(36rem, calc(100% - 2 * var(--gutter)));
     padding: 1.5rem 1.75rem 1.75rem;
+
+    --fg-2: rgb(247 246 243 / 72%);
+
+    color: var(--paper);
   }
 
   .news--lead .news__title {
@@ -478,7 +482,7 @@
   .news__excerpt {
     font-size: var(--fs-s);
     line-height: 1.6;
-    color: rgb(245 245 243 / 85%);
+    color: rgb(247 246 243 / 85%);
   }
 
   // Дата слева, рубрика справа на своей плашке: чётко разделены
@@ -492,7 +496,7 @@
 
   .news__meta > span {
     padding: 0.35rem 0.7rem;
-    color: var(--paper);
+    color: var(--fg);
     background: var(--field-hover);
   }
 
@@ -501,7 +505,7 @@
   }
 
   .news__caption .news__meta > span {
-    background: var(--accent-glass);
+    color: var(--paper);
   }
 
   .news__title {
@@ -514,7 +518,7 @@
   }
 
   .news:hover .news__title {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .news--lead:hover .news__title {
@@ -532,7 +536,7 @@
   .news__arrow {
     inline-size: 1.25rem;
     block-size: 1.25rem;
-    color: var(--accent);
+    color: var(--accent-text);
     transition: transform 0.5s var(--ease-out);
   }
 
@@ -576,7 +580,7 @@
     inset: 0;
     z-index: -1;
     content: '';
-    background: rgb(15 15 16 / 50%);
+    background: rgb(17 15 13 / 50%);
   }
 
   .request__layout {
@@ -608,7 +612,7 @@
     max-inline-size: 30rem;
     font-size: var(--fs-l);
     line-height: 1.5;
-    color: rgb(245 245 243 / 90%);
+    color: rgb(247 246 243 / 90%);
   }
 
   .request__contacts {
@@ -626,7 +630,7 @@
   }
 
   .request__mail {
-    color: rgb(245 245 243 / 90%);
+    color: rgb(247 246 243 / 90%);
   }
 
   .request__form {
@@ -647,7 +651,7 @@
   .request__legend {
     padding: 0;
     margin-block-end: 0.6rem;
-    color: rgb(245 245 243 / 80%);
+    color: rgb(247 246 243 / 80%);
   }
 
   .request__chips {

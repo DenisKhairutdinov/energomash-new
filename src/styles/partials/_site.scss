@@ -8,15 +8,19 @@
 }
 
 @layer sections {
+  html {
+    background: var(--site-bg);
+  }
+
   body {
-    @include theme-dark;
+    @include theme-site;
   }
 
   .header {
-    --hdr-bg: #0f0f10b3;
-    --hdr-bg-solid: #0f0f10e6;
+    --hdr-bg: #110f0db3;
+    --hdr-bg-solid: #110f0de6;
     --hdr-fg: var(--paper);
-    --hdr-fg-2: #f5f5f3b3;
+    --hdr-fg-2: #f7f6f3b3;
     --hdr-cell: #ffffff0f;
   }
 

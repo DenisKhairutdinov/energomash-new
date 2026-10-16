@@ -34,7 +34,7 @@
     inset-block-end: 0;
     inset-inline-end: var(--gutter);
     inline-size: min(52%, 46rem);
-    color: var(--accent);
+    color: var(--accent-text);
     opacity: 0.9;
   }
 
@@ -74,7 +74,7 @@
 
   .footer__title {
     margin-block-end: 1rem;
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .footer__list {

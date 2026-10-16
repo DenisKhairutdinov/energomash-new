@@ -26,7 +26,7 @@
     position: absolute;
     inset: 0;
     content: '';
-    background: rgb(15 15 16 / 74%);
+    background: rgb(17 15 13 / 74%);
   }
 
   // Завод в цифрах: фото во весь экран под затемнением, цифры гигантские на стеклянной полосе
@@ -63,7 +63,7 @@
     position: absolute;
     inset: 0;
     content: '';
-    background: rgb(15 15 16 / 52%);
+    background: rgb(17 15 13 / 52%);
   }
 
   .facts__head {
@@ -80,7 +80,7 @@
 
   .facts__lead {
     max-inline-size: 30rem;
-    color: rgb(245 245 243 / 85%);
+    color: rgb(247 246 243 / 85%);
   }
 
   .facts__list {
@@ -97,7 +97,7 @@
   }
 
   .facts__label {
-    color: rgb(245 245 243 / 80%);
+    color: rgb(247 246 243 / 80%);
   }
 
   .facts__value {
@@ -127,7 +127,7 @@
     position: relative;
     padding-block: var(--section-y);
 
-    @include theme-dark;
+    @include theme-site;
 
     background: var(--bg-2);
   }
@@ -265,7 +265,7 @@
   .process {
     padding-block: var(--section-y) 0;
 
-    @include theme-dark;
+    @include theme-site;
   }
 
   .process__head {
@@ -315,7 +315,7 @@
     inset: 0;
     z-index: -1;
     content: '';
-    background: rgb(15 15 16 / 38%);
+    background: rgb(17 15 13 / 38%);
   }
 
   .process__body {
@@ -352,7 +352,7 @@
 
   .process__text {
     line-height: 1.6;
-    color: rgb(245 245 243 / 85%);
+    color: rgb(247 246 243 / 85%);
   }
 
   @media (width >= 900px) {

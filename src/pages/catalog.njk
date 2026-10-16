@@ -1,2 +1,8 @@
-{% extends "layout.njk" %} {% set pageTitle = "Каталог" %} {% set currentPage = "catalog" %} {%
-block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pageTitle = "Каталог" %}
+{% set pageDescription = "Каталог завода «Энергомаш»: полуприцепы-цистерны и автоцистерны для нефтепродуктов и воды. Подбор по назначению, объёму и техническим параметрам." %}
+{% set currentPage = "catalog" %}
+{% set pageClass = "catalog" %}
+{% block content %}
+  {% include "catalog.njk" %}
+{% endblock %}

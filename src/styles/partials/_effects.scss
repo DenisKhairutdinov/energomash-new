@@ -87,7 +87,7 @@
   .loader__drawing {
     position: relative;
     inline-size: min(88vw, 62rem);
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .loader__drawing .drawing {
@@ -122,8 +122,8 @@
     z-index: 700;
     display: none;
     gap: 0.3rem;
-    color: var(--paper);
-    filter: drop-shadow(0 0 5px rgb(15 15 16 / 75%));
+    color: var(--fg);
+    filter: drop-shadow(0 0 5px var(--site-halo));
     transform: translateY(-50%);
   }
 

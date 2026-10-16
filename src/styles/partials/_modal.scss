@@ -14,7 +14,7 @@
   }
 
   .modal::backdrop {
-    background: rgb(15 15 16 / 55%);
+    background: rgb(17 15 13 / 55%);
     backdrop-filter: blur(5px);
   }
 
@@ -104,7 +104,7 @@
     inset: 0;
     z-index: -1;
     content: '';
-    background: rgb(15 15 16 / 62%);
+    background: rgb(17 15 13 / 62%);
   }
 
   .modal__aside-in {
@@ -120,7 +120,7 @@
   }
 
   .modal__text {
-    color: rgb(245 245 243 / 85%);
+    color: rgb(247 246 243 / 85%);
   }
 
   .modal__model strong {

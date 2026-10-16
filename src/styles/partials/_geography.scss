@@ -83,7 +83,7 @@
     font-weight: 200;
     font-variant-numeric: tabular-nums;
     line-height: 0.9;
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   // Сцена повторяет пропорции viewBox: SVG, метка завода и карточка считаются от её размера
@@ -200,7 +200,7 @@
     padding: 1.25rem 1.5rem;
     color: var(--paper);
     pointer-events: none;
-    background: rgb(15 15 16 / 70%);
+    background: rgb(17 15 13 / 70%);
     backdrop-filter: var(--glass-blur-strong);
   }
 
@@ -209,7 +209,7 @@
   }
 
   .geography__tooltip-label {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   // Названия длинные («Ханты-Мансийский автономный округ — Югра»), поэтому не заглавными и не крупно
@@ -226,7 +226,7 @@
 
   .geography__tooltip-cities {
     font-size: var(--fs-s);
-    color: rgb(245 245 243 / 70%);
+    color: rgb(247 246 243 / 70%);
   }
 
   .geography__tooltip-units:empty,

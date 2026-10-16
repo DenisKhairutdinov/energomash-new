@@ -1,25 +1,46 @@
-// Темы секций. Цвет секции задаётся переменными, поэтому компоненты внутри (кнопки, линии, поля) подстраиваются сами.
-@mixin theme-dark {
+// Темы. Цвета задаются переменными, поэтому компоненты внутри (кнопки, поля, стекло) подстраиваются сами.
+// theme-dark: всегда тёмная (секции с фото, подвал, шапка, окно). theme-site: следует теме сайта (тёмная или светлая).
+@mixin theme-dark-vars {
   --bg: var(--ink);
   --bg-2: var(--ink-soft);
   --fg: var(--paper);
-  --fg-2: rgb(245 245 243 / 68%);
+  --fg-2: rgb(247 246 243 / 68%);
   --line: var(--line-dark);
   --btn-ink: var(--paper);
   --btn-ink-fg: var(--ink);
+  --field: #f7f6f314;
+  --field-hover: #f7f6f324;
+  --accent-text: #e4744b;
+  --btn-line: #f7f6f38c;
+  --btn-hover-bg: var(--paper);
+  --btn-hover-fg: var(--ink);
+}
+
+@mixin theme-dark {
+  @include theme-dark-vars;
 
   color: var(--fg);
   background: var(--bg);
 }
 
-@mixin theme-light {
-  --bg: var(--paper);
-  --bg-2: var(--grey);
-  --fg: var(--ink);
-  --fg-2: rgb(15 15 16 / 66%);
-  --line: var(--line-light);
-  --btn-ink: var(--ink);
-  --btn-ink-fg: var(--paper);
+@mixin theme-site-vars {
+  --bg: var(--site-bg);
+  --bg-2: var(--site-bg-2);
+  --fg: var(--site-fg);
+  --fg-2: var(--site-fg-2);
+  --line: var(--site-line);
+  --btn-ink: var(--site-fg);
+  --btn-ink-fg: var(--site-bg);
+  --field: var(--site-field);
+  --field-hover: var(--site-field-hover);
+  --accent-text: var(--site-accent-text);
+  --btn-line: var(--site-btn-line);
+  --btn-hover-bg: var(--site-fg);
+  --btn-hover-fg: var(--site-bg);
+}
+
+@mixin theme-site {
+  @include theme-site-vars;
 
   color: var(--fg);
   background: var(--bg);

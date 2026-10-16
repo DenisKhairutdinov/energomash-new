@@ -1,5 +1,6 @@
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
+import { initCatalog } from './catalog'
 import { initCinema } from './cinema'
 import { initGeography } from './geography'
 import { initHeader } from './header'
@@ -10,9 +11,11 @@ import { initModal } from './modal'
 import { initPicker } from './picker'
 import { initPurposes } from './purposes'
 import { initReveal } from './reveal'
+import { initSearch } from './search'
 import { initSlider } from './slider'
 import { initSmoothScroll } from './smooth'
 import { initText } from './text'
+import { initTheme } from './theme'
 import { initWow } from './wow'
 import { initWaterRipples } from './water-ripples'
 
@@ -20,8 +23,11 @@ import { initWaterRipples } from './water-ripples'
 export const startApp = (): void => {
   initSmoothScroll()
   initHeader()
+  initTheme()
   initModal()
   initPicker()
+  initCatalog()
+  initSearch()
   initSlider()
   initLeasing()
   initGeography()

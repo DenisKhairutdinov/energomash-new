@@ -41,7 +41,7 @@
     inset: 0;
     z-index: -1;
     content: '';
-    background: var(--paper);
+    background: var(--btn-hover-bg, var(--paper));
     transform: translateX(-101%);
     transition: transform 0.55s var(--ease-out);
   }
@@ -54,7 +54,7 @@
   // Сайт тёмный: при наведении кнопка заливается белым и текст темнеет, заливка видна на любом фоне
   .button:hover,
   .button:focus-visible {
-    color: var(--ink);
+    color: var(--btn-hover-fg, var(--ink));
   }
 
   .button--ink {
@@ -139,7 +139,7 @@
 
   .link-arrow:hover,
   .link-arrow:focus-visible {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   // Поля формы
@@ -185,7 +185,7 @@
 
   .field__error {
     font-size: var(--fs-s);
-    color: oklch(62% 0.2 27deg);
+    color: var(--err);
   }
 
   // Чекбокс
@@ -288,7 +288,7 @@
   }
 
   .switch__input:checked ~ .switch__body .switch__text {
-    color: rgb(245 245 243 / 88%);
+    color: rgb(247 246 243 / 88%);
   }
 
   .switch__input:focus-visible + .switch__track {
@@ -470,7 +470,7 @@
     flex: none;
     inline-size: 1.25rem;
     block-size: 1.25rem;
-    color: var(--accent);
+    color: var(--accent-text);
     transition: transform 0.35s var(--ease-out);
   }
 
@@ -528,7 +528,7 @@
   }
 
   .select__option[aria-selected='true'] {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   // Сегментированный выбор

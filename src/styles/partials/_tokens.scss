@@ -1,34 +1,41 @@
 // Токены. Палитра со старого сайта (src/styles/base/vars.scss старого проекта). Исключение по просьбе владельца (2026-10-16):
-// основной чёрный нейтральный #0f0f10 вместо синеватого #0d0e13; второй тёмный --ink-soft считается из палитры (чёрный и тёмно-серый).
+// основной чёрный нейтральный #110f0d вместо синеватого #0d0e13; второй тёмный --ink-soft считается из палитры (чёрный и тёмно-серый).
 @layer tokens {
   :root {
     // Палитра
-    --paper: #f5f5f3;
-    --ink: #0f0f10;
-    --ink-soft: color-mix(in srgb, var(--ink), var(--grey-dark) 22%);
+    --paper: #f7f6f3;
+    --ink: #110f0d;
+    --ink-soft: #25221f;
     --accent: #c8603d;
     --accent-deep: #b84f30;
-    --grey: #dededc;
-    --grey-dark: #7a7a78;
-    --muted-dark: #a8aeb4;
+    --accent-text: #e4744b;
+    --grey: #dfdedb;
+    --grey-dark: #94928e;
+    --muted-dark: #b3b1ad;
+
+    // Вспомогательные цвета: категории и статусы, на тёмном контраст 6 и выше. Использовать точечно, не как фон
+    --steel: #84a4b7;
+    --amber: #eebc4a;
+    --ok: #5bbd74;
+    --err: #f75e54;
 
     // Совместимость со старыми именами
     --accent-bright: var(--accent);
 
     // Рамок у элементов нет: поля и плашки выделяются заливкой и тенью
-    --line-light: #0f0f101f;
-    --line-dark: #f5f5f326;
-    --btn-line: #f5f5f38c;
-    --field: #f5f5f314;
-    --field-hover: #f5f5f324;
+    --line-light: #110f0d1f;
+    --line-dark: #f7f6f326;
+    --btn-line: #f7f6f38c;
+    --field: #f7f6f314;
+    --field-hover: #f7f6f324;
 
     // Стекло: тёмная подложка и размытие
     // Стекло: прозрачнее и с умеренным размытием, чтобы фото под плашкой читалось
-    --glass-dark: #0f0f1059;
-    --glass-dark-strong: #0f0f1073;
-    --glass-clear: #0f0f1040;
+    --glass-dark: #110f0d59;
+    --glass-dark-strong: #110f0d73;
+    --glass-clear: #110f0d40;
     --glass-accent: #c8603dbf;
-    --accent-glass: #c8603d8c;
+    --accent-glass: #b84f30b3;
     --glass-blur: blur(9px);
     --glass-blur-strong: blur(12px) saturate(1.5);
 
@@ -63,25 +70,52 @@
     --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
-  // Темы секций: цвета задаются переменными, компоненты внутри (кнопки, поля, стекло) подстраиваются сами
-  :root,
-  .theme-light {
-    --bg: var(--paper);
-    --bg-2: var(--grey);
-    --fg: var(--ink);
-    --fg-2: #0f0f10a8;
-    --line: var(--line-light);
-    --btn-ink: var(--ink);
-    --btn-ink-fg: var(--paper);
+  // Тема сайта: тёмная по умолчанию, светлая включается атрибутом data-theme="light" на <html> (переключатель в шапке).
+  // Плоские секции берут цвета из --site-* (миксин theme-site); секции с фото остаются тёмными в любой теме (миксин theme-dark).
+  :root {
+    --site-bg: var(--ink);
+    --site-bg-2: var(--ink-soft);
+    --site-fg: var(--paper);
+    --site-fg-2: #f7f6f3ad;
+    --site-line: #f7f6f326;
+    --site-field: #f7f6f314;
+    --site-field-hover: #f7f6f324;
+    --site-accent-text: #e4744b;
+    --site-btn-line: #f7f6f38c;
+    --site-halo: #110f0dbf;
+
+    color-scheme: dark;
   }
 
+  :root[data-theme='light'] {
+    --site-bg: var(--paper);
+    --site-bg-2: #ecebe7;
+    --site-fg: var(--ink);
+    --site-fg-2: #110f0dad;
+    --site-line: #110f0d1f;
+    --site-field: #110f0d0f;
+    --site-field-hover: #110f0d1a;
+    --site-accent-text: #a8452a;
+    --site-btn-line: #110f0d73;
+    --site-halo: #f7f6f3d9;
+
+    color-scheme: light;
+  }
+
+  // Классы для готовой разметки (модальное окно, подвал): те же значения, что у миксинов
   .theme-dark {
     --bg: var(--ink);
     --bg-2: var(--ink-soft);
     --fg: var(--paper);
-    --fg-2: #f5f5f3b3;
+    --fg-2: #f7f6f3b3;
     --line: var(--line-dark);
     --btn-ink: var(--paper);
     --btn-ink-fg: var(--ink);
+    --field: #f7f6f314;
+    --field-hover: #f7f6f324;
+    --accent-text: #e4744b;
+    --btn-line: #f7f6f38c;
+    --btn-hover-bg: var(--paper);
+    --btn-hover-fg: var(--ink);
   }
 }
