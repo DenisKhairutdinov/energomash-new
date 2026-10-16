@@ -6,6 +6,7 @@ import { getLenis } from './smooth'
 const GROUP_SELECTOR = '[data-catalog-group]'
 const OPTION_SELECTOR = '[data-catalog-option]'
 
+const COLLAPSED_CLASS = 'cfilter--collapsed'
 const SEARCH_PARAMETER = 'q'
 const SEARCH_INPUT_SELECTOR = '[data-search-input]'
 
@@ -103,7 +104,10 @@ export const initCatalog = (): void => {
   const optionInputs = [...form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')]
   const volumeFromInput = form.querySelector<HTMLInputElement>('[name="volume-from"]')
   const volumeToInput = form.querySelector<HTMLInputElement>('[name="volume-to"]')
-  const drawer = form.querySelector<HTMLDialogElement>('[data-filter-drawer]')
+  const extra = form.querySelector<HTMLElement>('[data-catalog-extra]')
+  const more = form.querySelector<HTMLButtonElement>('[data-catalog-more]')
+  const moreLabel = form.querySelector<HTMLElement>('[data-catalog-more-label]')
+  const viewInputs = [...form.querySelectorAll<HTMLInputElement>('input[name="view"]')]
   const bar = document.querySelector<HTMLElement>('[data-filter-bar]')
   const dock = document.querySelector<HTMLElement>('[data-filter-dock]')
   const sentinel = document.querySelector<HTMLElement>('[data-catalog-sentinel]')
@@ -285,12 +289,20 @@ export const initCatalog = (): void => {
     for (const input of optionInputs) {
       const option = input.closest<HTMLElement>(OPTION_SELECTOR)
       const inScope = items.filter((item) => isTypeMatch(item, state) && hasValue(item, input))
-      const isAvailable = inScope.some((item) => isMatch(item, state, input.name))
+      const available = inScope.filter((item) => isMatch(item, state, input.name))
+      const isAvailable = available.length > 0
 
       input.disabled = !isAvailable && !input.checked
 
       if (option) {
         option.hidden = inScope.length === 0
+
+        // Сколько моделей даст это значение вместе с остальным выбором
+        const counter = option.querySelector<HTMLElement>('[data-chip-count]')
+
+        if (counter) {
+          counter.textContent = String(available.length)
+        }
       }
     }
 
@@ -315,13 +327,13 @@ export const initCatalog = (): void => {
     }
   }
 
-  // Число выбранных параметров в боковой панели: на кнопках «Фильтры»
+  // Число выбранных остальных параметров: на кнопках «Все параметры» и «Фильтры»
   const syncBadges = (): void => {
-    const inDrawer = [...(drawer?.querySelectorAll<HTMLInputElement>('input:checked') ?? [])].length
+    const inExtra = [...(extra?.querySelectorAll<HTMLInputElement>('input:checked') ?? [])].length
     const volumes = [volumeFromInput, volumeToInput].filter(
       (input) => input !== null && input.value.trim() !== '',
     ).length
-    const total = inDrawer + (volumes > 0 ? 1 : 0)
+    const total = inExtra + (volumes > 0 ? 1 : 0)
 
     for (const badge of badges) {
       badge.textContent = String(total)
@@ -384,7 +396,8 @@ export const initCatalog = (): void => {
     const parameters = new URLSearchParams()
 
     for (const [name, value] of new FormData(form)) {
-      if (typeof value === 'string' && value !== '') {
+      // Вид «сетка» по умолчанию в адрес не попадает
+      if (typeof value === 'string' && value !== '' && !(name === 'view' && value === 'grid')) {
         parameters.append(name, value)
       }
     }
@@ -459,6 +472,12 @@ export const initCatalog = (): void => {
         input.value = (parameters.get(input.name) ?? '').replaceAll(/\D/g, '')
       }
     }
+
+    for (const input of viewInputs) {
+      input.checked = input.value === (parameters.get('view') === 'list' ? 'list' : 'grid')
+    }
+
+    syncView()
   }
 
   // Тип выбран всегда и сам не снимается. Поле стоит вне формы, поэтому его change до формы не всплывает
@@ -494,28 +513,38 @@ export const initCatalog = (): void => {
     event.preventDefault()
   })
 
-  // Боковая панель: открывается кнопками «Фильтры», закрывается крестиком, кнопкой «Показать» и кликом по подложке.
-  // Пока она открыта, плавная прокрутка страницы остановлена
-  if (drawer) {
-    for (const opener of document.querySelectorAll<HTMLElement>('[data-filter-open]')) {
-      opener.addEventListener('click', () => {
-        getLenis()?.stop()
-        drawer.showModal()
-      })
+  // Остальные параметры раскрываются прямо под панелью; плавающая плашка возвращает к панели и раскрывает их
+  const setExpanded = (isExpanded: boolean): void => {
+    form.classList.toggle(COLLAPSED_CLASS, !isExpanded)
+    more?.setAttribute('aria-expanded', String(isExpanded))
+
+    if (moreLabel) {
+      moreLabel.textContent = isExpanded ? 'Скрыть параметры' : 'Все параметры'
     }
+  }
 
-    drawer.addEventListener('click', (event) => {
-      const isClose =
-        event.target instanceof Element && event.target.closest('[data-filter-close]') !== null
+  more?.addEventListener('click', () => {
+    setExpanded(form.classList.contains(COLLAPSED_CLASS))
+  })
 
-      // Клик по подложке: цель события сам dialog, а не его содержимое
-      if (isClose || event.target === drawer) {
-        drawer.close()
-      }
+  for (const button of document.querySelectorAll<HTMLElement>('[data-filter-up]')) {
+    button.addEventListener('click', () => {
+      setExpanded(true)
+      getLenis()?.scrollTo(form, { offset: -90 })
     })
+  }
 
-    drawer.addEventListener('close', () => {
-      getLenis()?.start()
+  // Вид списка: сетка или список. Выбор виден в адресе (?view=list)
+  const syncView = (): void => {
+    const view = viewInputs.find((input) => input.checked)?.value ?? 'grid'
+
+    list.dataset['view'] = view
+  }
+
+  for (const input of viewInputs) {
+    input.addEventListener('change', () => {
+      syncView()
+      refresh()
     })
   }
 
