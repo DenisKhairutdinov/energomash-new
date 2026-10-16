@@ -35,7 +35,7 @@ const initStatement = (): void => {
         filter: 'blur(0px)',
         ease: 'none',
         stagger: 0.12,
-        scrollTrigger: { trigger: text, start: 'top 82%', end: 'bottom 48%', scrub: 0.6 },
+        scrollTrigger: { trigger: text, start: 'top 85%', end: 'bottom 72%', scrub: 0.3 },
       },
     )
   })

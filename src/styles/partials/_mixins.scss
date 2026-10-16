@@ -1,7 +1,7 @@
 // Темы секций. Цвет секции задаётся переменными, поэтому компоненты внутри (кнопки, линии, поля) подстраиваются сами.
 @mixin theme-dark {
   --bg: var(--ink);
-  --bg-2: oklch(22% 0.014 282deg);
+  --bg-2: var(--ink-soft);
   --fg: var(--paper);
   --fg-2: rgb(245 245 243 / 68%);
   --line: var(--line-dark);
@@ -16,7 +16,7 @@
   --bg: var(--paper);
   --bg-2: var(--grey);
   --fg: var(--ink);
-  --fg-2: rgb(13 14 19 / 66%);
+  --fg-2: rgb(15 15 16 / 66%);
   --line: var(--line-light);
   --btn-ink: var(--ink);
   --btn-ink-fg: var(--paper);

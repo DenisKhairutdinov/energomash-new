@@ -37,8 +37,8 @@
     inset: 0;
     z-index: -2;
     background:
-      linear-gradient(to bottom, rgb(13 14 19 / 80%), rgb(13 14 19 / 0%) 50%),
-      linear-gradient(to top, rgb(13 14 19 / 78%), rgb(13 14 19 / 0%) 52%);
+      linear-gradient(to bottom, rgb(15 15 16 / 80%), rgb(15 15 16 / 0%) 50%),
+      linear-gradient(to top, rgb(15 15 16 / 78%), rgb(15 15 16 / 0%) 52%);
   }
 
   .hero__window {
@@ -178,7 +178,7 @@
   }
 
   .cat:hover .cat__arrow {
-    transform: translate(0.25rem, -0.25rem);
+    transform: translateX(0.4rem);
   }
 
   // Мини-фильтр: стекло, ведёт в каталог с параметрами в адресе
@@ -264,28 +264,50 @@
     background: var(--accent-deep);
   }
 
+  // Быстрые ссылки: ровный ряд стеклянных плашек на всю ширину сетки, колонки равные
   .hero__utp {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 2rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
     padding-block: 0 0.75rem;
   }
 
   .hero__utp-link {
-    padding-block: 0.6rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    min-block-size: 3.25rem;
+    padding: 0.75rem 1.1rem;
+    font-size: var(--fs-s);
     font-weight: 500;
     color: var(--paper);
+    text-decoration: none;
     pointer-events: auto;
+    transition: background-color 0.4s var(--ease-out);
   }
 
   .hero__utp-link:hover,
   .hero__utp-link:focus-visible {
-    color: var(--accent);
+    background: var(--accent-glass);
   }
 
   .hero__utp-icon {
+    flex: none;
     inline-size: 1.1rem;
     block-size: 1.1rem;
+    color: var(--paper);
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .hero__utp-link:hover .hero__utp-icon {
+    transform: translateX(0.3rem);
+  }
+
+  @media (width >= 900px) {
+    .hero__utp {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   @media (width >= 700px) {

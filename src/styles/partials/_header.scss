@@ -4,8 +4,8 @@
 // поиск, почта, Max, VK, телефон и звонок. Цвета берутся из переменных варианта: --hdr-bg, --hdr-fg, --hdr-fg-2, --hdr-cell, --hdr-hover.
 @layer sections {
   .header {
-    --hdr-bg: #0d0e13b3;
-    --hdr-bg-solid: #0d0e13e6;
+    --hdr-bg: #0f0f10b3;
+    --hdr-bg-solid: #0f0f10e6;
     --hdr-fg: var(--paper);
     --hdr-fg-2: #f5f5f3b3;
     --hdr-cell: #ffffff0f;
@@ -38,7 +38,7 @@
     padding: 0.3rem 0.5rem 0.3rem 1.25rem;
     margin-inline: auto;
     background: var(--hdr-bg);
-    box-shadow: 0 14px 44px rgb(13 14 19 / 16%);
+    box-shadow: 0 14px 44px rgb(15 15 16 / 16%);
     backdrop-filter: blur(14px) saturate(1.5);
     transition: background-color 0.4s;
   }
@@ -189,22 +189,22 @@
     display: flex;
     gap: 1rem;
     align-items: center;
-    padding: 1rem 1.25rem;
+    padding: 0.5rem 0.75rem 0.5rem 1.25rem;
   }
 
   .header__search-icon {
     flex: none;
-    inline-size: 1.5rem;
-    block-size: 1.5rem;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
     color: var(--accent);
   }
 
   .header__search-input {
     flex: 1;
     min-inline-size: 0;
-    padding: 0.7rem 1rem;
+    padding: 0.45rem 0.9rem;
     font-family: var(--font-display);
-    font-size: var(--fs-xl);
+    font-size: var(--fs-l);
     font-weight: 200;
     color: var(--hdr-fg);
     background: var(--hdr-cell);
@@ -352,7 +352,7 @@
       inset-inline: 0;
       visibility: hidden;
       padding: 0;
-      background: #0d0e13f2;
+      background: #0f0f10f2;
       box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 35%);
       opacity: 0;
       backdrop-filter: blur(14px) saturate(1.4);

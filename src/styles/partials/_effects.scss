@@ -121,25 +121,32 @@
     inset-inline-end: clamp(0.75rem, 1.6vw, 1.75rem);
     z-index: 700;
     display: none;
-    gap: 0.9rem;
+    gap: 0.3rem;
     color: var(--paper);
-    mix-blend-mode: difference;
+    filter: drop-shadow(0 0 5px rgb(15 15 16 / 75%));
     transform: translateY(-50%);
   }
 
+  // Без подложки: читаемость на любом фоне даёт тень вокруг линий и подписей; названия глав видны при наведении и у текущей главы
   .chapters__item {
     display: flex;
     gap: 0.75rem;
     align-items: center;
     justify-content: flex-end;
+    padding-block: 0.3rem;
     font-family: var(--font-mono);
     font-size: var(--fs-xs);
     color: inherit;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     text-decoration: none;
-    opacity: 0.45;
-    transition: opacity 0.4s;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+  }
+
+  .chapters__item:hover,
+  .chapters__item:focus-visible {
+    opacity: 1;
   }
 
   .chapters__name {
@@ -152,14 +159,15 @@
       opacity 0.4s;
   }
 
+  // Отметка главы: горизонтальная линия, у текущей длиннее и акцентная
   .chapters__item::after {
-    inline-size: 0.5rem;
-    block-size: 0.5rem;
+    inline-size: 1rem;
+    block-size: 2px;
     content: '';
     background: currentcolor;
     transition:
       inline-size 0.4s var(--ease-out),
-      block-size 0.4s var(--ease-out);
+      background-color 0.3s;
   }
 
   .chapters__item.is-active {
@@ -167,8 +175,7 @@
   }
 
   .chapters__item.is-active::after {
-    inline-size: 0.8rem;
-    block-size: 0.8rem;
+    inline-size: 1.75rem;
     background: var(--accent);
   }
 

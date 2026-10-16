@@ -243,6 +243,12 @@
     padding: 1.25rem 1.5rem;
     cursor: pointer;
     background: var(--field);
+    transition: background-color 0.35s var(--ease-out);
+  }
+
+  // Включённый переключатель: плашка заливается акцентным цветом, но остаётся прозрачной (стекло)
+  .switch:has(.switch__input:checked) {
+    background: var(--accent-glass);
   }
 
   .switch__input {
@@ -273,12 +279,16 @@
   }
 
   .switch__input:checked + .switch__track {
-    background: var(--accent-deep);
+    background: var(--paper);
   }
 
   .switch__input:checked + .switch__track::after {
-    background: var(--paper);
+    background: var(--accent-deep);
     transform: translateX(1.5rem);
+  }
+
+  .switch__input:checked ~ .switch__body .switch__text {
+    color: rgb(245 245 243 / 88%);
   }
 
   .switch__input:focus-visible + .switch__track {

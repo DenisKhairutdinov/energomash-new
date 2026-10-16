@@ -7,7 +7,7 @@
 
     @include theme-dark;
 
-    background: oklch(14% 0.012 282deg);
+    background: var(--ink);
   }
 
   // Огромное слово и чертёж цистерны над реквизитами
@@ -120,8 +120,14 @@
   }
 
   @media (width >= 1100px) {
+    // Три правые колонки по ширине содержимого и с одинаковым зазором между ними; бренд занимает остаток
     .footer__grid {
-      grid-template-columns: 1.3fr repeat(3, 1fr);
+      grid-template-columns: minmax(14rem, 1fr) repeat(3, max-content);
+      column-gap: clamp(2rem, 4.5vw, 5rem);
+    }
+
+    .footer__col {
+      max-inline-size: 22rem;
     }
 
     .footer__legal {

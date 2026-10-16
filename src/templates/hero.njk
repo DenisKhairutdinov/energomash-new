@@ -39,7 +39,7 @@
 
   <ul class="hero__utp container" data-hero-side>
     {% for item in home.hero.utp %}
-      <li><a class="hero__utp-link link-arrow" href="{{ item.url }}">{{ item.title }}{{ icon("arrow", "hero__utp-icon") }}</a></li>
+      <li><a class="hero__utp-link glass" href="{{ item.url }}"><span>{{ item.title }}</span>{{ icon("arrow", "hero__utp-icon") }}</a></li>
     {% endfor %}
   </ul>
 

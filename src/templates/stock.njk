@@ -38,13 +38,15 @@
               <span class="stock__type">{{ item.type }}</span>
               <span class="stock__model">{{ item.model }}</span>
             </span>
-            <span class="stock__specs">
-              {% for spec in item.specs %}
-                <span class="stock__spec">
-                  <span class="stock__spec-label mono">{{ spec[0] }}</span>
-                  <span class="stock__spec-value">{{ spec[1] }}</span>
-                </span>
-              {% endfor %}
+            <span class="stock__details">
+              <span class="stock__specs">
+                {% for spec in item.specs %}
+                  <span class="stock__spec">
+                    <span class="stock__spec-label mono">{{ spec[0] }}</span>
+                    <span class="stock__spec-value">{{ spec[1] }}</span>
+                  </span>
+                {% endfor %}
+              </span>
             </span>
             {{ icon("arrow", "stock__panel-icon") }}
           </a>

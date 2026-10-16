@@ -6,7 +6,7 @@
 @layer sections {
   .geography {
     // Цвет регионов без поставок заметно светлее фона секции, чтобы карта не сливалась с ним
-    --map-base: oklch(36% 0.014 282deg);
+    --map-base: color-mix(in srgb, var(--ink-soft), var(--paper) 18%);
 
     padding-block: var(--section-y);
 
@@ -200,7 +200,7 @@
     padding: 1.25rem 1.5rem;
     color: var(--paper);
     pointer-events: none;
-    background: rgb(13 14 19 / 70%);
+    background: rgb(15 15 16 / 70%);
     backdrop-filter: var(--glass-blur-strong);
   }
 
