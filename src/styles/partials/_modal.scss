@@ -1,31 +1,50 @@
 @layer components {
-  // Окно заявки: прямоугольное, слева акцентная панель, справа форма
+  // Окно заявки по центру экрана: слева затемнённое фото с текстом, справа форма на стекле
   .modal {
-    inline-size: min(100% - 2rem, 62rem);
+    inset: 0;
+    inline-size: min(100% - 2rem, 64rem);
     max-block-size: calc(100svh - 2rem);
     padding: 0;
+    margin: auto;
     overflow: auto;
-    color: var(--fg);
-    background: var(--bg);
-    border: 1px solid var(--line);
+    color: var(--paper);
+    background: transparent;
+    border: 0;
+    box-shadow: 0 2rem 6rem rgb(0 0 0 / 50%);
   }
 
   .modal::backdrop {
-    background: rgb(13 14 19 / 72%);
-    backdrop-filter: blur(6px);
+    background: rgb(13 14 19 / 55%);
+    backdrop-filter: blur(5px);
   }
 
   .modal[open] {
-    animation: modal-in 0.7s var(--ease-out);
+    animation: modal-in 0.5s var(--ease-out);
+  }
+
+  .modal[open]::backdrop {
+    animation: modal-fade 0.5s var(--ease-out);
   }
 
   @keyframes modal-in {
     from {
-      clip-path: inset(100% 0 0);
+      opacity: 0;
+      transform: translateY(1rem);
     }
 
     to {
-      clip-path: inset(0);
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes modal-fade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
     }
   }
 
@@ -43,18 +62,16 @@
     place-items: center;
     inline-size: 2.75rem;
     block-size: 2.75rem;
-    color: var(--fg);
-    background: transparent;
-    border: 1px solid var(--line);
-    transition:
-      background-color 0.3s,
-      color 0.3s;
+    color: var(--paper);
+    background: var(--glass-clear);
+    border: 0;
+    backdrop-filter: var(--glass-blur);
+    transition: background-color 0.3s;
   }
 
-  .modal__close:hover {
-    color: var(--paper);
+  .modal__close:hover,
+  .modal__close:focus-visible {
     background: var(--accent-deep);
-    border-color: var(--accent-deep);
   }
 
   .modal__close svg {
@@ -62,18 +79,43 @@
     block-size: 1.4rem;
   }
 
+  // Фото с тёмным фильтром вместо акцентного блока
   .modal__aside {
+    position: relative;
+    display: grid;
+    align-content: end;
+    min-block-size: 16rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .modal__photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .modal__aside::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: rgb(13 14 19 / 62%);
+  }
+
+  .modal__aside-in {
     display: grid;
     gap: 1.25rem;
-    align-content: start;
-    padding: clamp(1.5rem, 4vw, 3rem);
-    color: var(--paper);
-    background: var(--accent-deep);
   }
 
   .modal__title {
-    font-size: var(--fs-xl);
+    font-size: var(--fs-title-s);
     font-weight: 200;
+    line-height: 1;
     text-transform: uppercase;
   }
 
@@ -96,18 +138,20 @@
   .modal__form {
     display: grid;
     gap: 1.25rem;
-    align-content: start;
+    align-content: center;
     padding: clamp(1.5rem, 4vw, 3rem);
+    background: var(--glass-dark-strong);
+    backdrop-filter: blur(14px) saturate(1.5);
   }
 
   .modal__done {
     padding: 1rem;
-    background: var(--line);
+    background: var(--field-hover);
   }
 
   @media (width >= 800px) {
     .modal__panel {
-      grid-template-columns: 0.9fr 1.1fr;
+      grid-template-columns: 1fr 1fr;
     }
   }
 }

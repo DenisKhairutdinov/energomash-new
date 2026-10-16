@@ -78,8 +78,8 @@
           {% endfor %}
         </div>
       </fieldset>
-      <label class="picker__field">
-        <span class="picker__legend mono">Назначение</span>
+      <div class="picker__field">
+        <span class="picker__legend mono" id="picker-purpose-label">Назначение</span>
         <select class="picker__select" name="purpose" data-picker-purpose>
           <option value="">Любое</option>
           {% for type in home.picker.types %}
@@ -90,7 +90,7 @@
             </optgroup>
           {% endfor %}
         </select>
-      </label>
+      </div>
       <fieldset class="picker__field picker__field--volume">
         <legend class="picker__legend mono">Объём, м³</legend>
         <div class="picker__range">

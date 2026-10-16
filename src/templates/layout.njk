@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-variant="{{ variant or 'a' }}"{% if pageClass %} data-page="{{ pageClass }}"{% endif %}>
+<html lang="ru"{% if pageClass %} data-page="{{ pageClass }}"{% endif %}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,8 +19,8 @@
         }
       })()
     </script>
-    <link rel="stylesheet" href="/src/styles/{{ variant or 'a' }}.scss" />
-    <script type="module" src="/src/scripts/{{ variant or 'a' }}.ts"></script>
+    <link rel="stylesheet" href="/src/styles/main.scss" />
+    <script type="module" src="/src/scripts/main.ts"></script>
   </head>
   <body class="page{% if pageClass %} page--{{ pageClass }}{% endif %}">
     <a class="skip-link" href="#main">Перейти к содержимому</a>

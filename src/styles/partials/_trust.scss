@@ -1,6 +1,6 @@
 @use 'mixins' as *;
 
-// Лизинг, документы, вопросы, блог, заявка. Блоки на стекле поверх фото, без линий и полосок.
+// Лизинг, документы, вопросы, блог, заявка. Блоки на стекле поверх фото или на ровной заливке, без рамок, линий и градиентов.
 @layer sections {
   // Лизинг: фон фото и стеклянные панели
   .leasing {
@@ -15,10 +15,10 @@
   .leasing__bg,
   .request__bg {
     position: absolute;
-    inset: -10% 0;
+    inset: -6% 0;
     z-index: -2;
     inline-size: 100%;
-    block-size: 120%;
+    block-size: 112%;
     object-fit: cover;
   }
 
@@ -28,7 +28,7 @@
     inset: 0;
     z-index: -1;
     content: '';
-    background: linear-gradient(to right, rgb(13 14 19 / 88%), rgb(13 14 19 / 50%));
+    background: rgb(13 14 19 / 68%);
   }
 
   .leasing__layout {
@@ -111,7 +111,7 @@
     gap: 1rem;
     justify-content: space-between;
     padding: 0.75rem 1rem;
-    background: rgb(255 255 255 / 5%);
+    background: var(--field);
   }
 
   .leasing__summary dt {
@@ -146,7 +146,7 @@
     }
   }
 
-  // Документы: мозаика из стеклянных блоков
+  // Документы: сетка 5 + 7 колонок, все блоки одной высоты в ряду
   .docs {
     position: relative;
     padding-block: var(--section-y);
@@ -188,7 +188,7 @@
     display: grid;
     gap: 0.6rem;
     align-content: start;
-    padding: 1.4rem 1.4rem 1.6rem;
+    padding: 1.4rem 1.5rem 1.6rem;
   }
 
   .docs__mark {
@@ -196,6 +196,7 @@
     place-items: center;
     inline-size: 2rem;
     block-size: 2rem;
+    margin-block-end: 0.5rem;
     color: var(--paper);
     background: var(--accent-deep);
   }
@@ -239,46 +240,47 @@
 
   @media (width >= 900px) {
     .docs__layout {
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
-      align-items: stretch;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .docs__intro {
+      grid-column: span 5;
     }
 
     .docs__list {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .docs__item:nth-child(even) {
-      margin-block-start: 1.5rem;
+      grid-column: span 7;
+      grid-auto-rows: 1fr;
     }
 
     .service {
       grid-template-columns: auto 1fr auto;
       grid-column: 1 / -1;
-      margin-block-start: 1.25rem;
     }
   }
 
-  // Вопросы и ответы: левая панель закреплена, справа стеклянные карточки
+  // Вопросы и ответы: крупные вопросы на всю ширину контейнера. Строки без плашек, при наведении и раскрытии появляется заливка
   .faq {
-    position: relative;
     padding-block: var(--section-y);
-    overflow: clip;
-    isolation: isolate;
 
     @include theme-dark;
+
+    background: var(--bg-2);
   }
 
   .faq__layout {
     display: grid;
-    gap: 0.75rem;
-    align-items: start;
+    gap: clamp(2rem, 4vw, 3.5rem);
   }
 
   .faq__intro {
     display: grid;
-    gap: 1.5rem;
-    justify-items: start;
-    padding: clamp(1.5rem, 3vw, 2.75rem);
+    gap: 1.25rem var(--gap);
+    place-items: end start;
+  }
+
+  .faq__intro .section-title {
+    font-size: var(--fs-title-s);
   }
 
   .faq__lead {
@@ -288,34 +290,50 @@
 
   .faq__list {
     display: grid;
-    gap: 0.5rem;
+    gap: 0.25rem;
+  }
+
+  .faq__item {
+    transition: background-color 0.4s;
+  }
+
+  .faq__item:hover {
+    background: var(--field);
+  }
+
+  .faq__item[open] {
+    background: var(--field-hover);
   }
 
   .faq__question {
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 1.25rem;
+    gap: 1.5rem;
     align-items: center;
-    padding: 1.2rem 1.4rem;
-    font-size: var(--fs-m);
-    font-weight: 500;
+    padding: clamp(1rem, 2vw, 1.6rem) clamp(1rem, 2.5vw, 2rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 0.9rem + 1.5vw, 2.5rem);
+    font-weight: 200;
+    line-height: 1.1;
+    text-transform: uppercase;
     cursor: pointer;
     list-style: none;
-    transition: background-color 0.4s;
+    transition: color 0.3s;
   }
 
   .faq__question::-webkit-details-marker {
     display: none;
   }
 
-  .faq__question:hover {
-    background: rgb(255 255 255 / 6%);
+  .faq__question:hover,
+  .faq__item[open] .faq__question {
+    color: var(--accent);
   }
 
   .faq__mark {
     position: relative;
-    inline-size: 1.1rem;
-    block-size: 1.1rem;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
     color: var(--accent);
   }
 
@@ -328,7 +346,7 @@
     block-size: 1.5px;
     content: '';
     background: currentcolor;
-    transition: transform 0.5s var(--ease-out);
+    transition: transform 0.4s var(--ease-out);
   }
 
   .faq__mark::after {
@@ -340,73 +358,100 @@
   }
 
   .faq__body {
-    padding: 0 1.4rem 1.4rem;
+    padding: 0 clamp(1rem, 2.5vw, 2rem) clamp(1.25rem, 2.5vw, 2rem);
   }
 
   .faq__answer {
-    max-inline-size: 40rem;
-    font-size: var(--fs-s);
-    line-height: 1.7;
+    max-inline-size: 52rem;
+    font-size: var(--fs-l);
+    line-height: 1.6;
     color: var(--fg-2);
   }
 
   @media (width >= 900px) {
-    .faq__layout {
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
-      gap: 1rem;
+    .faq__intro {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
     }
 
-    .faq__intro {
-      position: sticky;
-      inset-block-start: calc(var(--header-h) + 2rem);
+    .faq__intro > .button {
+      justify-self: end;
     }
   }
 
-  // Блог: мозаика. Главная статья на весь кадр со стеклянной подписью, остальные стеклянными карточками с фото
+  // Блог: свежая статья на весь экран, ниже три крупные карточки. Фото чёрно-белые, цвет возвращается по наведению
   .blog {
-    position: relative;
     padding-block: var(--section-y);
 
     @include theme-dark;
-
-    background:
-      radial-gradient(55% 60% at 12% 20%, oklch(61% 0.145 40deg / 16%), transparent),
-      radial-gradient(45% 50% at 90% 80%, oklch(55% 0.04 250deg / 22%), transparent), var(--ink);
-  }
-
-  .blog__mosaic {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .blog__side {
-    display: grid;
-    gap: 0.75rem;
-    align-content: start;
   }
 
   .news {
-    position: relative;
-    display: block;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
     color: var(--paper);
     text-decoration: none;
   }
 
   .news__frame {
-    position: absolute;
-    inset: 0;
+    display: block;
+    aspect-ratio: 3 / 2;
+    margin-block-end: 0.5rem;
     overflow: hidden;
+    background: var(--bg-2);
   }
 
   .news__image {
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
-    transition: transform 1.6s var(--ease-out);
+    filter: grayscale(1) contrast(1.05);
+    transition:
+      filter 0.9s var(--ease-io),
+      transform 1.4s var(--ease-out);
   }
 
-  .news:hover .news__image {
-    transform: scale(1.07);
+  .news:hover .news__image,
+  .news:focus-visible .news__image {
+    filter: none;
+    transform: scale(1.03);
+  }
+
+  .news--lead {
+    position: relative;
+    display: block;
+    margin-block-end: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .news--lead .news__frame {
+    block-size: clamp(30rem, 78svh, 50rem);
+    aspect-ratio: auto;
+    margin: 0;
+  }
+
+  .news__caption {
+    position: absolute;
+    inset-block-end: clamp(1rem, 3vw, 2.5rem);
+    inset-inline-start: var(--gutter);
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    inline-size: min(36rem, calc(100% - 2 * var(--gutter)));
+    padding: 1.5rem 1.75rem 1.75rem;
+  }
+
+  .news--lead .news__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1rem + 2vw, 3rem);
+    font-weight: 300;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .news__excerpt {
+    font-size: var(--fs-s);
+    line-height: 1.6;
+    color: rgb(245 245 243 / 85%);
   }
 
   .news__meta {
@@ -418,106 +463,48 @@
 
   .news__title {
     font-family: var(--font-text);
-    font-size: var(--fs-m);
+    font-size: var(--fs-l);
     font-weight: 500;
     line-height: 1.35;
     text-wrap: balance;
+    transition: color 0.3s;
+  }
+
+  .news:hover .news__title {
+    color: var(--accent);
+  }
+
+  .news--lead:hover .news__title {
+    color: var(--paper);
+  }
+
+  .news__more {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: var(--fs-s);
+    color: var(--fg-2);
   }
 
   .news__arrow {
-    inline-size: 1.5rem;
-    block-size: 1.5rem;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
     color: var(--accent);
     transition: transform 0.5s var(--ease-out);
   }
 
   .news:hover .news__arrow {
-    transform: translate(0.3rem, -0.3rem);
+    transform: translateX(0.3rem);
   }
 
-  .news--lead {
-    min-block-size: 30rem;
-    overflow: hidden;
-  }
-
-  .news__caption {
-    position: absolute;
-    inset-block-end: 0.75rem;
-    inset-inline: 0.75rem;
+  .blog__grid {
     display: grid;
-    gap: 0.75rem;
-    justify-items: start;
-    max-inline-size: 36rem;
-    padding: 1.4rem 1.5rem 1.5rem;
-    transition: transform 0.8s var(--ease-out);
-  }
-
-  .news--lead:hover .news__caption {
-    transform: translateY(-0.5rem);
-  }
-
-  .news--lead .news__title {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
-    font-weight: 300;
-    line-height: 1.1;
-    text-transform: uppercase;
-  }
-
-  .news__excerpt {
-    font-size: var(--fs-s);
-    line-height: 1.6;
-    color: var(--fg-2);
-  }
-
-  .news--row {
-    display: grid;
-    grid-template-columns: 8.5rem 1fr auto;
-    gap: 1rem;
-    align-items: center;
-    padding: 0.6rem 1.2rem 0.6rem 0.6rem;
-    overflow: hidden;
-    transition: background-color 0.5s var(--ease-out);
-  }
-
-  .news--row:hover {
-    background: var(--glass-accent);
-  }
-
-  .news__thumb {
-    position: relative;
-    display: block;
-    block-size: 6rem;
-    overflow: hidden;
-  }
-
-  .news__body {
-    display: grid;
-    gap: 0.4rem;
+    gap: clamp(1.5rem, 2.5vw, 2.5rem) var(--gap);
   }
 
   @media (width >= 900px) {
-    .blog__mosaic {
-      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-      align-items: stretch;
-    }
-
-    .news--lead {
-      min-block-size: 36rem;
-    }
-
-    .blog__side {
-      grid-template-rows: repeat(3, 1fr);
-      align-content: stretch;
-    }
-
-    .news--row {
-      grid-template-columns: 10rem 1fr auto;
-    }
-
-    .news__thumb {
-      block-size: 100%;
-      min-block-size: 7rem;
+    .blog__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
@@ -554,9 +541,14 @@
     gap: 0.5rem;
   }
 
+  .request__intro .section-title {
+    font-size: var(--fs-hero);
+    line-height: 0.92;
+  }
+
   .request__phone {
     font-family: var(--font-display);
-    font-size: var(--fs-xl);
+    font-size: var(--fs-title-s);
     font-weight: 200;
     color: var(--fg);
     text-decoration: none;
@@ -581,7 +573,7 @@
 
   .request__done {
     padding: 1rem;
-    background: rgb(255 255 255 / 8%);
+    background: var(--field-hover);
   }
 
   @media (width >= 900px) {

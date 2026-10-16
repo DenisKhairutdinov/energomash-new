@@ -1,3 +1,5 @@
+import { enhanceSelect } from './select'
+
 /** Быстрый подбор: набор назначений и подсказка по объёму зависят от выбранного типа техники. */
 export const initPicker = (): void => {
   const form = document.querySelector<HTMLFormElement>('[data-picker]')
@@ -10,6 +12,7 @@ export const initPicker = (): void => {
   const from = form.querySelector<HTMLInputElement>('[data-volume-from]')
   const to = form.querySelector<HTMLInputElement>('[data-volume-to]')
   const groups = purpose?.querySelectorAll<HTMLOptGroupElement>('optgroup') ?? []
+  const custom = purpose ? enhanceSelect(purpose, 'picker-purpose-label') : undefined
 
   const apply = (): void => {
     const checked = form.querySelector<HTMLInputElement>('input[name="type"]:checked')
@@ -36,6 +39,8 @@ export const initPicker = (): void => {
     if (to) {
       to.placeholder = checked.dataset['volumeMax'] ?? ''
     }
+
+    custom?.refresh()
   }
 
   form.addEventListener('change', apply)

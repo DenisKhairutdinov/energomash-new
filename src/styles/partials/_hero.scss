@@ -208,29 +208,24 @@
     color: var(--fg-2);
   }
 
-  .picker__select,
   .picker__input {
     inline-size: 100%;
     min-block-size: 3.5rem;
     padding: 0.75rem 1rem;
     color: var(--paper);
-    background: rgb(13 14 19 / 40%);
-    border: 1px solid var(--line-dark);
-    transition: border-color 0.2s;
+    background: var(--field);
+    border: 0;
+    transition: background-color 0.25s;
   }
 
-  .picker__select option,
-  .picker__select optgroup {
-    color: var(--ink);
-    background: var(--paper);
-  }
-
-  .picker__select:hover,
   .picker__input:hover,
-  .picker__select:focus,
   .picker__input:focus {
     outline: none;
-    border-color: var(--accent);
+    background: var(--field-hover);
+  }
+
+  .picker__input::placeholder {
+    color: var(--fg-2);
   }
 
   .picker__range {
@@ -260,16 +255,13 @@
     padding: 0.55rem 0.8rem;
     color: var(--paper);
     text-decoration: none;
-    border: 1px solid var(--line-dark);
-    transition:
-      background-color 0.3s,
-      border-color 0.3s;
+    background: var(--field);
+    transition: background-color 0.3s;
   }
 
   .picker__preset:hover,
   .picker__preset:focus-visible {
     background: var(--accent-deep);
-    border-color: var(--accent-deep);
   }
 
   .hero__utp {

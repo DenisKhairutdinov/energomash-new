@@ -1,6 +1,6 @@
-@use '../partials/mixins' as *;
+@use 'mixins' as *;
 
-// Вариант B «Кино»: тёмные главы по умолчанию (общие partials оформлены тёмными), здесь шрифт и киноплёнка отгрузок.
+// Сайт: тёмные главы по умолчанию (общие partials оформлены тёмными), здесь шрифт текста и киноплёнка отгрузок.
 @layer tokens {
   :root {
     --font-text: 'Manrope Variable', system-ui, sans-serif;

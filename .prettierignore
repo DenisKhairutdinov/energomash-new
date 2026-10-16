@@ -1,9 +1,8 @@
-dist
+﻿dist
 node_modules
 database
 .claude
-design-variants
 package-lock.json
 src/assets
-# Nunjucks-шаблоны: HTML-парсер Prettier ломает теги {% ... %}
+# Nunjucks-С€Р°Р±Р»РѕРЅС‹: HTML-РїР°СЂСЃРµСЂ Prettier Р»РѕРјР°РµС‚ С‚РµРіРё {% ... %}
 *.njk

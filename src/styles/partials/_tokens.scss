@@ -14,19 +14,22 @@
     // Совместимость со старыми именами
     --accent-bright: var(--accent);
 
-    // Линии не используем как оформление блоков; цвета нужны только для границ полей и стекла
+    // Рамок у элементов нет: поля и плашки выделяются заливкой и тенью
     --line-light: #0d0e131f;
     --line-dark: #f5f5f326;
+    --field: #f5f5f314;
+    --field-hover: #f5f5f324;
 
     // Стекло: тёмная подложка и размытие
-    --glass-dark: #0d0e1399;
-    --glass-dark-strong: #0d0e13cc;
-    --glass-clear: #0d0e1359;
+    // Стекло: прозрачнее и с умеренным размытием, чтобы фото под плашкой читалось
+    --glass-dark: #0d0e1359;
+    --glass-dark-strong: #0d0e1373;
+    --glass-clear: #0d0e1340;
     --glass-accent: #c8603dbf;
-    --glass-blur: blur(14px);
-    --glass-blur-strong: blur(32px) saturate(1.6);
+    --glass-blur: blur(9px);
+    --glass-blur-strong: blur(12px) saturate(1.5);
 
-    // Шрифты: заголовки Oswald во всех вариантах, текст задаёт вариант (--font-text в a.scss и b.scss)
+    // Шрифты: заголовки Oswald, текст Manrope (--font-text в _site.scss)
     --font-display: 'Oswald Variable', 'Arial Narrow', sans-serif;
     --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
@@ -46,7 +49,7 @@
     --gutter: clamp(1rem, 3.5vw, 3.5rem);
     --section-y: clamp(5rem, 3rem + 7vw, 9.5rem);
     --gap: clamp(0.75rem, 1.4vw, 1.25rem);
-    --header-h: 4.5rem;
+    --header-h: 3.5rem;
     --max: 1680px;
 
     // Угол окна справа внизу оставляем свободным: на старом сайте там стоял виджет чата

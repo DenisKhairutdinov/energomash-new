@@ -16,13 +16,8 @@ import { initText } from './text'
 import { initWow } from './wow'
 import { initWaterRipples } from './water-ripples'
 
-interface AppOptions {
-  /** Горизонтальная «киноплёнка» отгрузок с пином (вариант B) */
-  cinema: boolean
-}
-
-/** Общий запуск всех модулей страницы; варианты A и B отличаются только стилями и настройками. */
-export const startApp = ({ cinema }: AppOptions): void => {
+/** Общий запуск всех модулей страницы. */
+export const startApp = (): void => {
   initSmoothScroll()
   initHeader()
   initModal()
@@ -39,10 +34,7 @@ export const startApp = ({ cinema }: AppOptions): void => {
   const ready = initLoader()
 
   initHero(ready)
-
-  if (cinema) {
-    initCinema()
-  }
+  initCinema()
 
   // Фото меняют высоту секций после загрузки: пересчитываем позиции триггеров
   window.addEventListener('load', () => {

@@ -1,8 +1,8 @@
-{# Документы и допуски: мозаика из стеклянных блоков поверх фото. #}
+{# Документы и допуски: ровная сетка стеклянных блоков поверх фото. #}
 {% from "icons.njk" import icon %}
 <section class="docs" aria-labelledby="docs-title" data-chapter="Документы">
-  <div class="docs__bg" data-frame>
-    <img src="/src/assets/models/IMG_0550.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.08" />
+  <div class="docs__bg">
+    <img src="/src/assets/models/IMG_0550.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.05" />
   </div>
   <div class="docs__layout container">
     <div class="docs__intro glass glass--strong">
@@ -12,7 +12,7 @@
     </div>
     <ul class="docs__list">
       {% for doc in home.docs %}
-        <li class="docs__item glass" data-depth="{{ loop.index * 6 }}">
+        <li class="docs__item glass">
           <span class="docs__mark" aria-hidden="true">{{ icon("check") }}</span>
           <h3 class="docs__title">{{ doc.title }}</h3>
           <p class="docs__text">{{ doc.text }}</p>

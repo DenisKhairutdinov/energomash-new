@@ -1,4 +1,4 @@
-// Шрифты (Oswald, Golos Text, JetBrains Mono) и стили Lenis подключаются в scripts/main.ts
+// Шрифты (Oswald, Manrope, JetBrains Mono) и стили Lenis подключаются в scripts/main.ts
 @layer reset {
   *,
   *::before,
@@ -79,7 +79,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 1px solid var(--accent);
     outline-offset: 3px;
   }
 

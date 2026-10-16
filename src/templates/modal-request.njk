@@ -5,14 +5,17 @@
       {{ icon("close") }}
     </button>
     <div class="modal__aside">
-      <h2 class="modal__title" id="request-modal-title" data-modal-title>Заказать звонок</h2>
-      <p class="modal__text" data-modal-text>
-        Оставьте телефон. Менеджер перезвонит в рабочее время, уточнит задачу и подскажет подходящую модель.
-      </p>
-      <p class="modal__model" hidden data-modal-model-row>
-        Модель: <strong data-modal-model></strong>
-      </p>
-      <a class="modal__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
+      <img class="modal__photo" src="/src/assets/models/IMG_4530.webp" width="2400" height="1600" alt="" loading="lazy" />
+      <div class="modal__aside-in">
+        <h2 class="modal__title" id="request-modal-title" data-modal-title>Заказать звонок</h2>
+        <p class="modal__text" data-modal-text>
+          Оставьте телефон. Менеджер перезвонит в рабочее время, уточнит задачу и подскажет подходящую модель.
+        </p>
+        <p class="modal__model" hidden data-modal-model-row>
+          Модель: <strong data-modal-model></strong>
+        </p>
+        <a class="modal__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
+      </div>
     </div>
     <form class="modal__form" action="#" method="post" novalidate data-request-form>
       <input type="hidden" name="kind" value="call" />
