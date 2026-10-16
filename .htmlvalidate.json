@@ -1,0 +1,12 @@
+{
+  "extends": ["html-validate:recommended"],
+  "elements": ["html5"],
+  "rules": {
+    "no-inline-style": "error",
+    "prefer-native-element": "error",
+    "require-sri": "off",
+    "void-style": ["error", { "style": "any" }],
+    "attribute-boolean-style": ["error", { "style": "omit" }],
+    "doctype-style": ["error", { "style": "lowercase" }]
+  }
+}

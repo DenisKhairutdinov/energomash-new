@@ -1,0 +1,9 @@
+dist
+node_modules
+database
+.claude
+design-variants
+package-lock.json
+src/assets
+# Nunjucks-шаблоны: HTML-парсер Prettier ломает теги {% ... %}
+*.njk
