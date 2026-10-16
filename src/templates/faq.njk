@@ -1,0 +1,21 @@
+{# Вопросы и ответы. Одновременно открыт один ответ: общий атрибут name у <details> (нативно, без скриптов) #}
+<section class="faq container" aria-labelledby="faq-title">
+  <div class="faq__layout">
+    <div class="faq__intro">
+      <h2 class="section-title" id="faq-title">Вопросы<br />и ответы</h2>
+      <p class="section-head__text">Коротко о сроках, лизинге, гарантии и документах. Остальное расскажет менеджер.</p>
+      <button class="button button--ink" type="button" data-modal-open="consult">Получить консультацию</button>
+    </div>
+    <div class="faq__list">
+      {% for item in home.faq %}
+        <details class="faq__item" name="faq">
+          <summary class="faq__question">
+            <span class="faq__text">{{ item.question }}</span>
+            <span class="faq__mark" aria-hidden="true"></span>
+          </summary>
+          <div class="faq__body"><p class="faq__answer">{{ item.answer }}</p></div>
+        </details>
+      {% endfor %}
+    </div>
+  </div>
+</section>

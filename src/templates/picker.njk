@@ -1,0 +1,52 @@
+{# Быстрый подбор: ведёт в каталог с параметрами в адресе. Назначения зависят от типа техники (scripts/modules/picker.ts) #}
+<section class="picker container" aria-labelledby="picker-title">
+  <form class="picker__form" action="/catalog.html" method="get" data-picker>
+    <h2 class="picker__title" id="picker-title">Подбор по параметрам</h2>
+    <fieldset class="picker__field picker__field--type">
+      <legend class="picker__legend">Тип техники</legend>
+      <div class="segmented">
+        {% for type in home.picker.types %}
+          <label class="segmented__item">
+            <input
+              class="segmented__input"
+              type="radio"
+              name="type"
+              value="{{ type.value }}"
+              data-volume-min="{{ type.volume[0] }}"
+              data-volume-max="{{ type.volume[1] }}"
+              {% if loop.first %}checked{% endif %}
+            />
+            <span class="segmented__label">{{ type.title }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <label class="picker__field">
+      <span class="picker__legend">Назначение</span>
+      <select class="picker__select" name="purpose" data-picker-purpose>
+        <option value="">Любое</option>
+        {% for type in home.picker.types %}
+          <optgroup label="{{ type.title }}" data-type="{{ type.value }}">
+            {% for purpose in home.picker.purposes[type.value] %}
+              <option value="{{ purpose.value }}">{{ purpose.title }}</option>
+            {% endfor %}
+          </optgroup>
+        {% endfor %}
+      </select>
+    </label>
+    <fieldset class="picker__field picker__field--volume">
+      <legend class="picker__legend">Объём, м³</legend>
+      <div class="picker__range">
+        <input class="picker__input" type="text" inputmode="numeric" name="volume-from" placeholder="{{ home.picker.types[0].volume[0] }}" aria-label="Объём от" data-volume-from />
+        <span aria-hidden="true">—</span>
+        <input class="picker__input" type="text" inputmode="numeric" name="volume-to" placeholder="{{ home.picker.types[0].volume[1] }}" aria-label="Объём до" data-volume-to />
+      </div>
+    </fieldset>
+    <label class="check picker__stock">
+      <input class="check__input" type="checkbox" name="in-stock" value="1" />
+      <span class="check__box" aria-hidden="true"></span>
+      <span class="check__text">Только в наличии</span>
+    </label>
+    <button class="button button--ink picker__submit" type="submit">Подобрать</button>
+  </form>
+</section>

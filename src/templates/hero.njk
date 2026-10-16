@@ -1,0 +1,37 @@
+{% from "icons.njk" import icon %}
+<section class="hero" aria-labelledby="hero-title" data-hero>
+  <img
+    class="hero__bg"
+    src="/src/assets/images/color.webp"
+    width="3548"
+    height="1774"
+    alt=""
+    fetchpriority="high"
+    data-animated-background
+  />
+  <div class="hero__shade" aria-hidden="true"></div>
+  {# Окно под текстом и кнопками: курсор над свободной частью фото вызывает рябь (scripts/modules/water-ripples.ts) #}
+  <div class="hero__window" aria-hidden="true" data-support-block></div>
+  <div class="hero__inner container">
+    <h1 class="hero__title" id="hero-title">
+      {% for line in home.hero.title %}
+        <span class="hero__line"><span class="hero__line-in" data-hero-line>{{ line }}</span></span>
+      {% endfor %}
+    </h1>
+    <div class="hero__side" data-hero-side>
+      <p class="hero__lead">{{ home.hero.lead }}</p>
+      <div class="hero__actions">
+        <a class="button button--accent" href="/catalog.html?in-stock=1">
+          Техника в наличии
+          <span class="button__badge">{{ home.catalogTotals.inStock }}</span>
+        </a>
+        <button class="button button--glass" type="button" data-modal-open="call">Заказать звонок</button>
+      </div>
+    </div>
+  </div>
+  <ul class="hero__utp container" data-hero-side>
+    {% for item in home.hero.utp %}
+      <li><a class="hero__utp-link" href="{{ item.url }}">{{ item.title }}{{ icon("arrow", "hero__utp-icon") }}</a></li>
+    {% endfor %}
+  </ul>
+</section>

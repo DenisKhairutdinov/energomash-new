@@ -1,0 +1,28 @@
+{% from "icons.njk" import icon %}
+<section class="purposes container" aria-labelledby="purposes-title">
+  <div class="section-head">
+    <h2 class="section-title" id="purposes-title">Каталог<br />по назначению</h2>
+    <p class="section-head__text">{{ home.catalogTotals.total }} моделей. Выберите груз, а подходящую цистерну найдём в каталоге.</p>
+  </div>
+  <ul class="purposes__grid">
+    {% for item in home.purposes %}
+      <li class="purposes__item{{ ' purposes__item--wide' if item.wide }}">
+        <a class="purposes__link" href="{{ item.url }}">
+          <img
+            class="purposes__image"
+            src="/src/assets/models/{{ item.photo }}"
+            width="2400"
+            height="1600"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="purposes__caption">
+            <span class="purposes__name">{{ item.title }}</span>
+            <span class="purposes__count">{{ item.count }} моделей {{ icon("arrow", "purposes__icon") }}</span>
+          </span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>

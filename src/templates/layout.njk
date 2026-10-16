@@ -3,16 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ pageTitle }}{% if pageTitle != "ООО «Энергомаш»" %} — Энергомаш{% endif %}</title>
+    <title>{{ pageTitleFull or (pageTitle + " — Энергомаш") }}</title>
+    {% if pageDescription %}<meta name="description" content="{{ pageDescription }}" />{% endif %}
+    <meta name="theme-color" content="#1b2430" />
+    <link rel="icon" href="/src/assets/favicon.svg" type="image/svg+xml" />
+    <script>document.documentElement.classList.add('js')</script>
     <link rel="stylesheet" href="/src/styles/main.scss" />
     <script type="module" src="/src/scripts/main.ts"></script>
   </head>
-  <body>
+  <body class="page{% if pageClass %} page--{{ pageClass }}{% endif %}">
     <a class="skip-link" href="#main">Перейти к содержимому</a>
     {% include "header.njk" %}
     <main id="main">
       {% block content %}{% endblock %}
     </main>
     {% include "footer.njk" %}
+    {% include "modal-request.njk" %}
   </body>
 </html>

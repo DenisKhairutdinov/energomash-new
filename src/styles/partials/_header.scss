@@ -1,0 +1,212 @@
+@layer sections {
+  .header {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 50;
+    color: var(--on-steel);
+    background: var(--steel);
+    transition: background-color 0.35s var(--ease-out);
+  }
+
+  .page--home .header:not(.is-solid, .is-open) {
+    background: transparent;
+  }
+
+  .page:not(.page--home) main {
+    padding-block-start: var(--header-h);
+  }
+
+  .header__bar {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    min-block-size: var(--header-h);
+  }
+
+  .header__logo {
+    display: block;
+    flex: none;
+  }
+
+  .header__logo img {
+    inline-size: 9.5rem;
+  }
+
+  .header__burger {
+    display: grid;
+    place-items: center;
+    inline-size: 3rem;
+    block-size: 3rem;
+    color: inherit;
+    background: transparent;
+    border: 0;
+  }
+
+  .header__burger-icon {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+  }
+
+  .header__panel {
+    position: absolute;
+    inset-block-start: var(--header-h);
+    inset-inline: 0;
+    display: none;
+    gap: 1.5rem;
+    max-block-size: calc(100svh - var(--header-h));
+    padding: 1rem var(--gutter) 2rem;
+    overflow: auto;
+    background: var(--steel);
+  }
+
+  .header.is-open .header__panel {
+    display: grid;
+  }
+
+  .header__contacts {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  .header__phone {
+    font-family: var(--font-display);
+    font-size: var(--fs-l);
+    font-weight: 300;
+    color: inherit;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  // Меню
+  .menu__list {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .menu__link {
+    display: block;
+    padding-block: 0.75rem;
+    font-size: var(--fs-l);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .menu__link--accent {
+    color: var(--accent-bright);
+  }
+
+  .menu__link--active {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  .menu__dropdown {
+    display: grid;
+    gap: 0.25rem;
+    padding-inline-start: 1rem;
+    border-inline-start: 1px solid var(--steel-line);
+  }
+
+  .menu__sublink {
+    display: block;
+    padding-block: 0.4rem;
+    font-size: var(--fs-s);
+    color: var(--on-steel-2);
+    text-decoration: none;
+  }
+
+  .menu__sublink:hover,
+  .menu__sublink--active {
+    color: var(--on-steel);
+  }
+
+  .menu__group {
+    padding-inline-start: 0.75rem;
+  }
+
+  @media (width >= 1100px) {
+    .header__burger {
+      display: none;
+    }
+
+    .header__panel {
+      position: static;
+      display: flex;
+      flex: 1;
+      gap: 2rem;
+      align-items: center;
+      justify-content: space-between;
+      max-block-size: none;
+      padding: 0;
+      overflow: visible;
+      background: transparent;
+    }
+
+    .header__contacts {
+      grid-auto-flow: column;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .menu__list {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .menu__link {
+      padding: 1.6rem 0.9rem;
+      font-size: var(--fs-m);
+    }
+
+    .menu__item:hover > .menu__link,
+    .menu__item:focus-within > .menu__link {
+      color: var(--accent-bright);
+    }
+
+    .menu__dropdown {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      gap: 2rem;
+      padding: 2.25rem max(var(--gutter), calc((100% - var(--max)) / 2)) 2.75rem;
+      color: var(--ink);
+      background: var(--paper);
+      border-block-end: 1px solid var(--line);
+      border-inline-start: 0;
+    }
+
+    .menu__item:hover > .menu__dropdown,
+    .menu__item:focus-within > .menu__dropdown {
+      display: grid;
+    }
+
+    .menu__sublink {
+      color: var(--ink-2);
+    }
+
+    .menu__sublink:hover,
+    .menu__sublink--active {
+      color: var(--accent);
+    }
+
+    .menu__subitem > .menu__sublink {
+      padding-block: 0.5rem 0.75rem;
+      font-family: var(--font-display);
+      font-size: var(--fs-l);
+      font-weight: 300;
+      color: var(--ink);
+      text-transform: uppercase;
+      border-block-end: 1px solid var(--line);
+    }
+
+    .menu__group {
+      padding-inline-start: 0;
+    }
+  }
+}

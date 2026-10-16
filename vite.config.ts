@@ -10,6 +10,10 @@ export default defineConfig({
   plugins: [
     vituum({
       formats: ['njk'],
+      // Точки входа заданы явно, чтобы части стилей и модули не собирались отдельными файлами
+      input: ['./src/styles/main.scss', './src/scripts/main.ts'],
+      // Плагин imports по умолчанию создаёт файлы `+.js` и `+.css` с импортами всей папки; нам они не нужны
+      imports: { paths: [] },
     }),
     nunjucks({
       root: './src/templates',
@@ -23,9 +27,6 @@ export default defineConfig({
   css: {
     transformer: 'lightningcss',
     lightningcss: { targets },
-    preprocessorOptions: {
-      scss: { api: 'modern-compiler' },
-    },
   },
   build: {
     cssMinify: 'lightningcss',

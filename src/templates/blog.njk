@@ -1,0 +1,31 @@
+{% from "icons.njk" import icon %}
+<section class="blog container" aria-labelledby="blog-title">
+  <div class="section-head">
+    <h2 class="section-title" id="blog-title">Блог</h2>
+    <p class="section-head__text">Статьи завода о цистернах, сервисе и эксплуатации техники.</p>
+    <a class="button button--ink" href="/blog.html">Смотреть все</a>
+  </div>
+  <ul class="blog__grid">
+    {% for post in home.posts %}
+      <li class="blog__item{{ ' blog__item--lead' if loop.first }}">
+        <a class="blog__link" href="{{ post.url }}">
+          <img
+            class="blog__image"
+            src="/src/assets/images/{{ post.image }}"
+            width="1024"
+            height="768"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="blog__meta">
+            <time datetime="{{ post.datetime }}">{{ post.date }}</time>
+            <span>{{ post.rubric }}</span>
+          </span>
+          <span class="blog__title">{{ post.title }}</span>
+          {% if loop.first %}<span class="blog__excerpt">{{ post.excerpt }}</span>{% endif %}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>

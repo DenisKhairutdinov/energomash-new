@@ -1,2 +1,22 @@
-{% extends "layout.njk" %} {% set pageTitle = "ООО «Энергомаш»" %} {% set currentPage = "" %} {%
-block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pageTitle = "ООО «Энергомаш»" %}
+{% set pageTitleFull = "Энергомаш: завод полуприцепов-цистерн и автоцистерн" %}
+{% set pageDescription = "Завод «Энергомаш» производит полуприцепы-цистерны и цистерны на шасси. 892 модели в каталоге, 162 единицы в наличии, лизинг и субсидия, гарантия 12 месяцев." %}
+{% set currentPage = "" %}
+{% set pageClass = "home" %}
+{% block content %}
+  {# Порядок по воронке: товар, доверие, как купить, сомнения, контент, заявка #}
+  {% include "hero.njk" %}
+  {% include "picker.njk" %}
+  {% include "facts.njk" %}
+  {% include "stock.njk" %}
+  {% include "purposes.njk" %}
+  {% include "shipments.njk" %}
+  {% include "geography.njk" %}
+  {% include "leasing.njk" %}
+  {% include "process.njk" %}
+  {% include "docs.njk" %}
+  {% include "faq.njk" %}
+  {% include "blog.njk" %}
+  {% include "request.njk" %}
+{% endblock %}

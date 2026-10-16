@@ -1,0 +1,24 @@
+{% from "icons.njk" import icon %}
+<section class="docs container" aria-labelledby="docs-title">
+  <div class="docs__layout">
+    <div class="docs__intro">
+      <h2 class="section-title" id="docs-title">Документы<br />и допуски</h2>
+      <p class="section-head__text">Техника выходит с завода с полным пакетом документов для регистрации и перевозки.</p>
+      <a class="button button--ink" href="/docs.html">Сертификаты и документы</a>
+    </div>
+    <ul class="docs__list">
+      {% for doc in home.docs %}
+        <li class="docs__item">
+          <span class="docs__mark" aria-hidden="true">{{ icon("check") }}</span>
+          <h3 class="docs__title">{{ doc.title }}</h3>
+          <p class="docs__text">{{ doc.text }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <aside class="service">
+    <h3 class="service__title">{{ home.service.title }}</h3>
+    <p class="service__text">{{ home.service.text }}</p>
+    <a class="service__link" href="{{ home.service.url }}">Сервис и запчасти {{ icon("arrow", "service__icon") }}</a>
+  </aside>
+</section>

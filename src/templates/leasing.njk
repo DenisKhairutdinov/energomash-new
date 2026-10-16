@@ -1,0 +1,88 @@
+{# Калькулятор лизинга. Расчёт ориентировочный: условия партнёров и субсидия лежат в src/data/home.json, ключ leasing. #}
+{# Партнёры: аванс, срок и удорожание условные, их нужно заменить данными самих лизинговых компаний. #}
+<section
+  class="leasing"
+  id="leasing"
+  aria-labelledby="leasing-title"
+  data-leasing
+  data-subsidy-share="{{ home.leasing.subsidyShare }}"
+  data-subsidy-cap="{{ home.leasing.subsidyCap }}"
+>
+  <div class="leasing__layout container">
+    <div class="leasing__intro">
+      <h2 class="section-title section-title--light" id="leasing-title">Лизинг<br />и субсидия</h2>
+      <p class="leasing__lead">
+        Выберите лизинговую компанию и посчитайте платёж за минуту. Все партнёры аккредитованы по программе Минпромторга.
+      </p>
+      <label class="switch">
+        <input class="switch__input" type="checkbox" checked data-subsidy />
+        <span class="switch__track" aria-hidden="true"></span>
+        <span class="switch__body">
+          <span class="switch__title">Учесть субсидию Минпромторга</span>
+          <span class="switch__text">
+            Государство компенсирует {{ home.leasing.subsidyShare }}% стоимости техники, не более 500&nbsp;000&nbsp;₽ на единицу. Работает только при лизинге. Правила:
+            <a href="{{ home.leasing.subsidyDoc }}" target="_blank" rel="noopener noreferrer">постановление Правительства №649</a>.
+          </span>
+        </span>
+      </label>
+    </div>
+
+    <form class="leasing__form" action="#" novalidate data-leasing-form>
+      <fieldset class="leasing__partners">
+        <legend class="leasing__legend">Лизинговый партнёр</legend>
+        <div class="leasing__chips">
+          {% for partner in home.leasing.partners %}
+            <label class="chip">
+              <input
+                class="chip__input"
+                type="radio"
+                name="partner"
+                value="{{ partner.id }}"
+                data-advance="{{ partner.advance }}"
+                data-term="{{ partner.term }}"
+                data-rate="{{ partner.rate }}"
+                data-name="{{ partner.name }}"
+                {% if loop.first %}checked{% endif %}
+              />
+              <span class="chip__label">{{ partner.name }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <div class="leasing__fields">
+        <label class="range">
+          <span class="range__label">Стоимость техники</span>
+          <span class="range__value range__value--input">
+            <input class="range__number" type="text" inputmode="numeric" autocomplete="off" value="6 000 000" aria-label="Стоимость техники, рублей" data-price />
+            <span class="range__unit">₽</span>
+          </span>
+          <input class="range__slider" type="range" min="500000" max="15000000" step="100000" value="6000000" aria-label="Стоимость техники, ползунок" data-price-range />
+        </label>
+        <label class="range">
+          <span class="range__label">Первоначальный взнос</span>
+          <span class="range__value"><output data-advance-out>20</output><span class="range__unit">%</span></span>
+          <input class="range__slider" type="range" min="0" max="50" step="1" value="20" aria-label="Первоначальный взнос, процентов" data-advance-range />
+        </label>
+        <label class="range">
+          <span class="range__label">Срок лизинга</span>
+          <span class="range__value"><output data-term-out>36</output><span class="range__unit">мес.</span></span>
+          <input class="range__slider" type="range" min="12" max="60" step="6" value="36" aria-label="Срок лизинга, месяцев" data-term-range />
+        </label>
+      </div>
+    </form>
+
+    <div class="leasing__result" aria-live="polite">
+      <p class="leasing__payment-label">Платёж в месяц</p>
+      <p class="leasing__payment" data-payment>—</p>
+      <dl class="leasing__summary">
+        <div><dt>Аванс</dt><dd data-advance-sum>—</dd></div>
+        <div data-subsidy-row><dt>Субсидия</dt><dd data-subsidy-sum>—</dd></div>
+        <div><dt>Всего платежей</dt><dd data-total>—</dd></div>
+        <div><dt>Переплата</dt><dd data-overpay>—</dd></div>
+      </dl>
+      <p class="leasing__note" data-note>Расчёт ориентировочный. Точные условия подтвердит лизинговая компания.</p>
+      <button class="button button--accent" type="button" data-modal-open="calc">Получить расчёт</button>
+    </div>
+  </div>
+</section>

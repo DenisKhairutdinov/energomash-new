@@ -1,4 +1,25 @@
-<header class="header">
-  <a class="header__logo" href="/" aria-label="Энергомаш, на главную">Энергомаш</a>
-  {% include "menu.njk" %}
+{% from "icons.njk" import icon %}
+<header class="header" data-header>
+  <div class="header__bar container">
+    <a class="header__logo" href="/" aria-label="Энергомаш, на главную">
+      <img src="/src/assets/images/logo.svg" width="176" height="27" alt="Энергомаш" />
+    </a>
+    <button
+      class="header__burger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      data-menu-toggle
+    >
+      <span class="visually-hidden">Меню</span>
+      {{ icon("menu", "header__burger-icon") }}
+    </button>
+    <div class="header__panel" id="site-menu" data-menu-panel>
+      {% include "menu.njk" %}
+      <div class="header__contacts">
+        <a class="header__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
+        <button class="button button--accent button--compact" type="button" data-modal-open="call">Заказать звонок</button>
+      </div>
+    </div>
+  </div>
 </header>

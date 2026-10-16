@@ -1,0 +1,160 @@
+// Шрифты (Oswald Variable, Golos Text Variable) подключаются в scripts/main.ts
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  img,
+  svg {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  img {
+    block-size: auto;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ul,
+  ol {
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-block-start: var(--header-h);
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-block-size: 100svh;
+    font: 400 var(--fs-m) / 1.55 var(--font-text);
+    color: var(--ink);
+    background: var(--paper);
+    text-rendering: optimizelegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    color: var(--on-accent);
+    background: var(--accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer layout {
+  .container {
+    inline-size: min(100% - 2 * var(--gutter), var(--max));
+    margin-inline: auto;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  .skip-link {
+    position: fixed;
+    inset-block-start: 0.5rem;
+    inset-inline-start: 0.5rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    color: var(--on-accent);
+    background: var(--ink);
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  .section-title {
+    font-size: var(--fs-title);
+    font-weight: 250;
+    line-height: 0.98;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+  }
+
+  .section-title--light {
+    color: var(--on-steel);
+  }
+
+  .section-head {
+    display: grid;
+    gap: var(--gap);
+    align-items: end;
+    margin-block-end: clamp(2rem, 4vw, 4rem);
+  }
+
+  .section-head__text {
+    max-inline-size: 34rem;
+    font-size: var(--fs-l);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .section-head > .button {
+    justify-self: start;
+  }
+
+  @media (width >= 900px) {
+    .section-head {
+      grid-template-columns: 1.2fr 1fr auto;
+    }
+
+    .section-head > .button {
+      justify-self: end;
+    }
+  }
+}

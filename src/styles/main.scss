@@ -1,28 +1,11 @@
-// Точка входа стилей. Токены и компоненты добавляются после выбора дизайн-направления.
-@layer reset, tokens, base, components, utilities;
-
-@layer reset {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  body {
-    margin: 0;
-  }
-}
-
-@layer base {
-  .skip-link {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    padding: 0.75rem 1rem;
-    transform: translateY(-100%);
-  }
-
-  .skip-link:focus-visible {
-    transform: none;
-  }
-}
+﻿// Точка входа стилей. Порядок @use = порядок вывода; слои описаны в partials/_layers.
+@use 'partials/layers';
+@use 'partials/tokens';
+@use 'partials/base';
+@use 'partials/components';
+@use 'partials/header';
+@use 'partials/hero';
+@use 'partials/catalog';
+@use 'partials/proof';
+@use 'partials/buy';
+@use 'partials/content';

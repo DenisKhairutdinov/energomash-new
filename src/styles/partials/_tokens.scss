@@ -1,0 +1,51 @@
+// Токены. Цвета в OKLCH: палитра отталкивается от фирменного оранжевого логотипа (#C8603D)
+// и красных цистерн на фото, нейтрали подкрашены в холодную сталь неба над заводом.
+@layer tokens {
+  :root {
+    // Нейтрали
+    --paper: oklch(98% 0.004 240deg);
+    --paper-2: oklch(95.5% 0.007 240deg);
+    --paper-3: oklch(91% 0.01 242deg);
+    --line: oklch(84% 0.012 245deg);
+    --ink: oklch(19% 0.03 255deg);
+    --ink-2: oklch(40% 0.03 252deg);
+
+    // Тёмные секции
+    --steel: oklch(23% 0.03 255deg);
+    --steel-2: oklch(29% 0.032 255deg);
+    --steel-line: oklch(40% 0.03 255deg);
+    --on-steel: oklch(96% 0.006 240deg);
+    --on-steel-2: oklch(77% 0.02 245deg);
+
+    // Акцент: заливка кнопок (белый текст, контраст выше 4.5:1) и яркий вариант для тёмного фона
+    --accent: oklch(52% 0.17 40deg);
+    --accent-hover: oklch(46% 0.17 40deg);
+    --accent-bright: oklch(68% 0.19 43deg);
+    --on-accent: oklch(99% 0.003 40deg);
+    --focus: oklch(60% 0.2 255deg);
+
+    // Шрифты
+    --font-display: 'Oswald Variable', 'Arial Narrow', sans-serif;
+    --font-text: 'Golos Text Variable', system-ui, sans-serif;
+
+    // Размеры текста (плавные)
+    --fs-s: clamp(0.8125rem, 0.78rem + 0.15vw, 0.9rem);
+    --fs-m: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+    --fs-l: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+    --fs-xl: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+    --fs-title: clamp(2.5rem, 1.4rem + 4.6vw, 5.75rem);
+    --fs-hero: clamp(2.25rem, 0.5rem + 6.6vw, 7.5rem);
+    --fs-number: clamp(3rem, 1.5rem + 5vw, 6.5rem);
+
+    // Отступы и сетка
+    --gutter: clamp(1rem, 4vw, 4rem);
+    --section-y: clamp(4.5rem, 2.5rem + 8vw, 9.5rem);
+    --gap: clamp(1rem, 2vw, 2rem);
+    --header-h: 4.5rem;
+    --max: 1680px;
+
+    // Движение
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+}

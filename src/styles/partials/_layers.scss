@@ -1,0 +1,2 @@
+// Порядок слоёв каскада. Позже объявленный слой перекрывает ранний без борьбы за специфичность.
+@layer reset, tokens, base, layout, components, sections, utilities;

@@ -1,0 +1,40 @@
+{# Отгрузки: данные-заглушки (модели, города, даты), позже придут из БД. Ключ shipments в src/data/home.json #}
+{% from "icons.njk" import icon %}
+<section class="shipments container" aria-labelledby="shipments-title">
+  <div class="section-head">
+    <h2 class="section-title" id="shipments-title">Недавно<br />отгружено</h2>
+    <p class="section-head__text">Свежие поставки заказчикам: модели, города и даты отгрузки.</p>
+    <a class="button button--ink" href="/shipments.html">Смотреть все отгрузки</a>
+  </div>
+  <ul class="shipments__grid">
+    {% for item in home.shipments %}
+      <li class="shipments__item">
+        <a class="shipments__link" href="/product.html">
+          <img
+            class="shipments__image"
+            src="/src/assets/images/{{ item.image }}"
+            width="1800"
+            height="1350"
+            alt="{{ item.type }} {{ item.model }}"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="shipments__where">
+            <time datetime="{{ item.datetime }}">{{ item.date }}</time>, {{ item.city }}
+          </span>
+          <span class="shipments__info">
+            <span class="shipments__type">{{ item.type }}</span>
+            <span class="shipments__model">{{ item.model }}</span>
+            <span class="shipments__details">
+              <span class="shipments__specs">
+                {% for spec in item.specs %}
+                  <span class="shipments__spec"><span>{{ spec[0] }}</span><span>{{ spec[1] }}</span></span>
+                {% endfor %}
+              </span>
+            </span>
+          </span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>

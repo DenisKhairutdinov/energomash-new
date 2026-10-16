@@ -1,0 +1,10 @@
+<section class="facts container" aria-label="Завод в цифрах">
+  <dl class="facts__list">
+    {% for fact in home.facts %}
+      <div class="facts__item">
+        <dt class="facts__label">{{ fact.label }}</dt>
+        <dd class="facts__value"><span data-count="{{ fact.value }}">{{ fact.value }}</span>{{ fact.suffix }}</dd>
+      </div>
+    {% endfor %}
+  </dl>
+</section>
