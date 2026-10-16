@@ -4,18 +4,18 @@
 
 ## Группы и ведущий скилл
 
-| Область | Ведущий | Помощники | Примечание |
-|---|---|---|---|
-| Доступность | `accessibility` (WCAG 2.2 AA) | `frontend-a11y-*`, `web-interface-guidelines` | `front-a11y` написан под WCAG 2.1 и Vue/Svelte/Astro: берём только как чек-лист, планка остаётся 2.2 AA |
-| Производительность | `performance`, `core-web-vitals` | `frontend-perf-*`, `frontend-errors-animation-jank`, `gsap-performance` | `web-quality-audit` — общий аудит перед релизом, а не замена перечисленным |
-| CSS и HTML | `frontend-syntax-*`, `frontend-impl-*` | `frontend-errors-*`, `frontend-core-web-standards-baseline` | Нативные возможности (container queries, `:has()`, `<dialog>`, Popover) раньше JS |
-| Анимация | `design-motion-principles` решает, нужна ли | `frontend-impl-view-transitions-scroll-animations` (нативный CSS), затем `gsap-core/timeline/scrolltrigger/plugins/utils` | Сначала CSS и scroll-driven animations; GSAP для последовательностей, pin и сложного scrub |
-| Компоненты | `frontend-component-*`, `frontend-impl-popover-dialog-anchor` | `popups` (только про конверсию) | Правила доступности модалок важнее маркетинговых |
-| Тексты | `copywriting` | `copy-editing`, `marketing-psychology`, `offers`, `lead-magnets` | Русский деловой текст без ИИ-примет; не копировать SaaS-шаблоны дословно |
-| SEO | `seo` | `seo-audit`, `schema`, `site-architecture`, `ai-seo`, `content-strategy` | Поисковик Яндекс в приоритете; `programmatic-seo` только если появится каталог на сотни страниц |
-| Конверсия | `cro` | `analytics`, `ab-testing` | Формы заявки, телефон, расчёт стоимости |
-| Код-ревью | встроенные `code-review`, `simplify` | `front-review`, `web-interface-guidelines` | |
-| Безопасность | встроенный `security-review` | `semgrep`, `sharp-edges`, `differential-review`, `supply-chain-risk-auditor` | Перед релизом и после добавления зависимостей |
+| Область            | Ведущий                                                       | Помощники                                                                                                                 | Примечание                                                                                              |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Доступность        | `accessibility` (WCAG 2.2 AA)                                 | `frontend-a11y-*`, `web-interface-guidelines`                                                                             | `front-a11y` написан под WCAG 2.1 и Vue/Svelte/Astro: берём только как чек-лист, планка остаётся 2.2 AA |
+| Производительность | `performance`, `core-web-vitals`                              | `frontend-perf-*`, `frontend-errors-animation-jank`, `gsap-performance`                                                   | `web-quality-audit` — общий аудит перед релизом, а не замена перечисленным                              |
+| CSS и HTML         | `frontend-syntax-*`, `frontend-impl-*`                        | `frontend-errors-*`, `frontend-core-web-standards-baseline`                                                               | Нативные возможности (container queries, `:has()`, `<dialog>`, Popover) раньше JS                       |
+| Анимация           | `design-motion-principles` решает, нужна ли                   | `frontend-impl-view-transitions-scroll-animations` (нативный CSS), затем `gsap-core/timeline/scrolltrigger/plugins/utils` | Сначала CSS и scroll-driven animations; GSAP для последовательностей, pin и сложного scrub              |
+| Компоненты         | `frontend-component-*`, `frontend-impl-popover-dialog-anchor` | `popups` (только про конверсию)                                                                                           | Правила доступности модалок важнее маркетинговых                                                        |
+| Тексты             | `copywriting`                                                 | `copy-editing`, `marketing-psychology`, `offers`, `lead-magnets`                                                          | Русский деловой текст без ИИ-примет; не копировать SaaS-шаблоны дословно                                |
+| SEO                | `seo`                                                         | `seo-audit`, `schema`, `site-architecture`, `ai-seo`, `content-strategy`                                                  | Поисковик Яндекс в приоритете; `programmatic-seo` только если появится каталог на сотни страниц         |
+| Конверсия          | `cro`                                                         | `analytics`, `ab-testing`                                                                                                 | Формы заявки, телефон, расчёт стоимости                                                                 |
+| Код-ревью          | встроенные `code-review`, `simplify`                          | `front-review`, `web-interface-guidelines`                                                                                |                                                                                                         |
+| Безопасность       | встроенный `security-review`                                  | `semgrep`, `sharp-edges`, `differential-review`, `supply-chain-risk-auditor`                                              | Перед релизом и после добавления зависимостей                                                           |
 
 ## Конфликты и решения
 
