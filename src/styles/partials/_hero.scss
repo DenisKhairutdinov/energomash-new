@@ -294,7 +294,7 @@
 
   @media (width >= 900px) {
     .hero__side {
-      grid-template-columns: minmax(0, 32rem) auto;
+      grid-template-columns: auto minmax(0, 32rem);
       gap: 3rem;
       justify-content: start;
     }

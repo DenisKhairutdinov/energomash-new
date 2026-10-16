@@ -45,8 +45,8 @@
 
   .stock__nav {
     display: flex;
+    gap: 0.5rem;
     align-items: center;
-    background: var(--field);
   }
 
   .stock__arrow {
@@ -56,7 +56,7 @@
     block-size: 3.5rem;
     color: var(--paper);
     cursor: pointer;
-    background: transparent;
+    background: var(--field-hover);
     border: 0;
     transition: background-color 0.3s;
   }

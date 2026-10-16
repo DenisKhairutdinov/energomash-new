@@ -57,6 +57,11 @@
     inline-size: 8.75rem;
   }
 
+  // В хедере рамок нет, в том числе у кнопки звонка
+  .header .button {
+    border: 0;
+  }
+
   .header__burger {
     display: grid;
     place-items: center;

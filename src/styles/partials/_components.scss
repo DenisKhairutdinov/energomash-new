@@ -41,7 +41,7 @@
     inset: 0;
     z-index: -1;
     content: '';
-    background: var(--ink);
+    background: var(--paper);
     transform: translateX(-101%);
     transition: transform 0.55s var(--ease-out);
   }
@@ -51,13 +51,9 @@
     transform: none;
   }
 
-  .theme-dark .button::before,
-  .button--on-dark::before {
-    background: var(--paper);
-  }
-
-  .theme-dark .button:hover,
-  .button--on-dark:hover {
+  // Сайт тёмный: при наведении кнопка заливается белым и текст темнеет, заливка видна на любом фоне
+  .button:hover,
+  .button:focus-visible {
     color: var(--ink);
   }
 
@@ -74,7 +70,8 @@
     background: var(--accent-deep);
   }
 
-  .theme-dark .button--ink:hover {
+  .button--ink:hover,
+  .button--ink:focus-visible {
     color: var(--paper);
   }
 
@@ -82,19 +79,23 @@
     @include glass('clear');
 
     color: var(--paper);
+    border: 1px solid var(--btn-line);
   }
 
   .button--glass::before {
     background: var(--paper);
   }
 
-  .button--glass:hover {
+  .button--glass:hover,
+  .button--glass:focus-visible {
     color: var(--ink);
+    border-color: var(--paper);
   }
 
   .button--line {
     color: var(--fg);
-    background: var(--field);
+    background: transparent;
+    border: 1px solid var(--btn-line);
   }
 
   .button--compact {
