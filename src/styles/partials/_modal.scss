@@ -11,7 +11,7 @@
   }
 
   .modal::backdrop {
-    background: oklch(17.5% 0.012 282deg / 72%);
+    background: rgb(13 14 19 / 72%);
     backdrop-filter: blur(6px);
   }
 
@@ -78,7 +78,7 @@
   }
 
   .modal__text {
-    color: oklch(96.9% 0.003 107deg / 85%);
+    color: rgb(245 245 243 / 85%);
   }
 
   .modal__model strong {

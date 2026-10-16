@@ -3,7 +3,7 @@
   --bg: var(--ink);
   --bg-2: oklch(22% 0.014 282deg);
   --fg: var(--paper);
-  --fg-2: oklch(96.9% 0.003 107deg / 68%);
+  --fg-2: rgb(245 245 243 / 68%);
   --line: var(--line-dark);
   --btn-ink: var(--paper);
   --btn-ink-fg: var(--ink);
@@ -16,7 +16,7 @@
   --bg: var(--paper);
   --bg-2: var(--grey);
   --fg: var(--ink);
-  --fg-2: oklch(17.5% 0.012 282deg / 66%);
+  --fg-2: rgb(13 14 19 / 66%);
   --line: var(--line-light);
   --btn-ink: var(--ink);
   --btn-ink-fg: var(--paper);
@@ -30,22 +30,20 @@
 // «Морозное» стекло: тёмная подложка, мягкий диагональный блик, размытие с насыщением.
 @mixin glass($strength: 'dark') {
   background:
-    linear-gradient(135deg, oklch(100% 0 0deg / 11%), oklch(100% 0 0deg / 1%) 55%),
-    var(--glass-dark);
-  border: 1px solid oklch(100% 0 0deg / 12%);
+    linear-gradient(135deg, rgb(255 255 255 / 11%), rgb(255 255 255 / 1%) 55%), var(--glass-dark);
+  border: 1px solid rgb(255 255 255 / 12%);
   backdrop-filter: var(--glass-blur) saturate(1.35);
 
   @if $strength == 'strong' {
     background:
-      linear-gradient(135deg, oklch(100% 0 0deg / 10%), oklch(100% 0 0deg / 1%) 55%),
+      linear-gradient(135deg, rgb(255 255 255 / 10%), rgb(255 255 255 / 1%) 55%),
       var(--glass-dark-strong);
     backdrop-filter: blur(22px) saturate(1.45);
   }
 
   @if $strength == 'clear' {
     background:
-      linear-gradient(135deg, oklch(100% 0 0deg / 12%), oklch(100% 0 0deg / 2%) 55%),
-      var(--glass-clear);
+      linear-gradient(135deg, rgb(255 255 255 / 12%), rgb(255 255 255 / 2%) 55%), var(--glass-clear);
     border-color: transparent;
     backdrop-filter: var(--glass-blur-strong);
   }

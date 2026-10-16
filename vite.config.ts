@@ -11,7 +11,12 @@ export default defineConfig({
     vituum({
       formats: ['njk'],
       // Точки входа заданы явно, чтобы части стилей и модули не собирались отдельными файлами
-      input: ['./src/styles/main.scss', './src/scripts/main.ts'],
+      input: [
+        './src/styles/a.scss',
+        './src/styles/b.scss',
+        './src/scripts/a.ts',
+        './src/scripts/b.ts',
+      ],
       // Плагин imports по умолчанию создаёт файлы `+.js` и `+.css` с импортами всей папки; нам они не нужны
       imports: { paths: [] },
     }),

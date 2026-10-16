@@ -1,49 +1,53 @@
-// Токены. Палитра со старого сайта (src/styles/base/vars.scss старого проекта), цвета переведены в OKLCH:
-// фон #f5f5f3, чернила #0d0e13, акцент #c8603d (для заливок: #b84f30), серые #dededc и #7a7a78.
+// Токены. Палитра со старого сайта (src/styles/base/vars.scss старого проекта), значения без пересчёта.
 @layer tokens {
   :root {
-    --paper: oklch(96.9% 0.003 107deg);
-    --ink: oklch(17.5% 0.012 282deg);
-    --accent: oklch(61% 0.145 40deg);
-    --accent-deep: oklch(55.5% 0.15 38deg);
-    --grey: oklch(90% 0.004 107deg);
-    --grey-dark: oklch(58.5% 0.004 107deg);
+    // Палитра
+    --paper: #f5f5f3;
+    --ink: #0d0e13;
+    --ink-soft: #1f2226;
+    --accent: #c8603d;
+    --accent-deep: #b84f30;
+    --grey: #dededc;
+    --grey-dark: #7a7a78;
+    --muted-dark: #a8aeb4;
 
-    // Линии: 1px и один из двух полупрозрачных цветов, одинаково читаются на любом фоне
-    --line-light: oklch(17.5% 0.012 282deg / 12%);
-    --line-dark: oklch(96.9% 0.003 107deg / 15%);
+    // Совместимость со старыми именами
+    --accent-bright: var(--accent);
 
-    // Стекло
-    --glass-dark: oklch(17.5% 0.012 282deg / 60%);
-    --glass-dark-strong: oklch(17.5% 0.012 282deg / 82%);
-    --glass-clear: oklch(17.5% 0.012 282deg / 35%);
-    --glass-accent: oklch(61% 0.145 40deg / 75%);
+    // Линии не используем как оформление блоков; цвета нужны только для границ полей и стекла
+    --line-light: #0d0e131f;
+    --line-dark: #f5f5f326;
+
+    // Стекло: тёмная подложка и размытие
+    --glass-dark: #0d0e1399;
+    --glass-dark-strong: #0d0e13cc;
+    --glass-clear: #0d0e1359;
+    --glass-accent: #c8603dbf;
     --glass-blur: blur(14px);
     --glass-blur-strong: blur(32px) saturate(1.6);
 
-    // Шрифты
+    // Шрифты: заголовки Oswald во всех вариантах, текст задаёт вариант (--font-text в a.scss и b.scss)
     --font-display: 'Oswald Variable', 'Arial Narrow', sans-serif;
-    --font-text: 'Golos Text Variable', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-    // Размеры текста (плавные)
-    --fs-xs: clamp(0.6875rem, 0.66rem + 0.12vw, 0.75rem);
-    --fs-s: clamp(0.8125rem, 0.78rem + 0.15vw, 0.9rem);
-    --fs-m: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
-    --fs-l: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
-    --fs-xl: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
-    --fs-title: clamp(3rem, 1rem + 7vw, 9.5rem);
-    --fs-title-s: clamp(2.25rem, 1rem + 3.4vw, 4.75rem);
-    --fs-hero: clamp(3rem, 0.6rem + 7.6vw, 9.5rem);
-    --fs-number: clamp(4rem, 1.5rem + 9vw, 12rem);
-    --fs-mega: clamp(4rem, 0.5rem + 17vw, 24rem);
+    // Размеры текста: меньше и аккуратнее, чем раньше
+    --fs-xs: 0.75rem;
+    --fs-s: 0.875rem;
+    --fs-m: 1rem;
+    --fs-l: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
+    --fs-xl: clamp(1.5rem, 1.15rem + 1.1vw, 2.125rem);
+    --fs-title: clamp(2.5rem, 1rem + 4.4vw, 6rem);
+    --fs-title-s: clamp(2.25rem, 1rem + 3vw, 4.25rem);
+    --fs-hero: clamp(2.75rem, 0.8rem + 6vw, 8.25rem);
+    --fs-number: clamp(3rem, 1.4rem + 5vw, 8rem);
+    --fs-mega: clamp(4rem, 0.5rem + 15vw, 22rem);
 
-    // Сетка и ритм
+    // Сетка и ритм: единая шкала отступов, чтобы всё стояло ровно
     --gutter: clamp(1rem, 3.5vw, 3.5rem);
-    --section-y: clamp(4.5rem, 2.5rem + 8vw, 10rem);
-    --gap: clamp(1rem, 2vw, 2rem);
+    --section-y: clamp(5rem, 3rem + 7vw, 9.5rem);
+    --gap: clamp(0.75rem, 1.4vw, 1.25rem);
     --header-h: 4.5rem;
-    --max: 1760px;
+    --max: 1680px;
 
     // Угол окна справа внизу оставляем свободным: на старом сайте там стоял виджет чата
     --corner-clearance: 6.5rem;
@@ -53,13 +57,13 @@
     --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
-  // Темы: переменные цвета секции. Светлая по умолчанию, тёмная классом .theme-dark
+  // Темы секций: цвета задаются переменными, компоненты внутри (кнопки, поля, стекло) подстраиваются сами
   :root,
   .theme-light {
     --bg: var(--paper);
     --bg-2: var(--grey);
     --fg: var(--ink);
-    --fg-2: oklch(17.5% 0.012 282deg / 66%);
+    --fg-2: #0d0e13a8;
     --line: var(--line-light);
     --btn-ink: var(--ink);
     --btn-ink-fg: var(--paper);
@@ -67,9 +71,9 @@
 
   .theme-dark {
     --bg: var(--ink);
-    --bg-2: oklch(22% 0.014 282deg);
+    --bg-2: #1f2226;
     --fg: var(--paper);
-    --fg-2: oklch(96.9% 0.003 107deg / 68%);
+    --fg-2: #f5f5f3b3;
     --line: var(--line-dark);
     --btn-ink: var(--paper);
     --btn-ink-fg: var(--ink);

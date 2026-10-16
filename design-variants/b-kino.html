@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Вариант B: Кино</title>
+<link rel="stylesheet" href="/node_modules/@fontsource-variable/oswald/wght.css" />
+<link rel="stylesheet" href="/node_modules/@fontsource-variable/manrope/wght.css" />
+<link rel="stylesheet" href="base.css" />
+<style>
+  :root { --text: 'Manrope Variable', system-ui, sans-serif; }
+  body { color: var(--paper); background: var(--ink); }
+  /* Тёмные главы, стеклянная таблетка в шапке (как у Terminal), заголовок разведён по краям (как у Q Industrial) */
+  .nav { position: fixed; z-index: 50; top: 1rem; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 0.2rem; padding: 0.4rem; }
+  .nav a { padding: 0.85rem 1.1rem; font: 600 0.8125rem/1 var(--text); transition: background 0.3s; }
+  .nav a:hover { background: #ffffff1a; }
+  .nav .logo { padding: 0.5rem 1.2rem 0.5rem 0.9rem; } .nav .logo img { width: 8.5rem; }
+  .nav .cta { background: var(--accent-deep); } .nav .cta:hover { background: var(--paper); color: var(--ink); }
+  .hero { position: relative; display: grid; grid-template-rows: 1fr auto; min-height: 100svh; overflow: hidden; }
+  .hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
+  .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(#0d0e13cc, #0d0e1300 45%), linear-gradient(0deg, #0d0e13d9, #0d0e1300 50%); }
+  .hero__title { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; padding: 8rem 3rem 0; font-size: clamp(3rem, 7.4vw, 9.5rem); }
+  .hero__title span { max-width: 48%; }
+  .hero__title span:last-child { text-align: right; margin-top: 2.2em; }
+  .hero__foot { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 2rem; padding: 2rem 3rem 3rem; }
+  .hero__foot p { max-width: 28rem; color: #f5f5f3d9; }
+  .hero__act { display: flex; gap: 0.5rem; }
+  .btn .sq { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; margin-right: -0.9rem; background: #ffffff26; }
+  .statement { display: grid; align-content: center; min-height: 100svh; padding: 8rem 3rem; background: var(--ink); }
+  .statement p { max-width: 62rem; font: 300 clamp(2rem, 4.2vw, 4.75rem)/1.12 var(--display); text-transform: uppercase; }
+  .statement .w { opacity: 0.18; transition: opacity 0.5s, filter 0.5s; filter: blur(5px); }
+  .statement .w.on { opacity: 1; filter: none; } .statement .w.acc.on { color: var(--accent); }
+  .stock { position: relative; height: 100svh; min-height: 40rem; overflow: hidden; }
+  .stock > img { width: 100%; height: 100%; object-fit: cover; }
+  .stock::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, #0d0e13bf, #0d0e1300 45%); }
+  .stock__head { position: absolute; z-index: 2; top: 6.5rem; left: 3rem; display: grid; gap: 1rem; padding: 1.6rem 1.9rem; max-width: 24rem; }
+  .stock__head h2 { font-size: clamp(2.5rem, 4vw, 4.5rem); }
+  .stock__head span { color: var(--muted-dark); font-size: 0.9375rem; }
+  .stock__panel { position: absolute; z-index: 2; left: 3rem; bottom: 3rem; display: grid; gap: 0.9rem; padding: 1.6rem 1.9rem; width: min(36rem, calc(100% - 6rem)); }
+  .stock__panel h3 { font-size: clamp(2rem, 3.4vw, 3.75rem); }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; font: 500 0.8125rem/1 ui-monospace, monospace; color: var(--muted-dark); text-transform: uppercase; letter-spacing: 0.04em; }
+  .tags b { font-weight: 500; color: var(--paper); }
+  .stock__nav { position: absolute; z-index: 2; top: 6.5rem; right: 3rem; display: flex; }
+  .stock__nav button { width: 3.5rem; height: 3.5rem; color: var(--paper); background: none; border: 0; font-size: 1.25rem; cursor: pointer; }
+  .stock__nav button:hover { background: var(--accent-deep); }
+  .nums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; padding: 9rem 3rem; background: linear-gradient(0deg, #0d0e13, #1f2226 60%, #0d0e13); }
+  .num { display: grid; gap: 3rem; padding: 1.6rem; min-height: 17rem; align-content: space-between; }
+  .num:nth-child(even) { margin-top: 4rem; }
+  .num b { font: 200 clamp(3.5rem, 6.4vw, 8.5rem)/0.9 var(--display); }
+  .num span { max-width: 12rem; font-size: 0.9375rem; color: var(--muted-dark); }
+  footer { padding: 4rem 3rem; background: #08090c; color: var(--muted-dark); font-size: 0.9375rem; }
+  footer b { display: block; margin-bottom: 1.5rem; font: 200 clamp(4rem, 14vw, 18rem)/0.85 var(--display); text-transform: uppercase; color: var(--paper); }
+</style>
+</head>
+<body>
+<nav class="nav glass" aria-label="Основное">
+  <a class="logo" href="#"><img src="/src/assets/images/logo.svg" alt="Энергомаш" /></a>
+  <a href="#">Каталог</a><a href="#">В наличии</a><a href="#">Условия</a><a href="#">О заводе</a><a href="#">Блог</a>
+  <a class="cta" href="#">8 800 101-22-00</a>
+</nav>
+<header class="hero">
+  <img src="/src/assets/images/color.webp" alt="" />
+  <h1 class="hero__title"><span>Завод полуприцепов-цистерн</span><span>и автоцистерн</span></h1>
+  <div class="hero__foot">
+    <p>Полуприцепы-цистерны и автоцистерны для нефтепродуктов и воды. Делаем в Мисяше, отгружаем со склада за несколько дней.</p>
+    <div class="hero__act"><a class="btn" href="#">Техника в наличии · 162</a><a class="btn btn--glass" href="#">Заказать звонок</a></div>
+  </div>
+</header>
+<section class="statement"><p id="st"></p></section>
+<section class="stock">
+  <img src="/src/assets/models/IMG_4623_1.webp" alt="" />
+  <div class="stock__head glass"><h2>Техника в наличии</h2><span>162 единицы на складе в Мисяше</span></div>
+  <div class="stock__nav glass"><button aria-label="Назад">←</button><button aria-label="Вперёд">→</button></div>
+  <div class="stock__panel glass"><h3>АТЗ-12/2-Б КАМАЗ-43118</h3><div class="tags"><span>[Объём <b>12 м³</b>]</span><span>[Секций <b>2</b>]</span><span>[Шасси <b>КАМАЗ-43118</b>]</span></div></div>
+</section>
+<section class="nums">
+  <div class="num glass"><b>892</b><span>модели в каталоге</span></div>
+  <div class="num glass"><b>162</b><span>единицы техники на складе</span></div>
+  <div class="num glass"><b>12</b><span>месяцев гарантии или 30 000 км</span></div>
+  <div class="num glass"><b>2</b><span>офиса: Челябинск и Набережные Челны</span></div>
+</section>
+<footer><b>Энергомаш</b>Завод полуприцепов-цистерн и автоцистерн · 8 (800) 101-22-00 · 1@bik55.ru</footer>
+<div class="switch"><a href="a-vitrina.html">A Витрина</a><a class="on" href="b-kino.html">B Кино</a><a href="c-bloki.html">C Блоки</a></div>
+<script>
+  // Проявление слов при прокрутке: слово загорается, когда доходит до середины экрана
+  const text = 'Мы делаем цистерны, которые работают на нефтепромыслах, трассах и в городских сетях. Каждая единица проходит испытания на нашем заводе и выходит с полным пакетом документов.'
+  const accent = new Set(['цистерны,', 'испытания', 'документов.'])
+  const el = document.getElementById('st')
+  el.innerHTML = text.split(' ').map((w) => `<span class="w${accent.has(w) ? ' acc' : ''}">${w}</span>`).join(' ')
+  const words = [...el.querySelectorAll('.w')]
+  const update = () => {
+    const mid = innerHeight * 0.6
+    words.forEach((w) => w.classList.toggle('on', w.getBoundingClientRect().top < mid))
+  }
+  addEventListener('scroll', update, { passive: true }); update()
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{# Заявление: слова проявляются по мере прокрутки (scripts/modules/wow.ts). Акцентные слова помечены в home.json (statement.accent) #}
+<section class="statement" aria-labelledby="statement-title" data-chapter="О заводе" data-statement>
+  <div class="statement__inner container">
+    <h2 class="visually-hidden" id="statement-title">О заводе</h2>
+    <p class="statement__text" data-words data-accent="{{ home.statement.accent | join('|') }}">{{ home.statement.text }}</p>
+    <a class="button button--ink" href="/about.html">О заводе</a>
+  </div>
+</section>

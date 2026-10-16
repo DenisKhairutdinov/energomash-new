@@ -12,8 +12,7 @@
 
     @include theme-dark;
 
-    background:
-      radial-gradient(45% 55% at 78% 40%, oklch(61% 0.145 40deg / 14%), transparent), var(--ink);
+    background: radial-gradient(45% 55% at 78% 40%, rgb(200 96 61 / 14%), transparent), var(--ink);
   }
 
   .geography__layout {
@@ -201,7 +200,7 @@
     padding: 1.25rem 1.5rem;
     color: var(--paper);
     pointer-events: none;
-    background: oklch(17.5% 0.012 282deg / 70%);
+    background: rgb(13 14 19 / 70%);
     backdrop-filter: var(--glass-blur-strong);
   }
 
@@ -227,7 +226,7 @@
 
   .geography__tooltip-cities {
     font-size: var(--fs-s);
-    color: oklch(96.9% 0.003 107deg / 70%);
+    color: rgb(245 245 243 / 70%);
   }
 
   .geography__tooltip-units:empty,

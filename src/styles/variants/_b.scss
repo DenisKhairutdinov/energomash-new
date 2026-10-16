@@ -1,0 +1,69 @@
+@use '../partials/mixins' as *;
+
+// Вариант B «Кино»: тёмные главы по умолчанию (общие partials оформлены тёмными), здесь шрифт и киноплёнка отгрузок.
+@layer tokens {
+  :root {
+    --font-text: 'Manrope Variable', system-ui, sans-serif;
+  }
+}
+
+@layer sections {
+  body {
+    @include theme-dark;
+  }
+
+  .header {
+    --hdr-bg: #0d0e13b3;
+    --hdr-bg-solid: #0d0e13e6;
+    --hdr-fg: var(--paper);
+    --hdr-fg-2: #f5f5f3b3;
+    --hdr-cell: #ffffff0f;
+  }
+
+  // Горизонтальная «киноплёнка» отгрузок: пин и сдвиг в cinema.ts, на телефоне обычная колонка
+  @media (width >= 900px) {
+    .shipments {
+      padding-block: 0;
+    }
+
+    .shipments__pin {
+      display: grid;
+      align-content: center;
+      min-block-size: 100svh;
+      padding-block: calc(var(--header-h) + 2rem) 2rem;
+      overflow: clip;
+    }
+
+    .shipments__head {
+      inline-size: min(100% - 2 * var(--gutter), var(--max));
+      margin-block-end: 2rem;
+      margin-inline: auto;
+    }
+
+    .shipments__viewport {
+      inline-size: 100%;
+      max-inline-size: none;
+      margin: 0;
+      overflow: clip;
+    }
+
+    .shipments__grid {
+      display: flex;
+      gap: 1rem;
+      inline-size: max-content;
+      padding-inline: var(--gutter);
+      will-change: transform;
+    }
+
+    .shipments__item {
+      flex: none;
+      block-size: min(54svh, 36rem);
+      aspect-ratio: 4 / 3;
+    }
+
+    .shipments__image {
+      min-block-size: 0;
+      aspect-ratio: auto;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{# «Цистерна наполняется»: чертёж полуприцепа со старого сайта заливается акцентом по мере прокрутки, число единиц на складе считается вместе с ним. #}
+<section class="fill" aria-labelledby="fill-title" data-chapter="Склад" data-fill>
+  <div class="fill__inner container">
+    <div class="fill__text">
+      <h2 class="fill__title" id="fill-title">
+        <span class="fill__num"><span data-fill-count="{{ home.catalogTotals.inStock }}">{{ home.catalogTotals.inStock }}</span></span>
+        <span class="fill__label">единицы техники готовы к отгрузке</span>
+      </h2>
+      <p class="fill__lead">Склад пополняется каждую неделю. Подберите модель из наличия, и мы отгрузим её в течение нескольких дней.</p>
+      <a class="button" href="/catalog.html?in-stock=1">Смотреть наличие</a>
+    </div>
+    <div class="fill__tank" aria-hidden="true">
+      <span class="drawing drawing--ppc fill__base"></span>
+      <span class="drawing drawing--ppc fill__level" data-fill-level></span>
+    </div>
+  </div>
+</section>

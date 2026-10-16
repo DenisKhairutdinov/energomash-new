@@ -1,45 +1,51 @@
 @use 'mixins' as *;
 
+// Шапка: плавающая стеклянная «таблетка» (приём Terminal Industries). В ней: логотип, меню с мега-панелями как на старом сайте,
+// поиск, почта, Max, VK, телефон и звонок. Цвета берутся из переменных варианта: --hdr-bg, --hdr-fg, --hdr-fg-2, --hdr-cell, --hdr-hover.
 @layer sections {
   .header {
+    --hdr-bg: #0d0e13b3;
+    --hdr-bg-solid: #0d0e13e6;
+    --hdr-fg: var(--paper);
+    --hdr-fg-2: #f5f5f3b3;
+    --hdr-cell: #ffffff0f;
+    --hdr-hover: var(--accent-deep);
+
     position: fixed;
-    inset-block-start: 0;
-    inset-inline: 0;
+    inset-block-start: 0.875rem;
+    inset-inline: var(--gutter);
     z-index: 600;
-    color: var(--paper);
-    transition: transform 0.6s var(--ease-out);
+    color: var(--hdr-fg);
+    transition: transform 0.7s var(--ease-out);
   }
 
-  // Стекло шапки лежит на отдельном слое: иначе родитель с backdrop-filter «обнулил» бы размытие мега-меню внутри
-  .header::before {
-    position: absolute;
-    inset: 0;
-    content: '';
-    background: var(--glass-clear);
-    backdrop-filter: var(--glass-blur-strong);
-    transition: background-color 0.4s;
-  }
-
-  .header.is-solid::before,
-  .header.is-open::before {
-    background: var(--glass-dark-strong);
-  }
-
-  .header.is-hidden:not(.is-open) {
-    transform: translateY(-100%);
+  .header.is-hidden:not(.is-open, .is-searching) {
+    transform: translateY(calc(-100% - 1.5rem));
   }
 
   .page:not(.page--home) main {
-    padding-block-start: var(--header-h);
+    padding-block-start: calc(var(--header-h) + 1.5rem);
   }
 
   .header__bar {
     position: relative;
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
     align-items: center;
     justify-content: space-between;
+    inline-size: min(100%, 96rem);
     min-block-size: var(--header-h);
+    padding: 0.5rem 0.75rem 0.5rem 1.25rem;
+    margin-inline: auto;
+    background: var(--hdr-bg);
+    box-shadow: 0 14px 44px rgb(13 14 19 / 16%);
+    backdrop-filter: blur(22px) saturate(1.5);
+    transition: background-color 0.4s;
+  }
+
+  .header.is-solid .header__bar,
+  .header.is-open .header__bar {
+    background: var(--hdr-bg-solid);
   }
 
   .header__logo {
@@ -48,35 +54,36 @@
   }
 
   .header__logo img {
-    inline-size: 9.5rem;
+    inline-size: 8.75rem;
   }
 
   .header__burger {
     display: grid;
     place-items: center;
-    inline-size: 3rem;
-    block-size: 3rem;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
     color: inherit;
     background: transparent;
     border: 0;
   }
 
   .header__burger-icon {
-    inline-size: 1.75rem;
-    block-size: 1.75rem;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
   }
 
+  // Мобильная панель (мобильную версию пока не дорабатываем, оставлена рабочая)
   .header__panel {
     position: absolute;
-    inset-block-start: var(--header-h);
-    inset-inline: calc(-1 * var(--gutter));
+    inset-block-start: calc(100% + 0.5rem);
+    inset-inline: 0;
     display: none;
-    gap: 1.5rem;
-    max-block-size: calc(100svh - var(--header-h));
-    padding: 1rem var(--gutter) 2rem;
+    gap: 1.25rem;
+    max-block-size: calc(100svh - var(--header-h) - 2rem);
+    padding: 1rem 1.25rem 1.5rem;
     overflow: auto;
-    background: var(--glass-dark-strong);
-    backdrop-filter: var(--glass-blur);
+    background: var(--hdr-bg-solid);
+    backdrop-filter: blur(22px);
   }
 
   .header.is-open .header__panel {
@@ -85,20 +92,10 @@
 
   .header__contacts {
     display: grid;
-    gap: 1rem;
+    gap: 0.75rem;
     justify-items: start;
   }
 
-  .header__phone {
-    font-family: var(--font-display);
-    font-size: var(--fs-l);
-    font-weight: 300;
-    color: inherit;
-    white-space: nowrap;
-    text-decoration: none;
-  }
-
-  // Инструменты: поиск, почта, мессенджеры. Иконки со старого сайта красятся цветом шапки через mask
   .header__tools {
     display: flex;
     gap: 0.25rem;
@@ -107,15 +104,14 @@
   .header__tool {
     display: grid;
     place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
     color: inherit;
     cursor: pointer;
     background: transparent;
-    border: 1px solid transparent;
+    border: 0;
     transition:
       background-color 0.3s,
-      border-color 0.3s,
       color 0.3s;
   }
 
@@ -123,18 +119,18 @@
   .header__tool:focus-visible,
   .header__tool[aria-expanded='true'] {
     color: var(--paper);
-    background: var(--accent-deep);
+    background: var(--hdr-hover);
   }
 
   .header__tool-icon {
-    inline-size: 1.4rem;
-    block-size: 1.4rem;
+    inline-size: 1.3rem;
+    block-size: 1.3rem;
   }
 
   .mask-icon {
     display: block;
-    inline-size: 1.2rem;
-    block-size: 1.2rem;
+    inline-size: 1.15rem;
+    block-size: 1.15rem;
     background: currentcolor;
     mask: var(--icon) center / contain no-repeat;
   }
@@ -151,14 +147,25 @@
     --icon: url('/src/assets/icons/vk.svg');
   }
 
-  // Строка поиска выезжает под шапкой, как мега-меню
+  .header__phone {
+    font-family: var(--font-display);
+    font-size: var(--fs-l);
+    font-weight: 300;
+    color: inherit;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  // Строка поиска выезжает под таблеткой
   .header__search {
     position: absolute;
-    inset-block-start: 100%;
+    inset-block-start: calc(100% + 0.5rem);
     inset-inline: 0;
     visibility: hidden;
-    background: var(--glass-dark-strong);
-    backdrop-filter: var(--glass-blur);
+    inline-size: min(100%, 96rem);
+    margin-inline: auto;
+    background: var(--hdr-bg-solid);
+    backdrop-filter: blur(22px) saturate(1.4);
     clip-path: inset(0 0 100%);
     transition:
       clip-path 0.6s var(--ease-out),
@@ -177,36 +184,36 @@
     display: flex;
     gap: 1rem;
     align-items: center;
-    padding-block: 1rem;
+    padding: 1rem 1.25rem;
   }
 
   .header__search-icon {
     flex: none;
-    inline-size: 1.6rem;
-    block-size: 1.6rem;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
     color: var(--accent);
   }
 
   .header__search-input {
     flex: 1;
     min-inline-size: 0;
-    padding: 0.6rem 1rem;
+    padding: 0.7rem 1rem;
     font-family: var(--font-display);
     font-size: var(--fs-xl);
     font-weight: 200;
-    color: var(--paper);
-    background: oklch(100% 0 0deg / 7%);
+    color: var(--hdr-fg);
+    background: var(--hdr-cell);
     border: 0;
     transition: background-color 0.3s;
   }
 
   .header__search-input:focus {
     outline: none;
-    background: oklch(100% 0 0deg / 12%);
+    background: rgb(128 128 128 / 22%);
   }
 
   .header__search-input::placeholder {
-    color: oklch(96.9% 0.003 107deg / 45%);
+    color: var(--hdr-fg-2);
   }
 
   // Меню
@@ -215,9 +222,8 @@
   }
 
   .menu__link {
-    position: relative;
     display: block;
-    padding-block: 0.85rem;
+    padding-block: 0.8rem;
     font-family: var(--font-display);
     font-size: var(--fs-xl);
     font-weight: 200;
@@ -226,15 +232,11 @@
     text-decoration: none;
   }
 
-  .menu__link--accent {
-    color: var(--accent);
-  }
-
+  .menu__link--accent,
   .menu__link--active {
     color: var(--accent);
   }
 
-  // На телефоне вложенные списки показаны всегда, в одну колонку
   .menu__dropdown {
     padding-block-end: 1rem;
   }
@@ -256,7 +258,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.7rem 0;
-    color: var(--paper);
+    color: var(--hdr-fg);
     text-decoration: none;
   }
 
@@ -269,18 +271,18 @@
 
   .menu__tile {
     font-size: var(--fs-s);
-    color: var(--on-dark-2, oklch(96.9% 0.003 107deg / 70%));
+    color: var(--hdr-fg-2);
   }
 
   .menu__group-all {
     display: inline-flex;
     gap: 0.5rem;
     align-items: center;
-    font-family: var(--font-mono);
     font-size: var(--fs-xs);
+    font-weight: 500;
     color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
   }
 
   .menu__arrow {
@@ -290,7 +292,7 @@
     transition: transform 0.4s var(--ease-out);
   }
 
-  @media (width >= 1100px) {
+  @media (width >= 1180px) {
     .header__burger {
       display: none;
     }
@@ -299,7 +301,7 @@
       position: static;
       display: flex;
       flex: 1;
-      gap: 2rem;
+      gap: 1rem;
       align-items: center;
       justify-content: space-between;
       max-block-size: none;
@@ -311,24 +313,25 @@
 
     .header__contacts {
       grid-auto-flow: column;
-      gap: 1.5rem;
+      gap: 0.75rem;
       align-items: center;
+    }
+
+    .header__phone {
+      display: none;
     }
 
     .menu__list {
       display: flex;
-      gap: 0.25rem;
+      gap: 0.15rem;
     }
 
     .menu__link {
-      padding: 1.75rem 1rem;
+      padding: 1.6rem 0.9rem;
       font-family: var(--font-text);
-      font-size: var(--fs-xs);
+      font-size: var(--fs-s);
       font-weight: 500;
-      letter-spacing: 0.1em;
-    }
-
-    .menu__link {
+      text-transform: none;
       transition: color 0.3s;
     }
 
@@ -337,15 +340,15 @@
       color: var(--accent);
     }
 
-    // Мега-панель на всю ширину шапки: сетка ячеек, колонки совпадают с сеткой страницы
+    // Мега-панель на всю ширину таблетки: сетка ячеек, как на старом сайте
     .menu__dropdown {
       position: absolute;
-      inset-block-start: 100%;
+      inset-block-start: calc(100% + 0.5rem);
       inset-inline: 0;
       visibility: hidden;
       padding: 0;
-      background: var(--glass-dark-strong);
-      backdrop-filter: var(--glass-blur);
+      background: var(--hdr-bg-solid);
+      backdrop-filter: blur(22px) saturate(1.4);
       clip-path: inset(0 0 100%);
       transition:
         clip-path 0.7s var(--ease-out),
@@ -361,11 +364,17 @@
         visibility 0s;
     }
 
+    .menu__item {
+      position: static;
+    }
+
     .menu__inner {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
-      gap: 1px;
-      padding-block: 2rem 2.5rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+      gap: 1rem;
+      inline-size: 100%;
+      padding: 1.5rem;
+      margin: 0;
     }
 
     .menu__inner--plain {
@@ -374,12 +383,12 @@
 
     .menu__groups {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
     .menu__tiles {
-      grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-      gap: 0.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+      gap: 0.4rem;
     }
 
     .menu__groups .menu__tiles {
@@ -387,9 +396,9 @@
     }
 
     .menu__cell {
-      background: oklch(17.5% 0.012 282deg / 70%);
+      background: var(--hdr-cell);
       opacity: 0;
-      transform: translateY(14px);
+      transform: translateY(12px);
       transition:
         opacity 0.3s,
         transform 0.3s;
@@ -407,7 +416,7 @@
 
     .menu__group-head,
     .menu__tile {
-      padding: 1.1rem 1.25rem;
+      padding: 1rem 1.1rem;
       overflow: hidden;
       isolation: isolate;
     }
@@ -422,7 +431,7 @@
       inset: 0;
       z-index: -1;
       content: '';
-      background: var(--accent-deep);
+      background: var(--hdr-hover);
       transform: translateX(-101%);
       transition: transform 0.5s var(--ease-out);
     }
@@ -445,7 +454,7 @@
     .menu__feature {
       position: relative;
       display: block;
-      min-block-size: 18rem;
+      min-block-size: 16rem;
       overflow: hidden;
       color: var(--paper);
       text-decoration: none;
@@ -470,8 +479,8 @@
       inset-inline: 0;
       display: grid;
       gap: 0.2rem;
-      padding: 1.25rem;
-      background: linear-gradient(to top, oklch(17.5% 0.012 282deg / 85%), transparent);
+      padding: 1.1rem;
+      background: linear-gradient(to top, rgb(13 14 19 / 85%), transparent);
     }
 
     .menu__feature-title {
@@ -479,6 +488,12 @@
       font-size: var(--fs-xl);
       font-weight: 200;
       text-transform: uppercase;
+    }
+  }
+
+  @media (width >= 1500px) {
+    .header__phone {
+      display: block;
     }
   }
 }
