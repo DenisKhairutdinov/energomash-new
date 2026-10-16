@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ pageTitle }}{% if pageTitle != "ООО «Энергомаш»" %} — Энергомаш{% endif %}</title>
+    <link rel="stylesheet" href="/src/styles/main.scss" />
+    <script type="module" src="/src/scripts/main.ts"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Перейти к содержимому</a>
+    {% include "header.njk" %}
+    <main id="main">
+      {% block content %}{% endblock %}
+    </main>
+    {% include "footer.njk" %}
+  </body>
+</html>

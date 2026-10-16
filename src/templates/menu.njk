@@ -1,0 +1,32 @@
+{# currentPage задаётся на странице как «раздел» или «раздел/подраздел» #}
+{% set currentPath = (currentPage or "").split("/") %}
+<nav class="menu" aria-label="Основное меню">
+  <ul class="menu__list">
+    {% for item in nav.menu %}
+      {% set children = nav.catalog if item.catalog else item.children %}
+      <li class="menu__item">
+        <a
+          class="menu__link{{ ' menu__link--accent' if item.accent }}{{ ' menu__link--active' if item.id == currentPath[0] }}"
+          href="{{ item.url }}"
+          {% if item.id == currentPage %}aria-current="page"{% endif %}
+        >{{ item.title }}</a>
+        {% if children %}
+          <ul class="menu__dropdown">
+            {% for child in children %}
+              <li class="menu__subitem">
+                <a class="menu__sublink{{ ' menu__sublink--active' if child.id == currentPath[1] }}" href="{{ child.url }}{{ item.urlSuffix }}">{{ child.title }}</a>
+                {% if child.children %}
+                  <ul class="menu__group">
+                    {% for leaf in child.children %}
+                      <li><a class="menu__sublink" href="{{ leaf.url }}{{ item.urlSuffix }}">{{ leaf.title }}</a></li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

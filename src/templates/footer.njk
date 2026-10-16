@@ -1,0 +1,9 @@
+<footer class="footer">
+  <nav class="footer__legal" aria-label="Юридическая информация">
+    <ul>
+      {% for link in nav.legal %}
+      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </nav>
+</footer>

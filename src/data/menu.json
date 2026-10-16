@@ -1,0 +1,159 @@
+{
+  "nav": {
+    "catalog": [
+      {
+        "id": "semitrailers",
+        "title": "Полуприцепы-цистерны",
+        "url": "/catalog.html?type=semitrailer",
+        "children": [
+          {
+            "id": "semitrailers-light-oil",
+            "title": "Для светлых нефтепродуктов",
+            "url": "/catalog.html?type=semitrailer&purpose=fuel"
+          },
+          {
+            "id": "semitrailers-dark-oil",
+            "title": "Для тёмных нефтепродуктов",
+            "url": "/catalog.html?type=semitrailer&purpose=oil"
+          },
+          {
+            "id": "semitrailers-tech-water",
+            "title": "Для технической воды",
+            "url": "/catalog.html?type=semitrailer&purpose=tech-water"
+          },
+          {
+            "id": "semitrailers-vacuum",
+            "title": "Вакуумные",
+            "url": "/catalog.html?type=semitrailer&purpose=vacuum"
+          }
+        ]
+      },
+      {
+        "id": "chassis",
+        "title": "Цистерны на шасси",
+        "url": "/catalog.html?type=chassis",
+        "children": [
+          {
+            "id": "chassis-refuelers",
+            "title": "Автотопливозаправщики",
+            "url": "/catalog.html?type=chassis&purpose=refueler"
+          },
+          {
+            "id": "chassis-light-oil",
+            "title": "Для светлых нефтепродуктов",
+            "url": "/catalog.html?type=chassis&purpose=fuel"
+          },
+          {
+            "id": "chassis-dark-oil",
+            "title": "Для тёмных нефтепродуктов",
+            "url": "/catalog.html?type=chassis&purpose=oil"
+          },
+          {
+            "id": "chassis-tech-water",
+            "title": "Для технической воды",
+            "url": "/catalog.html?type=chassis&purpose=tech-water"
+          },
+          {
+            "id": "chassis-drinking-water",
+            "title": "Для питьевой воды",
+            "url": "/catalog.html?type=chassis&purpose=drinking-water"
+          },
+          {
+            "id": "chassis-oil-gathering",
+            "title": "Для сбора нефти",
+            "url": "/catalog.html?type=chassis&purpose=oil-gathering"
+          },
+          {
+            "id": "chassis-municipal",
+            "title": "Коммунальные",
+            "url": "/catalog.html?type=chassis&purpose=municipal"
+          }
+        ]
+      }
+    ],
+    "menu": [
+      {
+        "id": "catalog",
+        "title": "Каталог",
+        "url": "/catalog.html",
+        "accent": true,
+        "catalog": true
+      },
+      {
+        "id": "stock",
+        "title": "В наличии",
+        "url": "/catalog.html?in-stock=1",
+        "urlSuffix": "&in-stock=1",
+        "catalog": true
+      },
+      {
+        "id": "terms",
+        "title": "Условия",
+        "url": "/terms.html",
+        "children": [
+          { "id": "leasing", "title": "Лизинг", "url": "/leasing.html" },
+          { "id": "subsidies", "title": "Субсидии", "url": "/subsidies.html" },
+          { "id": "dealers", "title": "Дилерам", "url": "/dealers.html" },
+          { "id": "tenders", "title": "Тендеры", "url": "/tenders.html" }
+        ]
+      },
+      {
+        "id": "about",
+        "title": "О заводе",
+        "url": "/about.html",
+        "children": [
+          { "id": "company", "title": "О компании / география поставок", "url": "/company.html" },
+          { "id": "manufacture", "title": "Производство", "url": "/manufacture.html" },
+          { "id": "guide", "title": "Как выбрать цистерну", "url": "/guide.html" },
+          { "id": "shipments", "title": "Наши отгрузки", "url": "/shipments.html" },
+          { "id": "services", "title": "Сервис и запчасти", "url": "/services.html" },
+          { "id": "docs", "title": "Сертификаты и документы", "url": "/docs.html" },
+          { "id": "faq", "title": "Вопросы и ответы", "url": "/faq.html" },
+          { "id": "company-details", "title": "Реквизиты", "url": "/company-details.html" },
+          { "id": "job", "title": "Вакансии", "url": "/job.html" }
+        ]
+      },
+      {
+        "id": "blog",
+        "title": "Блог",
+        "url": "/blog.html",
+        "children": [
+          {
+            "id": "news",
+            "title": "Новости и акции",
+            "url": "/blog-subsidiya-do-30-noyabrya.html"
+          },
+          {
+            "id": "engineering",
+            "title": "Инженерные решения",
+            "url": "/blog-cisterna-pod-tehzadanie.html"
+          },
+          {
+            "id": "selection-guide",
+            "title": "Гид по подбору",
+            "url": "/blog-lizing-kredit-ili-pokupka.html"
+          },
+          {
+            "id": "service-guide",
+            "title": "Гид по сервису",
+            "url": "/blog-garantiya-chto-pokryvaet.html"
+          },
+          {
+            "id": "transport-safety",
+            "title": "Транспортная безопасность",
+            "url": "/blog-dopog-i-reglamenty.html"
+          },
+          { "id": "factory-rhythm", "title": "Заводской ритм", "url": "/blog-put-zakaza.html" },
+          { "id": "events", "title": "Мероприятия", "url": "/blog-kak-stat-dilerom.html" },
+          { "id": "experience", "title": "Опыт эксплуатации", "url": "/blog-grsi-i-arshin.html" }
+        ]
+      },
+      { "id": "contacts", "title": "Контакты", "url": "/contacts.html" }
+    ],
+    "legal": [
+      { "title": "Политика конфиденциальности", "url": "/privacy.html" },
+      { "title": "Пользовательское соглашение", "url": "/agreement.html" },
+      { "title": "Политика использования cookie", "url": "/cookies.html" }
+    ]
+  }
+}
