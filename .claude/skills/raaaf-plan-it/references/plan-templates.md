@@ -1,0 +1,134 @@
+# Plan Templates
+
+Templates for Phase 2 (plan file).
+
+Content: plan format (executor-grade, with drift check/STOP/done criteria, challenge-result block, Delegate spec)
+
+## Plan Format (Phase 2)
+
+File: `docs/plans/{YYYY-MM-DD}-{slug}.md`
+
+**Executor rule:** The plan is written for an executor WITHOUT session context (a different model, a different session, or a human). Everything needed is in the file: exact paths, current state, conventions with an exemplar file, commands. "As discussed" is a violation.
+
+**Spelling self-check before v1 (German plans):** before challenging v1, grep the plan file for `ae|oe|ue|ss` inside German words and replace with real umlauts (ä, ö, ü, ß). Do this on v1; the v1 draft has shipped in transliteration before.
+
+```markdown
+# {Title}
+
+> **Executor instruction:** Follow step by step, check each verify
+> criterion before moving on. If a STOP condition occurs: stop and
+> report, do not improvise.
+>
+> **Drift check (first):** `git diff --stat {PLANNED_AT_SHA}..HEAD -- {in-scope paths}`
+> If an in-scope file has changed since the plan was created: reconcile the
+> current state against the live code; on a mismatch, that is a STOP condition.
+
+## Meta
+- Planned at: commit `{git rev-parse --short HEAD}`, {DATE}
+- Challengers: {ran: names + why; skipped: names + why}. Drift check: {ran by the orchestrator | manual-only}
+- Status: {omit or leave as "Spec" while planning; set to "Implemented"/past tense only after the implementation commit has actually landed, never in the same session that writes the code, so the line never claims a status the codebase does not yet have (3rd confirmed occurrence of this doc going stale immediately)}
+
+## Problem
+{What is the problem — in 1-3 sentences. The PROBLEM, not the solution.}
+
+## Goal
+{How do you know it's solved? Measurable if possible.}
+
+## Non-Goals
+{What is explicitly NOT part of this.}
+
+## Out of Scope (Files)
+{Files/areas that look related but must NOT be touched — with a 1-sentence reason (e.g. "legacy-api.ts: deprecated, v1 clients still depend on it").}
+
+## Solution
+
+### Approach
+{Description of the solution approach — why this way and not another.}
+
+### Steps
+1. {Concrete — which file, which component, what changes} → verify: {checkable criterion, e.g. "Test X green", "Route Y returns 200", "Grep for Z empty"}
+2. ... → verify: ...
+
+Every step gets a verify criterion. A step without a checkable outcome is not a step, it's an intention.
+
+### Affected Files
+- `path/to/file` — {what changes}
+
+**Relationship sweep (mandatory when the plan changes a model field).** For every added, removed,
+renamed or retyped model attribute or relationship, grep the type name across the repo and list
+EVERY type that holds a non-optional relationship or a stored reference to it, even when that file
+"only" needs a compile fix. A removed relationship breaks its counterpart, and the counterpart is
+what gets forgotten. Evidence: a plan removed a relationship and omitted the owning model file
+from this list, so the executor hit a build error the plan had not scoped.
+
+### Conventions
+{Name every MANDATORY convention from CLAUDE.md that the affected files must follow, by name (required trait, base class, guard, rate-limit trait), not only via an exemplar file. Evidence: SanitizesInput was known from CLAUDE.md and still missing from a plan's Conventions. Then the repo patterns with an exemplar file: "Error handling follows the Result pattern — see src/lib/result.ts and its usage in src/users/api.ts:40-60. Exactly like that."}
+
+## Edge Cases
+- {Case}: {Handling}
+
+## Known Costs
+- {What a rejected simplicity cut or a rejected "measure first" objection costs}: {one line}
+
+## Done Criteria
+Machine-checkable, ALL must hold — commands with expected result, no prose like "works correctly":
+- [ ] `{test command}` → exit 0, incl. {N} new tests
+- [ ] `{lint/typecheck command}` → exit 0
+- [ ] `grep -rn "{old pattern}" src/` → no matches
+- [ ] No files outside the affected-files list changed (`git status`)
+
+## STOP Conditions
+Stop and report (do not improvise) when:
+- The current state at the named locations does not match the descriptions (codebase has drifted).
+- A verify criterion fails twice after a serious fix attempt.
+- The fix would need to touch an out-of-scope file.
+- {plan-specific core assumption} turns out to be false.
+
+## Validation of the Bet
+{MANDATORY whenever the plan changes product identity (core loop, main surface, positioning) rather than just adding a feature. Two criteria, both concrete and dated:}
+- **Works when:** {observable signal that the bet is paying off, with a deadline — "after 3 weeks, at least 10 days with an entry", not "feels better"}
+- **Rollback when:** {observable signal that it failed, plus what exactly gets reverted}
+
+## Maintenance Notes
+{What future changes to this code will need to consider; what a reviewer should check in the PR; explicitly deferred items with a reason.}
+
+## Open Questions
+- {If any remain — otherwise omit}
+
+## Challenge Result
+- **Accepted:** {concern}: {what changed in the plan}
+- **Rejected:** {concern}: {reason, e.g. contradicts user decision}
+- **Deferred:** {concern}: revisit when {condition}
+- **Zur Diskussion:** {simplicity cuts and other scope cuts, with the hook; decided by the user, never auto-applied}
+
+## Delegate spec
+{MANDATORY, last section of the plan body. Exactly /delegate's mini-spec format, self-contained, so
+/delegate can execute it without re-specifying. The plan body above this heading stays at about 1,500
+words; longer material goes into an `## Appendix` after this section, or is cut.}
+
+## Task: {Title}
+**Goal:** {how success is recognized, measurable}
+**Context:** {current state with file:line; conventions with exemplar file}
+**Affected files:** {final list, each with line range(s) and symbol}
+**Out of Scope:** {files that will NOT be touched, with reason}
+**Steps:**
+1. {concrete, file + what} → verify: {command → expected result}
+2. ... → verify: ...
+**Done criteria (all):** {commands with expected result; git status: only affected files}
+**STOP conditions:** {current state deviates; verify fails twice; fix needs an out-of-scope file; core assumption wrong}
+```
+
+The Delegate spec condenses the Solution, Done Criteria and STOP sections above into the mini-spec;
+if it grows beyond a screen, the plan body is carrying too much detail.
+
+**Optional sections** (only when they add value):
+- Data flow diagram (ASCII or Mermaid)
+- Migration strategy
+- Rollback plan
+
+## Conditional Sub-Templates
+
+Added to the plan when it matches:
+- **Schema migration** (any SwiftData/DB schema bump): rollback plan, test against real data, lightweight vs custom stage check, tombstone vs in-place.
+- **CloudKit**: schema deploy phase (pre-flight, manual Console fields), conflict strategy, race scenarios, container topology.
+- **iOS plan**: privacy and secrets hygiene, target membership / `project.yml` regeneration, known limitations. For an iOS major-version migration additionally: API fallback plan per new framework, Swift 6 hotspot list, capability matrix (region x language x model x device).

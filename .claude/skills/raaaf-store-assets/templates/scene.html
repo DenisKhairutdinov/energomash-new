@@ -1,0 +1,606 @@
+<!doctype html>
+<!--
+  Single scene canvas for store stills. All brand values (fonts, colors,
+  logo, screen image, copy) and all device-asset paths (bezels, status-bar
+  overlays, sampled colors) arrive as query params from bin/render.mjs,
+  resolved against references/store-specs.md's "Devices" JSON there -- this
+  file itself never hardcodes a machine path or a project value (SKILL.md
+  "Conventions").
+
+  Layout (2026-09-27 REVISE round 2, real device bezels; round 5/6 are the
+  current vertical grid): a fixed three-band grid for every portrait scene
+  -- text zone 0-30% of the canvas height, but the headline/subline/pills
+  block itself centers inside the inner 7-30% (round 6's 7% top breathing
+  room: `#hd`'s own box IS that 7-30% range, so the headline shrinks in
+  4px steps to a 40px floor if it overflows THAT smaller box, never
+  growing past its 0.12/0.048 ceilings), an empty gap 30-40%, then the
+  image zone 40-100%.
+  A single-device scene's top edge sits at exactly 40% and runs off the
+  bottom edge (unchanged since round 5). A `combo` scene instead binary-
+  searches the largest scale (measured live via `getBoundingClientRect`,
+  so it adapts to any device kind/canvas aspect) starting its top at 36%
+  (round 7), with a margin (>=5% width on the sides, round 8) -- as large
+  as that side margin allows. Round 8 dropped the full-visibility bottom
+  constraint (the pair may now run off the canvas bottom too), keeping
+  only a floor on the back phone's own visible height (clipped by the
+  canvas edge) of >=35% of its rendered width, so it never crops away to
+  almost nothing. The fitted pair is centered horizontally (not
+  vertically any more, nothing to center against once the bottom is
+  unconstrained). Device frames are
+  real bezel PNGs + real status-bar capture overlays (store-specs.md
+  "Devices"), not CSS-drawn approximations (superseded from round 1).
+  play-feature (landscape) can also show one device on the right, sized
+  off canvas height instead of width (see the `front`/`deviceSpec`
+  handling in the `isLandscape` branch, unaffected by the portrait grid).
+
+  Query params:
+    format, width, height     canvas selection (as before)
+    bg, fg                    this scene's background/foreground (also drives the
+                               radial+linear gradient background)
+    headlineFont/Family       headline @font-face
+    sublineFont/Family        subline @font-face
+    headline                  headline copy (required)
+    subline                   subline copy (optional, omitted entirely when empty)
+    pill1, pill2               optional badge copy (both omitted when empty)
+    layout                    single | combo (default single)
+    device                    iphone | android | ipad (device kind, shared by both phones in combo)
+    deviceSpec                JSON: {w,h,sx,sy,sw,sh,r,sb,widthPct} from store-specs.md "Devices"
+                               (w/h = bezel pixel size, sx/sy/sw/sh = screen rect, r = corner
+                               radius, sb = status-bar band height, widthPct = device width as a
+                               percent of the canvas)
+    deviceSpec (frameless, ipad): {frameless, widthPct, cornerRadiusPct, shadow}; only
+                               screenSrc + cropTopPx are used, no bezel/status bar, always single
+    screenSrc/cropTopPx/topColor/statusBarTheme/bezelSrc/statusBarSrc/maskSrc
+                               layout=single: this phone's resolved asset paths + sampled state
+    front / back              layout=combo: JSON blobs with the same 7 fields per phone
+-->
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        overflow: hidden;
+        font-family: 'Inter Variable', system-ui, sans-serif;
+        position: relative;
+      }
+      /* Text zone is 0-30% of the height, but the block itself centers in
+         7-30% (round 6: 7% top breathing room) -- #hd's own box IS that
+         7-30% sub-range, so the existing shrink-to-fit (scrollHeight vs
+         clientHeight) is naturally bounded by it, no separate padding
+         needed. */
+      #hd {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(var(--h) * 0.07);
+        height: calc(var(--h) * 0.23);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #headline {
+        font-weight: 400;
+        line-height: 1.02;
+        text-align: center;
+        text-wrap: balance;
+        margin: 0 7%;
+        font-size: calc(var(--w) * 0.12 * var(--hs, 1));
+      }
+      #subline {
+        font-weight: 500;
+        line-height: 1.3;
+        text-align: center;
+        text-wrap: balance;
+        opacity: 0.8;
+        margin: calc(var(--w) * 0.033) 10% 0;
+        font-size: calc(var(--w) * 0.048);
+      }
+      .pills {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: calc(var(--w) * 0.015);
+        margin-top: calc(var(--w) * 0.03);
+      }
+      /* events' own atoms.status-badge :on-image variant (rounded-full,
+         border-white/30, bg-white/20, text-xs font-medium, backdrop-blur-sm),
+         scaled x3.17 for App-Store-screenshot resolution. */
+      .pill {
+        color: #fff;
+        font-weight: 500;
+        line-height: 1.33;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.2);
+        border: calc(var(--w) * 0.0024) solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(calc(var(--w) * 0.0096));
+        padding: calc(var(--w) * 0.0048) calc(var(--w) * 0.024);
+        font-size: calc(var(--w) * 0.0288);
+      }
+      /* Position + transform are always set inline by the script below (a
+         single-device slot centers via translateX(-50%), a combo slot uses
+         an explicit left/top instead); only transform-origin stays here,
+         since it differs by layout and never changes at render time. The
+         image zone starts at exactly 40% of the height (text zone 0-30%,
+         gap 30-40%, image zone 40-100%). */
+      .phone-slot {
+        position: absolute;
+        top: calc(var(--h) * 0.4);
+        transform-origin: top center;
+        filter: drop-shadow(0 calc(var(--w) * 0.03) calc(var(--w) * 0.06) rgba(0, 0, 0, 0.35));
+      }
+      .combo .phone-slot {
+        transform-origin: top left;
+      }
+      .device-box {
+        position: relative;
+      }
+      .device-box .bezel {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      .device-box .screen {
+        position: absolute;
+        overflow: hidden;
+      }
+      .device-box .screen img.shot {
+        position: absolute;
+        left: 0;
+        width: 100%;
+      }
+      .device-box .screen .band {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .device-box .screen img.statusbar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .device-box .mask {
+        position: absolute;
+      }
+      body.landscape #hd {
+        /* play-feature is unaffected by the portrait 7-30% text zone
+           (round 6): reset back to the top-left-anchored box it always
+           used. */
+        top: 0;
+        height: auto;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+      body.landscape #logo {
+        margin: calc(var(--h) * 0.08) 0 0 6%;
+        /* Percent height would resolve against #hd's own height, which is
+           auto in landscape (unlike the portrait 28% text zone) and so
+           never resolves -- sized off --h directly instead. */
+        height: calc(var(--h) * 0.06);
+      }
+      body.landscape #headline {
+        margin: calc(var(--h) * 0.1) 0 0 6%;
+        width: 70%;
+        text-align: left;
+        font-size: calc(var(--h) * 0.16);
+      }
+      #logo {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="hd">
+      <img id="logo" alt="" />
+      <h1 id="headline"></h1>
+      <p id="subline"></p>
+      <div class="pills" id="pills"></div>
+    </div>
+    <div id="devices"></div>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const get = (key, fallback) => params.get(key) ?? fallback;
+      const getJSON = (key) => {
+        const raw = params.get(key);
+        return raw ? JSON.parse(raw) : null;
+      };
+
+      const format = get('format', 'ios-6.9');
+      const width = Number(get('width', 1320));
+      const height = Number(get('height', 2868));
+      const isLandscape = format === 'play-feature';
+      const layout = get('layout', 'single');
+      const bg = get('bg', '#04081f');
+      const fg = get('fg', '#ffffff');
+
+      document.documentElement.style.setProperty('--w', width + 'px');
+      document.documentElement.style.setProperty('--h', height + 'px');
+      document.documentElement.style.setProperty('--hs', get('headlineScale', '1'));
+      // Optional vertical device shift (% of canvas height), default 0.
+      const deviceDy = (Number(get('deviceDy', 0)) / 100) * height;
+      document.documentElement.style.width = width + 'px';
+      document.documentElement.style.height = height + 'px';
+      document.body.style.width = width + 'px';
+      document.body.style.height = height + 'px';
+      document.body.style.color = fg;
+      document.body.style.background = isLandscape
+        ? bg
+        : get('sheen', '') === '1'
+        ? `linear-gradient(160deg, color-mix(in oklch, ${bg}, white 8%) 0%, ${bg} 55%, color-mix(in oklch, ${bg}, black 3%) 100%)`
+        : `radial-gradient(85% 40% at 50% 60%, color-mix(in oklch, ${bg}, white 12%) 0%, transparent 70%), ` +
+          `linear-gradient(180deg, color-mix(in oklch, ${bg}, white 5%) 0%, ${bg} 50%, color-mix(in oklch, ${bg}, black 14%) 100%)`;
+      if (isLandscape) document.body.classList.add('landscape');
+      if (layout === 'combo') document.body.classList.add('combo');
+
+      const headlineFamily = get('headlineFamily', 'Holdstone');
+      const sublineFamily = get('sublineFamily', 'Inter Variable');
+      const fontStyle = document.createElement('style');
+      fontStyle.textContent = `
+        @font-face { font-family: "${headlineFamily}"; src: url("${get('headlineFont', '')}") format("${get('headlineFormat', 'woff2')}"); font-weight: 400; font-style: normal; }
+        @font-face { font-family: "${sublineFamily}"; src: url("${get('sublineFont', '')}") format("${get('sublineFormat', 'woff2')}"); font-weight: 400 700; font-style: normal; }
+      `;
+      document.head.appendChild(fontStyle);
+
+      // Headlines must never break at a hyphen ("WhatsApp-Chaos." -> "WhatsApp-"
+      // / "Chaos." across two lines). Wrapping the hyphenated word itself in a
+      // nowrap span keeps it on one line; U+2011 (non-breaking hyphen) is
+      // avoided since Holdstone may not have that glyph. Built via
+      // createElement/textContent, never innerHTML, so this is not an XSS
+      // vector.
+      function renderHyphenSafe(el, text) {
+        el.textContent = '';
+        for (const part of text.split(/(\s+)/)) {
+          if (part.includes('-') && part.trim() !== '') {
+            const span = document.createElement('span');
+            span.style.whiteSpace = 'nowrap';
+            span.textContent = part;
+            el.appendChild(span);
+          } else {
+            el.appendChild(document.createTextNode(part));
+          }
+        }
+      }
+
+      const headlineEl = document.getElementById('headline');
+      const rawHeadline = get('headline', '');
+      renderHyphenSafe(headlineEl, rawHeadline);
+      headlineEl.style.fontFamily = `"${headlineFamily}", system-ui, sans-serif`;
+
+      const subline = get('subline', '');
+      const sublineEl = document.getElementById('subline');
+      if (subline) {
+        sublineEl.textContent = subline;
+        sublineEl.style.fontFamily = `"${sublineFamily}", system-ui, sans-serif`;
+      } else {
+        sublineEl.remove();
+      }
+
+      const pill1 = get('pill1', '');
+      const pill2 = get('pill2', '');
+      const hasPills = Boolean(pill1 || pill2);
+      const pillsEl = document.getElementById('pills');
+      if (hasPills) {
+        for (const text of [pill1, pill2]) {
+          if (!text) continue;
+          const span = document.createElement('span');
+          span.className = 'pill';
+          span.textContent = text;
+          pillsEl.appendChild(span);
+        }
+      } else {
+        pillsEl.remove();
+      }
+
+      // Builds one phone's DOM: bezel + screen (screenshot, sampled-color
+      // backfill strip, real status-bar overlay) + optional mask overlay
+      // (Android's corners+punch-hole). Stack order per store-specs.md
+      // "Devices": iPhone paints the screen first then the bezel on top
+      // (screen_over_bezel); Android paints the bezel first, the screen
+      // on top, then the mask on top of that.
+      function buildDeviceBox(spec, deviceKind, deviceSpec) {
+          const box = document.createElement('div');
+          box.className = 'device-box';
+          box.style.width = deviceSpec.w + 'px';
+          box.style.height = deviceSpec.h + 'px';
+
+          const bezel = document.createElement('img');
+          bezel.className = 'bezel';
+          bezel.src = spec.bezelSrc;
+          bezel.style.width = deviceSpec.w + 'px';
+
+          const screen = document.createElement('div');
+          screen.className = 'screen';
+          screen.style.left = deviceSpec.sx + 'px';
+          screen.style.top = deviceSpec.sy + 'px';
+          screen.style.width = deviceSpec.sw + 'px';
+          screen.style.height = deviceSpec.sh + 'px';
+          screen.style.borderRadius = deviceSpec.r + 'px';
+          if (!spec.native) screen.style.background = spec.topColor;
+
+          const shot = document.createElement('img');
+          shot.className = 'shot';
+          shot.src = spec.screenSrc;
+          shot.style.top = spec.native ? '0px' : deviceSpec.sb - spec.cropTopPx + 'px';
+          screen.appendChild(shot);
+
+          if (!spec.native) {
+            const band = document.createElement('div');
+            band.className = 'band';
+            band.style.height = deviceSpec.sb + 'px';
+            band.style.background = spec.topColor;
+            screen.appendChild(band);
+
+            const statusBar = document.createElement('img');
+            statusBar.className = 'statusbar';
+            statusBar.src = spec.statusBarSrc;
+            screen.appendChild(statusBar);
+          }
+
+          const mask = spec.maskSrc
+            ? (() => {
+                const m = document.createElement('img');
+                m.className = 'mask';
+                m.src = spec.maskSrc;
+                m.style.left = deviceSpec.sx + 'px';
+                m.style.top = deviceSpec.sy + 'px';
+                m.style.width = deviceSpec.sw + 'px';
+                m.style.height = deviceSpec.sh + 'px';
+                return m;
+              })()
+            : null;
+
+          if (deviceSpec.screenOverBezel) {
+            box.appendChild(screen);
+            box.appendChild(bezel);
+          } else {
+            box.appendChild(bezel);
+            box.appendChild(screen);
+            if (mask) box.appendChild(mask);
+          }
+          return box;
+        }
+
+      const device = get('device', 'iphone');
+      const deviceSpec = getJSON('deviceSpec');
+      const devicesEl = document.getElementById('devices');
+
+      if (isLandscape) {
+        document.getElementById('logo').src = get('logoSrc', '');
+        document.getElementById('logo').style.display = 'block';
+        // play-feature's right half is otherwise empty: an optional single
+        // device (the hero's front phone, Pixel-framed) sized off canvas
+        // height, cropped off the bottom, tucked to the right edge. Only
+        // rendered when bin/render.mjs actually supplies one (a project
+        // without a combo hero simply gets no device here, same as before).
+        const front = getJSON('front');
+        if (front && deviceSpec) {
+          const scale = (height * 1.2) / deviceSpec.h;
+          const slot = document.createElement('div');
+          slot.className = 'phone-slot';
+          slot.style.right = 'calc(var(--w) * -0.08)';
+          slot.style.top = height * 0.18 + 'px';
+          slot.style.transformOrigin = 'top right';
+          slot.style.transform = `scale(${scale}) rotate(-6deg)`;
+          slot.appendChild(buildDeviceBox(front, device, deviceSpec));
+          devicesEl.appendChild(slot);
+        } else {
+          devicesEl.remove();
+        }
+      } else if (layout === 'combo') {
+        // Fixed compositional constants for the two-phone hero (not a
+        // brand value: purely how this one layout is art-directed), tuned
+        // in round 7 for a noticeably larger pair (less vertical spread,
+        // more overlap, tighter margins, taller start): back's offset from
+        // front is still expressed as a fraction of the (unscaled) device
+        // size, so the "overlap and offset look" survives whatever scale
+        // the fit search below lands on. Order matters: back appended
+        // first (painted behind), front second (painted on top), matching
+        // the approved prototype.
+        // Optional per-scene override (`combo.geometry`), default unchanged.
+        const geo = getJSON('comboGeometry') || {};
+        const ROTATE_FRONT = geo.rotate_front ?? -4;
+        const ROTATE_BACK = geo.rotate_back ?? 5;
+        const OFFSET_X = geo.offset_x ?? 0.5; // back's left, past front's left, in device widths
+        const OFFSET_Y = geo.offset_y ?? 0.05; // back's top, past front's top, in device heights
+        // Round 8: dropped the full-visibility bottom constraint (the pair
+        // may now run off the canvas bottom like a single-device scene),
+        // widened the side margin, sized as large as that margin allows.
+        const marginX = width * 0.05;
+        const zoneTop = height * 0.36;
+
+        const back = getJSON('back');
+        const front = getJSON('front');
+        const backSlot = document.createElement('div');
+        backSlot.className = 'phone-slot';
+        backSlot.appendChild(buildDeviceBox(back, device, deviceSpec));
+        const frontSlot = document.createElement('div');
+        frontSlot.className = 'phone-slot';
+        frontSlot.appendChild(buildDeviceBox(front, device, deviceSpec));
+        devicesEl.appendChild(backSlot);
+        devicesEl.appendChild(frontSlot);
+
+        function layoutAt(scale) {
+          const dw = deviceSpec.w * scale;
+          const dh = deviceSpec.h * scale;
+          frontSlot.style.left = marginX + 'px';
+          frontSlot.style.top = zoneTop + 'px';
+          frontSlot.style.transform = `scale(${scale}) rotate(${ROTATE_FRONT}deg)`;
+          backSlot.style.left = marginX + OFFSET_X * dw + 'px';
+          backSlot.style.top = zoneTop + OFFSET_Y * dh + 'px';
+          backSlot.style.transform = `scale(${scale}) rotate(${ROTATE_BACK}deg)`;
+          return dw;
+        }
+
+        function unionRect() {
+          const f = frontSlot.getBoundingClientRect();
+          const b = backSlot.getBoundingClientRect();
+          return {
+            left: Math.min(f.left, b.left),
+            right: Math.max(f.right, b.right),
+            top: Math.min(f.top, b.top),
+            bottom: Math.max(f.bottom, b.bottom),
+          };
+        }
+
+        // Binary-search the largest scale where both phones' actual
+        // (rotated) bounding boxes stay within the side margins, measured
+        // live rather than derived from trigonometry, so this adapts to
+        // any device kind/canvas size without a project- or format-
+        // specific constant. No bottom-visibility constraint any more (the
+        // pair may run off the canvas bottom like a single-device scene);
+        // the only floor is the back phone's own visible height (clipped
+        // by the canvas edge) staying at least ~35% of its rendered width,
+        // so it never crops away to almost nothing.
+        let lo = 0.02;
+        let hi = width / deviceSpec.w;
+        for (let i = 0; i < 24; i++) {
+          const mid = (lo + hi) / 2;
+          const dw = layoutAt(mid);
+          const r = unionRect();
+          const b = backSlot.getBoundingClientRect();
+          const backVisibleHeight = Math.min(b.bottom, height) - b.top;
+          const fits = r.left >= marginX - 0.5 && r.right <= width - marginX + 0.5 && backVisibleHeight >= 0.35 * dw;
+          if (fits) lo = mid;
+          else hi = mid;
+        }
+        layoutAt(lo);
+
+        // Center the fitted pair horizontally within the margin zone.
+        const fitted = unionRect();
+        const available = width - 2 * marginX;
+        const shift = marginX + (available - (fitted.right - fitted.left)) / 2 - fitted.left;
+        frontSlot.style.left = parseFloat(frontSlot.style.left) + shift + 'px';
+        backSlot.style.left = parseFloat(backSlot.style.left) + shift + 'px';
+      } else if (deviceSpec.frameless) {
+        // Frameless device (iPad): the source screenshot itself as a rounded
+        // rectangle with a drop shadow, no bezel/status-bar overlay. Width,
+        // corner radius and shadow come from store-specs.md "Devices"; the
+        // top edge sits at 40% and the image runs off the bottom edge like
+        // any single device. cropTopPx (source pixels, default 0) shifts the
+        // screenshot up inside the rounded box.
+        const boxW = width * (deviceSpec.widthPct / 100);
+        const slot = document.createElement('div');
+        slot.className = 'phone-slot';
+        slot.style.left = '50%';
+        slot.style.transform = 'translateX(-50%)';
+        slot.style.filter = 'none';
+        const box = document.createElement('div');
+        box.style.width = boxW + 'px';
+        box.style.borderRadius = (boxW * deviceSpec.cornerRadiusPct) / 100 + 'px';
+        box.style.overflow = 'hidden';
+        box.style.boxShadow = deviceSpec.shadow;
+        if (get('edge', '') === '1') {
+          // Optional device edge: 12% foreground hairline plus the soft shadow.
+          const m = /^#?([0-9a-f]{6})$/i.exec(fg);
+          const rgb = m ? [0, 2, 4].map((i) => parseInt(m[1].slice(i, i + 2), 16)) : [128, 128, 128];
+          const hair = Math.max(2, Math.round(width * 0.0012));
+          box.style.boxShadow = `0 0 0 ${hair}px rgba(${rgb.join(',')}, 0.12), 0 ${width * 0.012}px ${width * 0.04}px rgba(0, 0, 0, 0.22), ${deviceSpec.shadow}`;
+        }
+        slot.style.top = height * 0.4 + 'px';
+        const shot = document.createElement('img');
+        shot.src = get('screenSrc', '');
+        shot.style.display = 'block';
+        shot.style.width = '100%';
+        const cropTopPx = Number(get('cropTopPx', 0));
+        if (cropTopPx) {
+          shot.addEventListener('load', () => {
+            shot.style.marginTop = -cropTopPx * (boxW / shot.naturalWidth) + 'px';
+          });
+        }
+        box.appendChild(shot);
+        slot.appendChild(box);
+        devicesEl.appendChild(slot);
+      } else {
+        const single = {
+          screenSrc: get('screenSrc', ''),
+          cropTopPx: Number(get('cropTopPx', 0)),
+          topColor: get('topColor', '#000000'),
+          native: get('nativeStatusBar', '') === '1',
+          bezelSrc: get('bezelSrc', ''),
+          statusBarSrc: get('statusBarSrc', ''),
+          maskSrc: get('maskSrc', '') || null,
+        };
+        const scale = (width * (deviceSpec.widthPct / 100)) / deviceSpec.w;
+        const slot = document.createElement('div');
+        slot.className = 'phone-slot';
+        slot.style.left = '50%';
+        slot.style.transform = `translateX(-50%) scale(${scale})`;
+        slot.style.top = height * 0.4 + deviceDy + 'px';
+        slot.appendChild(buildDeviceBox(single, device, deviceSpec));
+        devicesEl.appendChild(slot);
+      }
+
+      // Render readiness contract for bin/render.mjs: fonts must be the
+      // requested family, never a silent fallback (SKILL.md Edge Cases:
+      // "Font lädt nicht"). play-feature never renders a subline, so the
+      // browser never fetches that font file and the check would always
+      // fail; only checked when the subline is actually on the page.
+      document.fonts.ready.then(() => {
+        const headlineLoaded = document.fonts.check(`16px "${headlineFamily}"`);
+        const sublineLoaded = !subline || document.fonts.check(`16px "${sublineFamily}"`);
+
+        // Typographic apostrophe: Holdstone renders the ASCII apostrophe (')
+        // as a detached, acute-like mark with a gap ("who ´s"). Swap to
+        // U+2019 in both headline and subline. Checked live via
+        // document.fonts.check (only reliable once fonts.ready has
+        // resolved, hence doing this here, not at the earlier render
+        // pass), never assumed: if the headline font itself lacks the
+        // U+2019 glyph, only that character renders in the subline font
+        // instead, inside its own span.
+        const hasApostrophe = document.fonts.check(`16px "${headlineFamily}"`, '’');
+        function appendApostropheSafe(container, text) {
+          if (hasApostrophe) {
+            container.appendChild(document.createTextNode(text));
+            return;
+          }
+          const bits = text.split('’');
+          bits.forEach((bit, i) => {
+            if (bit) container.appendChild(document.createTextNode(bit));
+            if (i < bits.length - 1) {
+              const span = document.createElement('span');
+              span.style.fontFamily = `"${sublineFamily}", system-ui, sans-serif`;
+              span.textContent = '’';
+              container.appendChild(span);
+            }
+          });
+        }
+        const normalizedHeadline = rawHeadline.replace(/'/g, '’');
+        headlineEl.textContent = '';
+        for (const part of normalizedHeadline.split(/(\s+)/)) {
+          if (part.includes('-') && part.trim() !== '') {
+            const span = document.createElement('span');
+            span.style.whiteSpace = 'nowrap';
+            appendApostropheSafe(span, part);
+            headlineEl.appendChild(span);
+          } else {
+            appendApostropheSafe(headlineEl, part);
+          }
+        }
+        if (subline) sublineEl.textContent = subline.replace(/'/g, '’');
+
+        // Headline overflow: shrink in 4px steps down to a 40px floor, on
+        // either the text zone overflowing vertically (hd) or a single
+        // line overflowing horizontally (headlineEl itself -- a nowrap
+        // hyphenated-word span can force this even when hd still fits).
+        const hd = document.getElementById('hd');
+        let f = parseFloat(getComputedStyle(headlineEl).fontSize);
+        while ((hd.scrollHeight > hd.clientHeight || headlineEl.scrollWidth > headlineEl.clientWidth) && f > 40) {
+          f -= 4;
+          headlineEl.style.fontSize = f + 'px';
+        }
+
+        document.body.dataset.ready = headlineLoaded && sublineLoaded ? 'true' : 'font-failed';
+      });
+    </script>
+  </body>
+</html>

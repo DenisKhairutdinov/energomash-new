@@ -1,0 +1,265 @@
+#!/usr/bin/env bash
+# Serializes test runs across parallel agents (fix agents, verifiers,
+# orchestrator). Two concurrent `php artisan test` runs against the same DB
+# corrupt each other's fixtures — this is a semaphore, not a convention.
+#
+# Usage: test-lock.sh <command...>
+#        test-lock.sh [--cached] --cmd "<command string>"
+#   bash "$AUDIT_BIN/test-lock.sh" php artisan test --compact tests/Unit/FooTest.php
+#   bash "$AUDIT_BIN/test-lock.sh" --cmd "$TEST_COMMAND"
+# `--cmd` is for a command held in a variable: zsh (the Bash tool's shell) does not
+# word-split `$TEST_COMMAND`, so the string is handed over whole and run via `bash -c`.
+# The lock key still sees its `-destination` id.
+# `--cached` marks a FULL, unfiltered run (/audit Phase 4, /ship Phase 2b): a green run on an identical
+# tree is remembered for 30 min and a repeat prints `TEST_CACHE_HIT <key>` instead of running (lib-testrun.sh,
+# tr_cache_*). It also runs the command as a `suite` run: admission (two suites at once, memory-pressure
+# rule), stall watchdog and one restart. TESTRUN_CLASS=suite (set by deploy) does the same without the cache.
+# Env: TESTRUN_CACHE_CMD overrides the cache key command; TEST_LOCK_KEY=common forces the common-dir lock key (mutate.sh); TESTRUN_DISABLE=1 restores the
+# pre-lib behaviour (lock only).
+#
+# Portable mkdir spinlock (flock is not available on stock macOS). Lock is
+# per-repo, TTL 15 min against stale locks from killed runs.
+#
+# The lock dir lives under the repo's shared git dir (`--git-common-dir`),
+# NOT under $TMPDIR: every subagent runs in its own sandbox with its own
+# TMPDIR, so a TMPDIR lock was private to each agent and serialized nothing.
+# Three parallel fix agents collided on the same test database on
+# 2026-08-31 and again on 2026-09-02 with the lock "in place" (learning log:
+# "test-lock.sh trotz Pflicht kollidiert", root cause found 2026-09-03). The
+# common git dir is the one path every agent of a repo shares, across
+# linked worktrees too, which is right because worktrees usually share the
+# test database as well. $TMPDIR stays only as the fallback outside a repo
+# or when the git dir is not writable.
+# A background heartbeat touches the lock dir every 60s while the wrapped
+# command runs, so a legitimately slow run keeps refreshing its own mtime and
+# is never mistaken for an orphan. WAIT_MAX is kept >= TTL_SECONDS so a waiter
+# never times out before an actual orphan ages past the TTL.
+#
+# Ownership is explicit, not just "the directory exists": each holder writes
+# a PID+nonce token into a file inside the lock dir at acquisition. Stale
+# reaping uses `mv` (atomic rename) instead of `rm -rf` directly, so that
+# when two waiters both decide a lock looks stale, only one of them can win
+# the actual reap -- the loser's `mv` fails because the source is already
+# gone, instead of both `rm -rf`-ing the same path and one deleting a
+# directory the other has since recreated. The EXIT trap only removes the
+# lock dir if the token still inside it matches the token this process wrote.
+
+set -u
+
+# shellcheck disable=SC1091
+. "$(dirname "$0")/lib-testrun.sh" 2>/dev/null || TESTRUN_DISABLE=1
+command -v tr_run >/dev/null 2>&1 || TESTRUN_DISABLE=1
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+HASH=$(printf '%s' "$REPO_ROOT" | { md5 2>/dev/null || md5sum | cut -d' ' -f1; })
+
+# Lock granularity is repo PLUS destination. A PHP suite contends on one test
+# database, so the repo alone is the right key there. An xcodebuild run
+# contends on one booted simulator, and two runs against the SAME simulator
+# kill each other: the loser dies with "Early unexpected exit, operation never
+# finished bootstrapping ... Test crashed with signal kill", which reads like a
+# product crash and cost a session two wasted re-runs on 2026-09-19. Two runs
+# against DIFFERENT simulators are genuinely independent and should not
+# serialize, so the destination id joins the key when there is one.
+dest_key_of() {
+  case "$1" in
+    *id=*) printf '%s' "$1" | grep -oE 'id=[^,"'"'"' ]+' | head -1 | cut -c4- ;;
+    *) printf '%s' "$1" | tr -c 'A-Za-z0-9' '-' ;;
+  esac
+}
+
+CMD_STRING=""
+CACHED=0
+if [ "${1:-}" = "--cached" ]; then CACHED=1; shift; fi
+if [ "${1:-}" = "--cmd" ]; then
+  [ $# -eq 2 ] || { echo "usage: test-lock.sh [--cached] --cmd \"<command string>\"" >&2; exit 64; }
+  CMD_STRING=$2
+  set -- bash -c "$CMD_STRING"
+fi
+
+DEST_KEY=""
+if [ -n "$CMD_STRING" ]; then
+  case "$CMD_STRING" in
+    *-destination*) DEST_KEY=$(dest_key_of "$(printf '%s' "${CMD_STRING#*-destination}" | cut -c1-120)") ;;
+  esac
+else
+  prev=""
+  for arg in "$@"; do
+    [ "$prev" = "-destination" ] && DEST_KEY=$(dest_key_of "$arg")
+    prev="$arg"
+  done
+fi
+[ -n "$DEST_KEY" ] && DEST_KEY="-$(printf '%s' "$DEST_KEY" | tr -c 'A-Za-z0-9' '-')"
+
+GIT_COMMON=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
+# A linked worktree whose .claude/ship.md says `test-isolation: worktree` has its own test database
+# (the project's test bootstrap suffixes it), so it locks on its own git dir instead of the shared one.
+# The main checkout, worktrees without the flag and mutate.sh (TEST_LOCK_KEY=common) keep the common dir.
+LOCK_BASE=$GIT_COMMON
+if [ "${TEST_LOCK_KEY:-}" != common ] && [ "${TESTRUN_DISABLE:-}" != 1 ] && [ -n "$GIT_COMMON" ]; then
+  GIT_OWN=$(git rev-parse --path-format=absolute --git-dir 2>/dev/null || true)
+  if [ -n "$GIT_OWN" ] && [ "$GIT_OWN" != "$GIT_COMMON" ] && [ "$(tr_ship_value test-isolation "$REPO_ROOT")" = worktree ]; then
+    LOCK_BASE=$GIT_OWN
+  fi
+fi
+if [ -n "$LOCK_BASE" ] && [ -d "$LOCK_BASE" ] && [ -w "$LOCK_BASE" ]; then
+  LOCK_DIR="$LOCK_BASE/claude-audit-test-lock${DEST_KEY}"
+else
+  LOCK_DIR="${TMPDIR:-/tmp}/claude-audit-test-lock-${HASH}${DEST_KEY}"
+fi
+OWNER_FILE="$LOCK_DIR/owner"
+
+# Cache hit: nothing to run, nothing to lock. This also holds for a reentrant call (deploy inside
+# /audit or /ship): its own entry, keyed TESTRUN_CACHE_CMD, is what deploy's push gate looks up later.
+# The cache key is the command string, or TESTRUN_CACHE_CMD when a wrapper (deploy) runs a longer
+# command for the same suite, so /audit, /ship and deploy share one entry.
+CACHE_CMD=${TESTRUN_CACHE_CMD:-${CMD_STRING:-$*}}
+if [ "$CACHED" = 1 ] && tr_cache_hit "$REPO_ROOT" "$CACHE_CMD"; then exit 0; fi
+# The tree is hashed BEFORE the run: a command that writes into the tree must not cache its own output.
+RUN_TREE=""; [ "$CACHED" = 1 ] && RUN_TREE=$(tr_tree "$REPO_ROOT")
+RUN_T0=$(date +%s)
+RUN_CLASS=${TESTRUN_CLASS:-}
+[ "$CACHED" = 1 ] && RUN_CLASS=suite
+[ "${TESTRUN_DISABLE:-}" = 1 ] && RUN_CLASS=""
+# A command that is or calls xcodebuild (the string, or a script file among the words) runs as class
+# `xcode` (900 s stall limit, ceiling 2): as `suite` its 300 s limit would kill a quiet UI test, and the
+# xcodebuild shim inside is nested and cannot apply the xcode rules on its own.
+if [ -n "$RUN_CLASS" ] && ( set -f; tr_calls_xcodebuild $CMD_STRING "$@" ); then RUN_CLASS=xcode; fi
+run_cmd() { if [ -n "$RUN_CLASS" ]; then TESTRUN_RESTARTABLE=1 tr_run "$RUN_CLASS" "${TESTRUN_PROJECT:-$(tr_project "$REPO_ROOT")}" "$@"; else "$@"; fi; }
+
+# Reentrant for children of the holder: a wrapped command that calls this script again (deploy's
+# test gate wraps its suite, and /ship or /audit wrap `deploy <app> test`) runs under the lock its
+# parent already holds. Without this the inner call waited WAIT_MAX on its own parent and aborted
+# without running a test (2026-10-03). Only descendants inherit TEST_LOCK_HELD, and the lock dir
+# must still exist, so an unrelated run never skips the lock.
+HELD_BY_PARENT=0
+if [ "${TEST_LOCK_HELD:-}" = "$LOCK_DIR" ] && [ -d "$LOCK_DIR" ]; then HELD_BY_PARENT=1; fi
+TTL_SECONDS=900
+WAIT_MAX=960
+NOTICE_SECONDS=${TEST_LOCK_NOTICE_SECONDS:-60}   # progress line interval while waiting (even number: WAITED steps by 2)
+WAITED=0
+OWNED=0
+# Token identifying this process's hold on the lock, written into
+# OWNER_FILE at acquisition and checked again before release.
+TOKEN="$$-$RANDOM-$(date +%s 2>/dev/null || echo 0)"
+
+# Try to atomically claim a stale-looking lock dir for removal. Returns 0
+# only if THIS process won the race to rename it away; a loser's `mv` fails
+# because the source no longer exists once the winner has moved it.
+reap_stale() {
+  local reap_dir="${LOCK_DIR}.reap.$$.${RANDOM}"
+  if mv "$LOCK_DIR" "$reap_dir" 2>/dev/null; then
+    rm -rf "$reap_dir"
+    return 0
+  fi
+  return 1
+}
+
+acquire() {
+  while ! mkdir "$LOCK_DIR" 2>/dev/null; do
+    # Stale lock? (owner died without cleanup)
+    if [ -d "$LOCK_DIR" ]; then
+      NOW=$(date +%s)
+      LOCK_TS=$(stat -f %m "$LOCK_DIR" 2>/dev/null || stat -c %Y "$LOCK_DIR" 2>/dev/null || echo "$NOW")
+      if [ $((NOW - LOCK_TS)) -gt "$TTL_SECONDS" ]; then
+        echo "test-lock: lock looks stale (older than ${TTL_SECONDS}s), attempting reap" >&2
+        reap_stale || true
+        # Whether or not our own reap won, loop back and retry mkdir --
+        # never assume we hold the lock just because we decided it was
+        # stale; only a winning mkdir proves ownership.
+        continue
+      fi
+    fi
+    if [ "$WAITED" -ge "$WAIT_MAX" ]; then
+      echo "test-lock: timeout after ${WAIT_MAX}s waiting for $LOCK_DIR" >&2
+      exit 75
+    fi
+    sleep 2
+    WAITED=$((WAITED + 2))
+    # Periodic progress line: a caller with an output-stall watchdog (deploy's test gate
+    # kills a run after minutes without output) must not read waiting as a hang.
+    if [ $((WAITED % NOTICE_SECONDS)) -eq 0 ]; then
+      echo "test-lock: waiting for $LOCK_DIR (${WAITED}s)" >&2
+    fi
+  done
+  # mkdir succeeded: we own the lock. Record our token so release() can
+  # verify, at cleanup time, that we still own it. If the token write
+  # itself fails (read-only TMPDIR, disk full), do not pretend to hold
+  # the lock: an OWNED=1 with an empty/missing OWNER_FILE can never match
+  # TOKEN in release(), so the lock dir would never be removed and every
+  # subsequent waiter blocks until the full TTL_SECONDS reap. Fail loudly
+  # and remove the directory we just created instead.
+  if ! printf '%s' "$TOKEN" > "$OWNER_FILE" 2>/dev/null; then
+    echo "test-lock: failed to write ownership token to $OWNER_FILE, aborting" >&2
+    rm -rf "$LOCK_DIR"
+    exit 74
+  fi
+  OWNED=1
+}
+
+release() {
+  # Order matters here (bash 3.2): killing the heartbeat job BEFORE the
+  # $(...) command substitution below interleaves the heartbeat's SIGCHLD
+  # with the substitution's own internal subshell/wait, which corrupts
+  # bash 3.2's trap bookkeeping and prints spurious internal warnings
+  # ("run_pending_traps: bad value in trap_list[15]", "Terminated: 15 ...")
+  # to stderr -- noise a reviewing agent would otherwise read as test
+  # output. Doing the lock-directory cleanup FIRST and killing the
+  # heartbeat LAST avoids the interleaving entirely (verified: 0/40 noisy
+  # runs with this order vs. ~50-70% noisy with kill-first, regardless of
+  # string- vs function-form trap).
+  if [ "$OWNED" -eq 1 ]; then
+    local current_owner
+    current_owner=$(cat "$OWNER_FILE" 2>/dev/null || echo "")
+    if [ "$current_owner" = "$TOKEN" ]; then
+      rm -rf "$LOCK_DIR"
+    fi
+  fi
+  kill "$HB_PID" 2>/dev/null
+}
+
+HB_PID=""
+if [ "$HELD_BY_PARENT" = 0 ]; then
+acquire
+export TEST_LOCK_HELD="$LOCK_DIR"
+trap release EXIT INT TERM
+
+# Heartbeat: refresh the lock dir mtime periodically so a live, slow run is
+# never aged past TTL_SECONDS and reaped by a waiter. Runs sleep 60 as an
+# explicit child and traps TERM inside the subshell so `kill "$HB_PID"` in
+# the cleanup trap above kills the sleep child too, instead of leaving it
+# as an orphan for up to 60s after the wrapped command exits.
+(
+  SLEEP_PID=""
+  trap 'kill "$SLEEP_PID" 2>/dev/null; exit 0' TERM
+  while :; do
+    sleep 60 &
+    SLEEP_PID=$!
+    wait "$SLEEP_PID" 2>/dev/null
+    touch "$LOCK_DIR" 2>/dev/null || exit
+  done
+) &
+HB_PID=$!
+fi
+
+# Run the wrapped command through tee so a failure can be classified without
+# changing the caller-visible behavior: STATUS is still the wrapped command's
+# own exit code (via PIPESTATUS), stdout/stderr still stream live. Detection
+# is best-effort and fail-open -- if the temp file can't be created, fall
+# back to running the command directly exactly as before.
+ENV_CHECK=$(mktemp "${TMPDIR:-/tmp}/audit-test-lock-output.XXXXXX" 2>/dev/null) || ENV_CHECK=""
+if [ -n "$ENV_CHECK" ]; then
+  run_cmd "$@" 2>&1 | tee "$ENV_CHECK"
+  STATUS=${PIPESTATUS[0]}
+  [ "$STATUS" -eq 0 ] && [ "$CACHED" = 1 ] && tr_cache_put "$REPO_ROOT" "$CACHE_CMD" "$RUN_T0" "$ENV_CHECK" "$RUN_TREE"
+  if [ "$STATUS" -ne 0 ] && grep -qiE 'never finished bootstrapping|crashed with signal kill|Early unexpected exit' "$ENV_CHECK" 2>/dev/null; then
+    echo "TEST_LOCK_COLLISION: the test runner was killed before it connected, which is what a second concurrent run against the same simulator looks like -- not a product crash and not a failing test. Re-run once the other run has finished; the lock at $LOCK_DIR only serializes callers that go through this wrapper." >&2
+  elif [ "$STATUS" -ne 0 ] && grep -qiE 'simdiskimaged|CoreSimulatorService|unable to boot device|no devices are booted|could not find.*(simulator|runtime)|no runtimes discoverable|xcresult.*(operation not permitted|permission denied)' "$ENV_CHECK" 2>/dev/null; then
+    echo "TEST_LOCK_ENV_ERROR: CoreSimulator looks unreachable from this sandboxed shell (simdiskimaged/no runtimes/xcresult write denial) -- this is an environment failure, not a test failure or an incomplete fix." >&2
+  fi
+  rm -f "$ENV_CHECK" 2>/dev/null
+else
+  run_cmd "$@"
+  STATUS=$?
+fi
+exit "$STATUS"

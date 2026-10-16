@@ -1,0 +1,2482 @@
+// screens.test.mjs: one test per branch named in the plan step 2 verify
+// criterion. Run with `node --test screens/bin/`.
+//
+// Each test constructs a throwaway fixture under a fresh mkdtemp() dir
+// (never the repo itself) and calls the exported functions directly, so
+// the Laravel/Bun DB guard tests can inject a stub command runner instead
+// of spawning `php`.
+
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, writeFileSync, mkdirSync, existsSync, readFileSync, statSync } from 'node:fs';
+import { join, basename } from 'node:path';
+import { tmpdir } from 'node:os';
+import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+
+// `resolveScreensOutputRoot`'s default (no `config.output_dir`) falls back
+// to `~/Developer/screens/<slug>`; every fixture below overrides
+// `output_dir` to stay under its own tmp root, but `HOME` is still
+// overridden here so the small number of tests that deliberately exercise
+// the DEFAULT (slug-derivation, top-level index aggregation) never touch
+// the real machine's `~/Developer/screens/`.
+const FAKE_HOME = mkdtempSync(join(tmpdir(), 'screens-home-'));
+process.env.HOME = FAKE_HOME;
+
+import {
+  expandProjectRoot,
+  planEntries,
+  checkLock,
+  repoHash,
+  simulatorNameForDevice,
+  parseDfAvailableGb,
+  checkDiskGuard,
+  findNewestIosRuntimeId,
+  findSimulatorUdidByName,
+  statusBarOverrideArgs,
+  appearanceArgs,
+  iosDeviceSetup,
+  macosDeviceSetup,
+  xcresultExportAttachmentsArgs,
+  stripXcresultSuffix,
+  mapXcresultExportToIncoming,
+  cmdMacosExport,
+  androidAvdName,
+  androidEmulatorPort,
+  resolveAndroidSdkRoot,
+  androidToolPaths,
+  resolveAvdmanagerPath,
+  androidToolsPreflight,
+  avdExists,
+  findInstalledSystemImages,
+  androidAvdCreateShellCmd,
+  androidDemoModeArgs,
+  androidThemeArgs,
+  androidExplicitIntentArgs,
+  androidDeepLinkUrl,
+  waitForAndroidBoot,
+  androidDeviceSetup,
+  cmdUp,
+  cmdDown,
+  cmdAndroidNavigate,
+  killPortListeners,
+  androidAppUrlEnv,
+  laravelDbGuard,
+  composePhpIniScanDir,
+  phpFixedClockEnv,
+  laravelPerfEnv,
+  laravelSessionEnv,
+  pidFilePath,
+  demoPasswordEnv,
+  playwrightWorkers,
+  computeSeedFingerprint,
+  readPngDimensions,
+  promoteFile,
+  deviceClassFor,
+  buildScreenshotPath,
+  moveRemovedEntries,
+  cmdPromote,
+  cmdMigrateLayout,
+  cmdPlan,
+  cmdTrust,
+  computeCommandHash,
+  marketingTargetDir,
+  resolveMarketingBackground,
+  resolveMarketingGradient,
+  darkenHex,
+  backgroundIsDark,
+  resolveMarketingLayout,
+  resolveMarketingFont,
+  resolveMarketingLogo,
+  findMarketingSourceSet,
+  resolveEntrySources,
+  cmdMarketing,
+  parsePromotedFilename,
+  buildIndexItems,
+  attachIndexHistory,
+  buildIndexMarketing,
+  runIdFor,
+  historyVersionsFor,
+  enforceHistoryRetention,
+  readRunsJsonl,
+  buildCatalogSummary,
+  buildTopIndexHtml,
+  regenerateTopIndex,
+  cmdIndex,
+  cmdMigrateOutput,
+  affectedIds,
+  writeJson,
+  readJson,
+  generateDemoPassword,
+  ensureGitignoreEntry,
+  ensureSecretsFile,
+  secretConfigGuard,
+  expandHome,
+  deriveProjectSlug,
+  resolveScreensOutputRoot,
+} from './screens.mjs';
+
+// Minimal valid PNG byte layout for readPngDimensions: 8-byte signature +
+// 4-byte chunk length + 4-byte "IHDR" type + 4-byte width + 4-byte height
+// (big-endian), the rest is irrelevant filler.
+function fakePng(width, height, filler = 'x') {
+  const buf = Buffer.alloc(30, filler);
+  buf.writeUInt32BE(width, 16);
+  buf.writeUInt32BE(height, 20);
+  return buf;
+}
+
+// Every fixture pins `config.output_dir` to its own `screenshots/` dir
+// (the `${PROJECT_ROOT}` placeholder `resolveScreensOutputRoot` expands),
+// reproducing the pre-central-folder default exactly so the bulk of the
+// existing `root/screenshots/...` assertions below stay valid unchanged.
+// A test that writes its OWN `.screens/config.json` (overwriting this
+// default) re-adds `output_dir` itself wherever it exercises a
+// screenshots-writing command.
+function fixture() {
+  const root = mkdtempSync(join(tmpdir(), 'screens-test-'));
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots' });
+  return root;
+}
+
+function writeFile(root, relPath, content) {
+  const full = join(root, relPath);
+  mkdirSync(join(full, '..'), { recursive: true });
+  writeFileSync(full, content);
+}
+
+// --- expandProjectRoot: `${PROJECT_ROOT}` placeholder --------------------
+
+test('expandProjectRoot: nested launch_args expansion', () => {
+  const root = fixture();
+  const entry = { launch_args: ['--import', '${PROJECT_ROOT}/.screens/mac/fixtures/cube.stl'] };
+  const expanded = expandProjectRoot(entry, root);
+  assert.equal(expanded.launch_args[1], `${root}/.screens/mac/fixtures/cube.stl`);
+});
+
+test('expandProjectRoot: unknown placeholder left untouched', () => {
+  const root = fixture();
+  const value = { extra_args: ['-Flag', '${OTHER_PLACEHOLDER}'] };
+  const expanded = expandProjectRoot(value, root);
+  assert.equal(expanded.extra_args[1], '${OTHER_PLACEHOLDER}');
+});
+
+// --- plan: new entry -> planned -----------------------------------------
+
+test('plan: new entry -> planned (new)', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'a');
+  const manifest = { entries: [{ id: 'home', sources: ['view.blade.php'] }] };
+  const state = { entries: {} };
+  const [r] = planEntries(root, manifest, state, false);
+  assert.equal(r.status, 'new');
+});
+
+// --- plan: unchanged entry -> skipped ------------------------------------
+
+test('plan: unchanged entry -> unchanged (skipped)', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'a');
+  const manifest = { entries: [{ id: 'home', sources: ['view.blade.php'] }] };
+  const fingerprint = planEntries(root, manifest, { entries: {} }, false)[0].fingerprint;
+  writeFile(root, 'screenshots/web/area/home/filled.png', 'png-bytes');
+  const state = {
+    entries: {
+      home: { fingerprint, dir: 'web/area/home', pngs: { 'filled.png': 'whatever' } },
+    },
+  };
+  const [r] = planEntries(root, manifest, state, false);
+  assert.equal(r.status, 'unchanged');
+});
+
+// --- plan: source change -> stale ----------------------------------------
+
+test('plan: source file changed -> stale', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'a');
+  const manifest = { entries: [{ id: 'home', sources: ['view.blade.php'] }] };
+  const fingerprint = planEntries(root, manifest, { entries: {} }, false)[0].fingerprint;
+  writeFile(root, 'screenshots/web/area/home/filled.png', 'png-bytes');
+  const state = { entries: { home: { fingerprint, dir: 'web/area/home', pngs: { 'filled.png': 'x' } } } };
+  writeFile(root, 'view.blade.php', 'a-changed');
+  const [r] = planEntries(root, manifest, state, false);
+  assert.equal(r.status, 'stale');
+});
+
+// --- plan: global invalidator (lockfile) change -> all stale -------------
+
+test('plan: global_sources (lockfile) change -> all entries stale', () => {
+  const root = fixture();
+  writeFile(root, 'view-a.blade.php', 'a');
+  writeFile(root, 'view-b.blade.php', 'b');
+  writeFile(root, 'composer.lock', 'lock-v1');
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', global_sources: ['composer.lock'] });
+  const manifest = {
+    entries: [
+      { id: 'a', sources: ['view-a.blade.php'] },
+      { id: 'b', sources: ['view-b.blade.php'] },
+    ],
+  };
+  const before = planEntries(root, manifest, { entries: {} }, false);
+  writeFile(root, 'screenshots/web/area/a/filled.png', 'x');
+  writeFile(root, 'screenshots/web/area/b/filled.png', 'x');
+  const state = {
+    entries: {
+      a: { fingerprint: before[0].fingerprint, dir: 'web/area/a', pngs: { 'filled.png': 'x' } },
+      b: { fingerprint: before[1].fingerprint, dir: 'web/area/b', pngs: { 'filled.png': 'x' } },
+    },
+  };
+  writeFile(root, 'composer.lock', 'lock-v2');
+  const after = planEntries(root, manifest, state, false);
+  assert.ok(after.every((r) => r.status === 'stale'), 'every entry should be stale after a lockfile bump');
+});
+
+// --- plan: missing PNG -> planned ----------------------------------------
+
+test('plan: fingerprint unchanged but PNG missing -> missing_png (planned)', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'a');
+  const manifest = { entries: [{ id: 'home', sources: ['view.blade.php'] }] };
+  const fingerprint = planEntries(root, manifest, { entries: {} }, false)[0].fingerprint;
+  const state = { entries: { home: { fingerprint, dir: 'web/area/home', pngs: { 'filled.png': 'x' } } } };
+  // no PNG written on disk
+  const [r] = planEntries(root, manifest, state, false);
+  assert.equal(r.status, 'missing_png');
+});
+
+// --- plan: --full -> all planned -----------------------------------------
+
+test('plan: --full recaptures an otherwise unchanged entry', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'a');
+  const manifest = { entries: [{ id: 'home', sources: ['view.blade.php'] }] };
+  const fingerprint = planEntries(root, manifest, { entries: {} }, false)[0].fingerprint;
+  writeFile(root, 'screenshots/web/area/home/filled.png', 'png-bytes');
+  const state = { entries: { home: { fingerprint, dir: 'web/area/home', pngs: { 'filled.png': 'x' } } } };
+  const [r] = planEntries(root, manifest, state, true);
+  assert.equal(r.status, 'stale');
+});
+
+// --- promote: removed entry -> moved to _removed --------------------------
+
+test('promote: entry removed from manifest -> PNGs moved to _removed/<date>/', () => {
+  const root = fixture();
+  writeFile(root, 'screenshots/web/area/gone/filled.png', 'bytes');
+  const state = { entries: { gone: { dir: 'web/area/gone', fingerprint: 'x', pngs: { 'filled.png': 'x' } } } };
+  const moved = moveRemovedEntries(root, [], state, '2026-09-24');
+  assert.deepEqual(moved, ['gone']);
+  assert.ok(existsSync(join(root, 'screenshots/_removed/2026-09-24/web/area/gone/filled.png')));
+  assert.ok(!existsSync(join(root, 'screenshots/web/area/gone/filled.png')));
+  assert.equal(state.entries.gone, undefined);
+});
+
+// --- promote: equal hash -> old file untouched (mtime unchanged) ---------
+
+test('promote: identical bytes -> target file left untouched (mtime unchanged)', () => {
+  const root = fixture();
+  writeFile(root, 'incoming/entry__filled.png', 'same-bytes');
+  const targetPath = join(root, 'screenshots/web/area/entry/filled.png');
+  writeFile(root, 'screenshots/web/area/entry/filled.png', 'same-bytes');
+  const prevHash = require_sha256('same-bytes');
+  const before = statSync(targetPath).mtimeMs;
+  const { changed } = promoteFile(join(root, 'incoming/entry__filled.png'), targetPath, prevHash);
+  const after = statSync(targetPath).mtimeMs;
+  assert.equal(changed, false);
+  assert.equal(before, after);
+});
+
+// --- promote: different hash -> replaced ----------------------------------
+
+test('promote: different bytes -> target file replaced', () => {
+  const root = fixture();
+  writeFile(root, 'incoming/entry__filled.png', 'new-bytes');
+  const targetPath = join(root, 'screenshots/web/area/entry/filled.png');
+  writeFile(root, 'screenshots/web/area/entry/filled.png', 'old-bytes');
+  const prevHash = require_sha256('old-bytes');
+  const { changed } = promoteFile(join(root, 'incoming/entry__filled.png'), targetPath, prevHash, { hasCompare: false });
+  assert.equal(changed, true);
+  assert.equal(readFileSync(targetPath, 'utf8'), 'new-bytes');
+});
+
+// --- promote: tolerance compare (diff_tolerance, ImageMagick compare) ------
+
+test('promote: AE within diff_tolerance -> old file kept (tolerated)', () => {
+  const root = fixture();
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, 'incoming/entry__filled.png', newBuf);
+  const targetPath = join(root, 'screenshots/web/area/entry/filled.png');
+  writeFile(root, 'screenshots/web/area/entry/filled.png', oldBuf);
+  const prevHash = createHash('sha256').update(oldBuf).digest('hex');
+  // 50 differing pixels of 1,000,000 = 0.005%, under the default 0.01% tolerance.
+  const compareRunner = () => ({ stderr: '50' });
+  const { changed, tolerated, hash } = promoteFile(
+    join(root, 'incoming/entry__filled.png'), targetPath, prevHash,
+    { hasCompare: true, compareRunner },
+  );
+  assert.equal(changed, false);
+  assert.equal(tolerated, true);
+  assert.equal(hash, prevHash);
+  assert.equal(readFileSync(targetPath).compare(oldBuf), 0, 'old file must stay untouched');
+});
+
+test('promote: AE above diff_tolerance -> target file replaced', () => {
+  const root = fixture();
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, 'incoming/entry__filled.png', newBuf);
+  const targetPath = join(root, 'screenshots/web/area/entry/filled.png');
+  writeFile(root, 'screenshots/web/area/entry/filled.png', oldBuf);
+  const prevHash = createHash('sha256').update(oldBuf).digest('hex');
+  // 5,000 of 1,000,000 pixels = 0.5%, above the default 0.01% tolerance.
+  const compareRunner = () => ({ stderr: '5000' });
+  const { changed, tolerated } = promoteFile(
+    join(root, 'incoming/entry__filled.png'), targetPath, prevHash,
+    { hasCompare: true, compareRunner },
+  );
+  assert.equal(changed, true);
+  assert.equal(tolerated, false);
+  assert.equal(readFileSync(targetPath).compare(newBuf), 0);
+});
+
+test('promote: ImageMagick missing -> byte-exact compare (no tolerance applied)', () => {
+  const root = fixture();
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, 'incoming/entry__filled.png', newBuf);
+  const targetPath = join(root, 'screenshots/web/area/entry/filled.png');
+  writeFile(root, 'screenshots/web/area/entry/filled.png', oldBuf);
+  const prevHash = createHash('sha256').update(oldBuf).digest('hex');
+  const compareRunner = () => {
+    throw new Error('compareRunner must not be called when hasCompare is false');
+  };
+  const { changed, tolerated } = promoteFile(
+    join(root, 'incoming/entry__filled.png'), targetPath, prevHash,
+    { hasCompare: false, compareRunner },
+  );
+  assert.equal(changed, true);
+  assert.equal(tolerated, false);
+});
+
+test('readPngDimensions reads width/height from IHDR bytes 16-23', () => {
+  const buf = fakePng(1440, 900);
+  assert.deepEqual(readPngDimensions(buf), { width: 1440, height: 900 });
+});
+
+// --- promote persists the fingerprint plan needs on the next run ---------
+
+test('promote: persists entry fingerprint so a later plan call with no source changes reports unchanged', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'a');
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'entry', platform: 'web', area: 'area', view: 'entry', sources: ['view.blade.php'] }],
+  });
+  writeJson(join(root, '.screens/state.json'), { entries: {} });
+  writeFile(root, '.screens/.incoming/web/entry__filled__guest__1440x900__light.png', 'bytes');
+
+  cmdPromote(['--platform', 'web'], root);
+
+  const stateAfterPromote = readJson(join(root, '.screens/state.json'), {});
+  assert.ok(stateAfterPromote.entries.entry.fingerprint, 'promote must store a fingerprint');
+
+  const planLines = cmdPlan([], root);
+  assert.ok(planLines.includes('PLAN_ENTRY entry unchanged'), planLines.join('\n'));
+});
+
+// --- promote: per-combination PROMOTE_ENTRY line (stage (f) follow-up 2) ---
+
+test('promote: PROMOTE_ENTRY carries the combo and distinguishes unchanged from tolerated', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'entry', platform: 'web', area: 'area', view: 'entry', sources: [] }],
+  });
+  const unchangedBuf = Buffer.from('same-bytes');
+  const relPath = 'web/1440x900/area/entry/filled__guest__light.png';
+  writeFile(root, join('screenshots', relPath), unchangedBuf);
+  writeJson(join(root, '.screens/state.json'), {
+    entries: { entry: { fingerprint: 'x', pngs: { [relPath]: require_sha256(unchangedBuf) } } },
+  });
+  writeFile(root, '.screens/.incoming/web/entry__filled__guest__1440x900__light.png', unchangedBuf);
+
+  const lines = cmdPromote(['--platform', 'web'], root);
+
+  assert.ok(lines.includes('PROMOTE_ENTRY entry filled__guest__1440x900__light unchanged'), lines.join('\n'));
+});
+
+// --- promote: known_nondeterministic entries excluded from changed/unchanged ---
+
+test('promote: known_nondeterministic entry is reported separately, not counted as changed or unchanged', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{
+      id: 'reorderable', platform: 'web', area: 'area', view: 'reorderable', sources: [],
+      known_nondeterministic: 'row order has no ORDER BY tie-break',
+    }],
+  });
+  writeJson(join(root, '.screens/state.json'), { entries: {} });
+  writeFile(root, '.screens/.incoming/web/reorderable__filled__guest__1440x900__light.png', 'bytes');
+
+  const lines = cmdPromote(['--platform', 'web'], root);
+
+  assert.ok(lines.some((l) => l === 'PROMOTE_ENTRY reorderable filled__guest__1440x900__light known_nondeterministic (row order has no ORDER BY tie-break)'), lines.join('\n'));
+  assert.ok(lines.some((l) => l.startsWith('PROMOTE_RESULT=OK changed=0 unchanged=0 tolerated=0 removed=0 known_nondeterministic=1')), lines.join('\n'));
+});
+
+// --- drift reporting (step 1, --full only) ----------------------------------
+
+test('promote --full: unchanged fingerprint + changed image -> drift, old fingerprint\'s prev PNG still written', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'same-content');
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'entry', platform: 'web', area: 'area', view: 'entry', sources: ['view.blade.php'] }],
+  });
+  const fingerprint = require_sha256('view.blade.php' + 'same-content');
+  const relPath = 'web/1440x900/area/entry/filled__guest__light.png';
+  const targetPath = join(root, 'screenshots', relPath);
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, join('screenshots', relPath), oldBuf);
+  writeJson(join(root, '.screens/state.json'), {
+    entries: {
+      entry: {
+        fingerprint,
+        pngs: { [relPath]: require_sha256(oldBuf) },
+      },
+    },
+  });
+  writeFile(root, '.screens/.incoming/web/entry__filled__guest__1440x900__light.png', newBuf);
+
+  const lines = cmdPromote(['--platform', 'web', '--full'], root);
+
+  assert.ok(lines.includes('PROMOTE_ENTRY entry filled__guest__1440x900__light drift'), lines.join('\n'));
+  assert.ok(lines.some((l) => l.startsWith('PROMOTE_RESULT=OK changed=0 unchanged=0 tolerated=0 removed=0 known_nondeterministic=0 drift=1')), lines.join('\n'));
+  assert.equal(readFileSync(targetPath).compare(newBuf), 0, 'truth wins: the new PNG is written despite being reported as drift');
+});
+
+test('promote --full: changed fingerprint + changed image -> changed, not drift', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'new-content');
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'entry', platform: 'web', area: 'area', view: 'entry', sources: ['view.blade.php'] }],
+  });
+  const relPath = 'web/1440x900/area/entry/filled__guest__light.png';
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, join('screenshots', relPath), oldBuf);
+  writeJson(join(root, '.screens/state.json'), {
+    entries: {
+      entry: {
+        fingerprint: 'stale-fingerprint-from-before-the-source-edit',
+        pngs: { [relPath]: require_sha256(oldBuf) },
+      },
+    },
+  });
+  writeFile(root, '.screens/.incoming/web/entry__filled__guest__1440x900__light.png', newBuf);
+
+  const lines = cmdPromote(['--platform', 'web', '--full'], root);
+
+  assert.ok(lines.includes('PROMOTE_ENTRY entry filled__guest__1440x900__light changed'), lines.join('\n'));
+  assert.ok(!lines.some((l) => l.endsWith(' drift')), lines.join('\n'));
+  assert.ok(lines.some((l) => l.startsWith('PROMOTE_RESULT=OK changed=1 unchanged=0 tolerated=0 removed=0 known_nondeterministic=0 drift=0')), lines.join('\n'));
+});
+
+// --- change history: promote moves a changed/drift PNG into _history/ ----
+
+test('promote: changed verdict moves the old PNG to _history/<run-id>/, writes the new one', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'entry', platform: 'web', area: 'area', view: 'entry', sources: [] }],
+  });
+  const relPath = 'web/1440x900/area/entry/filled__guest__light.png';
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, join('screenshots', relPath), oldBuf);
+  writeJson(join(root, '.screens/state.json'), {
+    entries: { entry: { fingerprint: 'x', pngs: { [relPath]: require_sha256(oldBuf) } } },
+  });
+  writeFile(root, '.screens/.incoming/web/entry__filled__guest__1440x900__light.png', newBuf);
+
+  const lines = cmdPromote(['--platform', 'web'], root);
+  assert.ok(lines.includes('PROMOTE_ENTRY entry filled__guest__1440x900__light changed'), lines.join('\n'));
+
+  const targetPath = join(root, 'screenshots', relPath);
+  assert.equal(readFileSync(targetPath).compare(newBuf), 0, 'new bytes at the catalog path');
+  const versions = historyVersionsFor(join(root, 'screenshots'), relPath);
+  assert.equal(versions.length, 1, 'exactly one historical version');
+  const historyFile = join(root, 'screenshots', versions[0].path);
+  assert.ok(existsSync(historyFile));
+  assert.equal(readFileSync(historyFile).compare(oldBuf), 0, 'old bytes preserved under _history/');
+});
+
+test('promote --full: drift verdict also moves the old PNG to _history/', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'same-content');
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'entry', platform: 'web', area: 'area', view: 'entry', sources: ['view.blade.php'] }],
+  });
+  const fingerprint = require_sha256('view.blade.php' + 'same-content');
+  const relPath = 'web/1440x900/area/entry/filled__guest__light.png';
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, join('screenshots', relPath), oldBuf);
+  writeJson(join(root, '.screens/state.json'), {
+    entries: { entry: { fingerprint, pngs: { [relPath]: require_sha256(oldBuf) } } },
+  });
+  writeFile(root, '.screens/.incoming/web/entry__filled__guest__1440x900__light.png', newBuf);
+
+  const lines = cmdPromote(['--platform', 'web', '--full'], root);
+  assert.ok(lines.includes('PROMOTE_ENTRY entry filled__guest__1440x900__light drift'), lines.join('\n'));
+
+  const versions = historyVersionsFor(join(root, 'screenshots'), relPath);
+  assert.equal(versions.length, 1);
+  assert.equal(readFileSync(join(root, 'screenshots', versions[0].path)).compare(oldBuf), 0);
+});
+
+// `promoteFile` is where the history-vs-no-history decision is actually
+// made (`cmdPromote` only supplies `historyPath`), so unchanged/tolerated
+// are exercised here with an injected `compareRunner` for a deterministic
+// AE instead of the real ImageMagick `compare` binary on tiny fixture PNGs.
+
+test('promoteFile: unchanged verdict (identical bytes) writes nothing, no history', () => {
+  const root = fixture();
+  const targetPath = join(root, 'target.png');
+  const buf = fakePng(1000, 1000, 'a');
+  writeFileSync(targetPath, buf);
+  const incoming = join(root, 'incoming-same.png');
+  writeFileSync(incoming, buf);
+  const historyPath = join(root, '_history/run1/target.png');
+
+  const result = promoteFile(incoming, targetPath, require_sha256(buf), { historyPath });
+
+  assert.equal(result.changed, false);
+  assert.ok(!existsSync(historyPath));
+});
+
+test('promoteFile: tolerated verdict (AE within diff_tolerance) writes nothing, no history', () => {
+  const root = fixture();
+  const targetPath = join(root, 'target.png');
+  const oldBuf = fakePng(1000, 1000, 'a');
+  writeFileSync(targetPath, oldBuf);
+  const incoming = join(root, 'incoming-tolerated.png');
+  writeFileSync(incoming, fakePng(1000, 1000, 'b'));
+  const historyPath = join(root, '_history/run1/target.png');
+
+  const result = promoteFile(incoming, targetPath, require_sha256(oldBuf), {
+    historyPath, hasCompare: true, compareRunner: () => ({ stderr: '1' }),
+  });
+
+  assert.equal(result.tolerated, true);
+  assert.ok(!existsSync(historyPath));
+});
+
+test('promoteFile: a brand-new promotion (no prevHash) writes no history even with historyPath given', () => {
+  const root = fixture();
+  const targetPath = join(root, 'new-target.png');
+  const buf = fakePng(10, 10, 'z');
+  const incoming = join(root, 'incoming-new.png');
+  writeFileSync(incoming, buf);
+  const historyPath = join(root, '_history/run1/new-target.png');
+
+  const result = promoteFile(incoming, targetPath, undefined, { historyPath, hasCompare: false });
+
+  assert.equal(result.changed, true);
+  assert.ok(!existsSync(historyPath), 'no previous file to move, so no history for a brand-new PNG');
+  assert.equal(readFileSync(targetPath).compare(buf), 0);
+});
+
+// --- change history: retention (history_keep, history_max_mb) ------------
+
+test('enforceHistoryRetention: keeps only history_keep versions per combo, oldest deleted first', () => {
+  const root = fixture();
+  const outputRoot = join(root, 'screenshots');
+  const relPath = 'web/1440x900/area/entry/filled__guest__light.png';
+  const runIds = ['2026-09-01_120000', '2026-09-08_120000', '2026-09-15_120000', '2026-09-22_120000'];
+  for (const runId of runIds) writeFile(root, join('screenshots/_history', runId, relPath), `bytes-${runId}`);
+
+  enforceHistoryRetention(outputRoot, { history_keep: 2 }, runIds[runIds.length - 1], [relPath]);
+
+  const remaining = historyVersionsFor(outputRoot, relPath).map((v) => v.runId);
+  assert.deepEqual(remaining, runIds.slice(-2), 'only the two newest versions survive');
+  assert.ok(!existsSync(join(outputRoot, '_history', runIds[0])), 'the emptied oldest run folder is removed');
+});
+
+test('enforceHistoryRetention: size cap removes oldest run folders first, never the current run', () => {
+  const root = fixture();
+  const outputRoot = join(root, 'screenshots');
+  const relPathA = 'web/1440x900/area/a/filled__guest__light.png';
+  const relPathB = 'web/1440x900/area/b/filled__guest__light.png';
+  const runIds = ['2026-09-01_120000', '2026-09-08_120000', '2026-09-15_120000'];
+  const bigBuf = Buffer.alloc(1024 * 1024, 'x'); // 1 MiB per file
+  for (const runId of runIds) {
+    writeFile(root, join('screenshots/_history', runId, relPathA), bigBuf);
+    writeFile(root, join('screenshots/_history', runId, relPathB), bigBuf);
+  }
+  // 3 runs * 2 MiB each = 6 MiB total; cap at 3 MiB forces the two oldest
+  // run folders out (current run stays, even if it alone exceeds nothing).
+  enforceHistoryRetention(outputRoot, { history_keep: 10, history_max_mb: 3 / 1024 }, runIds[runIds.length - 1], []);
+
+  assert.ok(!existsSync(join(outputRoot, '_history', runIds[0])), 'oldest run folder removed');
+  assert.ok(!existsSync(join(outputRoot, '_history', runIds[1])), 'second-oldest run folder removed');
+  assert.ok(existsSync(join(outputRoot, '_history', runIds[2])), 'current run folder never removed by the size cap');
+});
+
+// --- change history: runs.jsonl run log -----------------------------------
+
+test('promote: appends one runs.jsonl line with the expected counts and changed/new/removed detail', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'entry', platform: 'web', area: 'area', view: 'entry', sources: [] }],
+  });
+  const relPath = 'web/1440x900/area/entry/filled__guest__light.png';
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, join('screenshots', relPath), oldBuf);
+  writeJson(join(root, '.screens/state.json'), {
+    entries: { entry: { fingerprint: 'x', pngs: { [relPath]: require_sha256(oldBuf) } } },
+  });
+  writeFile(root, '.screens/.incoming/web/entry__filled__guest__1440x900__light.png', newBuf);
+
+  cmdPromote(['--platform', 'web'], root);
+
+  const runs = readRunsJsonl(join(root, 'screenshots'));
+  assert.equal(runs.length, 1);
+  const run = runs[0];
+  assert.ok(/^\d{4}-\d{2}-\d{2}_\d{6}$/.test(run.run_id), run.run_id);
+  assert.equal(run.counts.changed, 1);
+  assert.equal(run.counts.new, 0);
+  assert.equal(run.changed.length, 1);
+  assert.equal(run.changed[0].id, 'entry');
+  assert.equal(run.changed[0].combo, 'filled__guest__1440x900__light');
+  assert.ok(run.changed[0].history_path.startsWith('_history/'));
+  assert.deepEqual(run.new, []);
+  assert.deepEqual(run.removed, []);
+});
+
+// --- change history: index data builder -----------------------------------
+
+test('attachIndexHistory: catalog item carries its historical versions, newest first', () => {
+  const root = fixture();
+  const outputRoot = join(root, 'screenshots');
+  const relPath = 'web/desktop/area/entry/filled__guest__light.png';
+  writeFile(root, join('screenshots/_history/2026-09-01_120000', relPath), 'v1');
+  writeFile(root, join('screenshots/_history/2026-09-08_120000', relPath), 'v2');
+  const items = [{ id: 'entry', platform: 'web', deviceClass: 'desktop', area: 'area', view: 'entry', path: relPath }];
+
+  const withHistory = attachIndexHistory(items, outputRoot);
+
+  assert.equal(withHistory[0].history.length, 2);
+  assert.equal(withHistory[0].history[0].run_id, '2026-09-08_120000', 'newest first');
+});
+
+test('cmdIndex: embedded data includes runs (from runs.jsonl) and per-item history', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { output_dir: '${PROJECT_ROOT}/screenshots', platforms: ['web'], global_sources: [] });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'entry', platform: 'web', area: 'area', view: 'entry', sources: [] }],
+  });
+  const relPath = 'web/1440x900/area/entry/filled__guest__light.png';
+  const oldBuf = fakePng(1000, 1000, 'a');
+  const newBuf = fakePng(1000, 1000, 'b');
+  writeFile(root, join('screenshots', relPath), oldBuf);
+  writeJson(join(root, '.screens/state.json'), {
+    entries: { entry: { fingerprint: 'x', pngs: { [relPath]: require_sha256(oldBuf) } } },
+  });
+  writeFile(root, '.screens/.incoming/web/entry__filled__guest__1440x900__light.png', newBuf);
+  cmdPromote(['--platform', 'web'], root);
+
+  cmdIndex([], root);
+
+  const html = readFileSync(join(root, 'screenshots/index.html'), 'utf8');
+  const match = /<script id="screens-data" type="application\/json">([\s\S]*?)<\/script>/.exec(html);
+  const data = JSON.parse(match[1]);
+  assert.equal(data.runs.length, 1);
+  assert.equal(data.runs[0].counts.changed, 1);
+  assert.equal(data.items.length, 1);
+  assert.equal(data.items[0].history.length, 1);
+});
+
+// --- device-class path builder (Output layout) ------------------------------
+
+test('buildScreenshotPath: viewport maps to device class, viewport drops out of the filename', () => {
+  const config = { axes: { device_classes: { web: { '1440x900': 'desktop', '390x844': 'mobile' } } } };
+  const entry = { area: 'app', view: 'dashboard' };
+  const { relDir, relPath } = buildScreenshotPath(config, entry, 'web', {
+    state: 'filled', role: 'admin', viewport: '1440x900', theme: 'light',
+  });
+  assert.equal(relDir, join('web', 'desktop', 'app', 'dashboard'));
+  assert.equal(relPath, join('web', 'desktop', 'app', 'dashboard', 'filled__admin__light.png'));
+});
+
+test('buildScreenshotPath: locale suffix only when a locale part is present', () => {
+  const config = { axes: { device_classes: { web: { '1440x900': 'desktop' } } } };
+  const entry = { area: 'marketing', view: 'home' };
+  const { relPath } = buildScreenshotPath(config, entry, 'web', {
+    state: 'filled', role: 'guest', viewport: '1440x900', theme: 'light', locale: 'en',
+  });
+  assert.equal(relPath, join('web', 'desktop', 'marketing', 'home', 'filled__guest__light__en.png'));
+});
+
+test('deviceClassFor: unconfigured viewport falls back to itself', () => {
+  const config = { axes: { device_classes: { web: { '1440x900': 'desktop' } } } };
+  assert.equal(deviceClassFor(config, 'web', '999x999'), '999x999');
+});
+
+// --- migrate-layout: moves existing PNGs into device-class folders, keeps hash ---
+
+test('cmdMigrateLayout: moves a flat-layout PNG to the device-class path, state.json key + hash updated', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), {
+    output_dir: '${PROJECT_ROOT}/screenshots',
+    platforms: ['web'], axes: { device_classes: { web: { '1440x900': 'desktop' } } },
+  });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'dashboard', platform: 'web', area: 'app', view: 'dashboard' }],
+  });
+  const oldRel = 'web/app/dashboard/filled__admin__1440x900__light.png';
+  writeFile(root, `screenshots/${oldRel}`, 'png-bytes');
+  const hash = require_sha256('png-bytes');
+  writeJson(join(root, '.screens/state.json'), {
+    entries: { dashboard: { dir: 'web/app/dashboard', fingerprint: 'x', pngs: { 'filled__admin__1440x900__light.png': hash } } },
+  });
+
+  const lines = cmdMigrateLayout([], root);
+
+  assert.ok(lines.some((l) => l.startsWith('MIGRATE_RESULT=OK moved=1')), lines.join('\n'));
+  const newRel = 'web/desktop/app/dashboard/filled__admin__light.png';
+  assert.ok(!existsSync(join(root, 'screenshots', oldRel)));
+  assert.ok(existsSync(join(root, 'screenshots', newRel)));
+  const state = readJson(join(root, '.screens/state.json'), {});
+  assert.equal(state.entries.dashboard.dir, undefined);
+  assert.equal(state.entries.dashboard.pngs[newRel], hash);
+});
+
+// --- up: worker-count formula ------------------------------------------------
+
+test('playwrightWorkers: min(4, floor(cores/2))', () => {
+  assert.equal(playwrightWorkers(2), 1);
+  assert.equal(playwrightWorkers(4), 2);
+  assert.equal(playwrightWorkers(8), 4);
+  assert.equal(playwrightWorkers(16), 4);
+  assert.equal(playwrightWorkers(1), 1);
+});
+
+// --- Apple device setup (stage d): simulator name derivation ----------------
+
+test('simulatorNameForDevice: deterministic per repo hash + device class', () => {
+  assert.equal(simulatorNameForDevice('abcd1234', 'iphone'), 'screens-abcd1234-iphone');
+});
+
+test('repoHash: same root -> same hash; different roots -> different hashes', () => {
+  const a = repoHash('/Users/rafael/Developer/apps/topf-secret/ios');
+  const b = repoHash('/Users/rafael/Developer/apps/topf-secret/ios');
+  const c = repoHash('/Users/rafael/Developer/apps/mail-guard');
+  assert.equal(a, b);
+  assert.notEqual(a, c);
+});
+
+// --- Apple device setup: disk guard branch -----------------------------------
+
+test('parseDfAvailableGb: reads the Available column from `df -g` output', () => {
+  const stdout = 'Filesystem     1G-blocks Used Available Capacity iused ifree %iused  Mounted on\n'
+    + '/dev/disk3s1s1       460   12        26    33%  484014 275459240    0%   /\n';
+  assert.equal(parseDfAvailableGb(stdout), 26);
+});
+
+test('checkDiskGuard: below 8 GB free -> not ok', () => {
+  const runner = () => ({ stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 95 5 95%\n', status: 0 });
+  const result = checkDiskGuard('/tmp', runner);
+  assert.equal(result.ok, false);
+  assert.equal(result.freeGb, 5);
+});
+
+test('checkDiskGuard: at or above 8 GB free -> ok', () => {
+  const runner = () => ({ stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 80 20 80%\n', status: 0 });
+  const result = checkDiskGuard('/tmp', runner);
+  assert.equal(result.ok, true);
+  assert.equal(result.freeGb, 20);
+});
+
+// --- Apple device setup: reuse of an existing simulator ----------------------
+
+test('findSimulatorUdidByName: finds an existing device across runtime buckets', () => {
+  const devicesJson = JSON.stringify({
+    devices: {
+      'com.apple.CoreSimulator.SimRuntime.iOS-18-0': [
+        { name: 'screens-abcd1234-iphone', udid: 'UDID-1', state: 'Shutdown' },
+      ],
+    },
+  });
+  assert.equal(findSimulatorUdidByName(devicesJson, 'screens-abcd1234-iphone'), 'UDID-1');
+  assert.equal(findSimulatorUdidByName(devicesJson, 'nonexistent'), null);
+});
+
+test('iosDeviceSetup: reuses an existing device, never calls simctl create', () => {
+  const root = fixture();
+  const config = { ios: { device_class: 'iphone' } };
+  const name = simulatorNameForDevice(repoHash(root), 'iphone');
+  let createCalled = false;
+  const runner = (cmd, args) => {
+    if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 };
+    if (args[1] === 'list' && args[2] === 'devices') {
+      return { stdout: JSON.stringify({ devices: { 'iOS-18': [{ name, udid: 'UDID-EXISTING' }] } }), status: 0 };
+    }
+    if (args[1] === 'create') createCalled = true;
+    return { stdout: '', status: 0 };
+  };
+  const result = iosDeviceSetup(root, config, runner);
+  assert.equal(result.ok, true);
+  assert.equal(result.skip, false);
+  assert.equal(result.udid, 'UDID-EXISTING');
+  assert.equal(createCalled, false);
+});
+
+test('iosDeviceSetup bootedByUs + cmdDown: shutdown only when this run booted the simulator', () => {
+  const name = (root) => simulatorNameForDevice(repoHash(root), 'iphone');
+  const runnerFor = (root, state, calls) => (cmd, args) => {
+    calls.push([cmd, ...args].join(' '));
+    if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 };
+    if (args[1] === 'list' && args[2] === 'devices') {
+      return { stdout: JSON.stringify({ devices: { 'iOS-18': [{ name: name(root), udid: 'UDID-1', state }] } }), status: 0 };
+    }
+    return { stdout: '', status: 0 };
+  };
+  const config = { ios: { device_class: 'iphone' }, platforms: ['ios'] };
+
+  const rootA = fixture();
+  writeJson(join(rootA, '.screens/config.json'), config);
+  assert.equal(iosDeviceSetup(rootA, config, runnerFor(rootA, 'Shutdown', [])).bootedByUs, true);
+  mkdirSync(join(rootA, '.screens/.run'), { recursive: true });
+  writeFileSync(join(rootA, '.screens/.run/ios.booted'), 'UDID-1');
+  const callsA = [];
+  cmdDown(['--platform', 'ios'], rootA, runnerFor(rootA, 'Booted', callsA));
+  assert.ok(callsA.includes('xcrun simctl shutdown UDID-1'));
+
+  const rootB = fixture();
+  writeJson(join(rootB, '.screens/config.json'), config);
+  assert.equal(iosDeviceSetup(rootB, config, runnerFor(rootB, 'Booted', [])).bootedByUs, false);
+  const callsB = [];
+  cmdDown(['--platform', 'ios'], rootB, runnerFor(rootB, 'Booted', callsB));
+  assert.ok(!callsB.some((c) => c.includes('simctl shutdown')));
+});
+
+test('iosDeviceSetup: no existing device -> creates one from the newest available iOS runtime', () => {
+  const root = fixture();
+  const config = { ios: { device_class: 'iphone' } };
+  const runtimesJson = JSON.stringify({
+    runtimes: [
+      { identifier: 'com.apple.CoreSimulator.SimRuntime.iOS-17-0', version: '17.0', isAvailable: true },
+      { identifier: 'com.apple.CoreSimulator.SimRuntime.iOS-18-2', version: '18.2', isAvailable: true },
+      { identifier: 'com.apple.CoreSimulator.SimRuntime.watchOS-11-0', version: '11.0', isAvailable: true },
+    ],
+  });
+  const calls = [];
+  const runner = (cmd, args) => {
+    calls.push([cmd, ...args]);
+    if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 };
+    if (args[1] === 'list' && args[2] === 'devices') return { stdout: JSON.stringify({ devices: {} }), status: 0 };
+    if (args[1] === 'list' && args[2] === 'runtimes') return { stdout: runtimesJson, status: 0 };
+    if (args[1] === 'create') return { stdout: 'UDID-NEW\n', status: 0 };
+    return { stdout: '', status: 0 };
+  };
+  const result = iosDeviceSetup(root, config, runner);
+  assert.equal(result.ok, true);
+  assert.equal(result.udid, 'UDID-NEW');
+  const createCall = calls.find((c) => c[2] === 'create');
+  assert.ok(createCall, calls.map((c) => c.join(' ')).join('\n'));
+  assert.equal(createCall[createCall.length - 1], 'com.apple.CoreSimulator.SimRuntime.iOS-18-2');
+});
+
+test('iosDeviceSetup: below disk threshold -> SKIP, no simctl calls', () => {
+  const root = fixture();
+  let simctlCalled = false;
+  const runner = (cmd) => {
+    if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 95 5 95%\n', status: 0 };
+    simctlCalled = true;
+    return { stdout: '', status: 0 };
+  };
+  const result = iosDeviceSetup(root, {}, runner);
+  assert.equal(result.skip, true);
+  assert.match(result.reason, /low disk: 5 GB free/);
+  assert.equal(simctlCalled, false);
+});
+
+test('macosDeviceSetup: below disk threshold -> SKIP; above -> ok, no simulator', () => {
+  const root = fixture();
+  const lowRunner = () => ({ stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 95 5 95%\n', status: 0 });
+  const okRunner = () => ({ stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 });
+  assert.equal(macosDeviceSetup(root, lowRunner).skip, true);
+  const ok = macosDeviceSetup(root, okRunner);
+  assert.equal(ok.ok, true);
+  assert.equal(ok.skip, false);
+  assert.equal(ok.udid, undefined);
+});
+
+// --- macOS xcresult export (attachments, since a macOS XCUITest runner is
+// sandboxed and cannot write a PNG into the project directory) -----------
+
+test('xcresultExportAttachmentsArgs: composes the export command with a png filter', () => {
+  const args = xcresultExportAttachmentsArgs('/tmp/Result.xcresult', '/tmp/export');
+  assert.deepEqual(args, ['xcresulttool', 'export', 'attachments', '--path', '/tmp/Result.xcresult', '--output-path', '/tmp/export', '--filter', '*.png']);
+});
+
+test("stripXcresultSuffix: strips xcresulttool's _<index>_<UUID> disambiguation suffix", () => {
+  const name = 'content-view-with-model__filled__guest__mac__dark_0_96B887EF-3941-4AF2-B98F-5ECBAEE2068E.png';
+  assert.equal(stripXcresultSuffix(name), 'content-view-with-model__filled__guest__mac__dark.png');
+});
+
+test('stripXcresultSuffix: a name without the suffix is left untouched', () => {
+  assert.equal(stripXcresultSuffix('content-view-empty__empty__guest__mac__dark.png'), 'content-view-empty__empty__guest__mac__dark.png');
+});
+
+// Fixture shaped exactly like a real `xcrun xcresulttool export attachments`
+// manifest.json (Xcode 27, captured live against the layer pilot,
+// 2026-09-24): our two screenshot attachments plus one of XCUITest's own
+// debug-description attachments, which `mapXcresultExportToIncoming` must
+// ignore even though the CLI's own `--filter "*.png"` would normally have
+// kept it out already.
+const REAL_XCRESULT_MANIFEST_FIXTURE = [
+  {
+    testIdentifier: 'ScreensCatalogTests/test_screensCatalog()',
+    testIdentifierURL: 'test://com.apple.xcode/Layer/LayerScreensUITests/ScreensCatalogTests/test_screensCatalog',
+    attachments: [
+      {
+        exportedFileName: '70634DCB-2F28-4B5D-8656-D5275404B510.png',
+        suggestedHumanReadableName: 'content-view-with-model__filled__guest__mac__dark_0_96B887EF-3941-4AF2-B98F-5ECBAEE2068E.png',
+        isAssociatedWithFailure: false,
+        configurationName: 'Test Scheme Action',
+        deviceName: 'My Mac',
+        deviceId: '00006040-000849E92600801C',
+      },
+      {
+        exportedFileName: '9E6FBB06-C68E-4DF9-A9E6-2181BEF01602.png',
+        suggestedHumanReadableName: 'content-view-empty__empty__guest__mac__dark_0_C066E3BB-C9E3-47D3-9B32-E3C1A586B828.png',
+        isAssociatedWithFailure: false,
+        configurationName: 'Test Scheme Action',
+        deviceName: 'My Mac',
+        deviceId: '00006040-000849E92600801C',
+      },
+      {
+        exportedFileName: '05B9F5AE-C43E-405E-9F25-B68CC117D35B.txt',
+        suggestedHumanReadableName: 'App UI hierarchy for de.rafaelalex_0_CD6E34A0-B69D-443B-8C8E-B5C57516AA6F.layerapp',
+        isAssociatedWithFailure: false,
+        configurationName: 'Test Scheme Action',
+        deviceName: 'My Mac',
+        deviceId: '00006040-000849E92600801C',
+      },
+    ],
+  },
+];
+
+test('mapXcresultExportToIncoming: maps every .png attachment to its stripped incoming name, ignores non-png noise', () => {
+  const mapping = mapXcresultExportToIncoming(REAL_XCRESULT_MANIFEST_FIXTURE);
+  assert.deepEqual(mapping, {
+    '70634DCB-2F28-4B5D-8656-D5275404B510.png': 'content-view-with-model__filled__guest__mac__dark.png',
+    '9E6FBB06-C68E-4DF9-A9E6-2181BEF01602.png': 'content-view-empty__empty__guest__mac__dark.png',
+  });
+});
+
+test('cmdMacosExport: no result bundle yet -> SKIP, never spawns xcresulttool', () => {
+  const root = fixture();
+  const lines = cmdMacosExport([], root, () => { throw new Error('should not spawn'); });
+  assert.match(lines[0], /^MACOS_EXPORT_RESULT=SKIP/);
+});
+
+test('cmdMacosExport: runs the export, moves mapped PNGs into .screens/.incoming/macos/', () => {
+  const root = fixture();
+  const bundlePath = join(root, '.screens/.build/macos/Result.xcresult');
+  mkdirSync(bundlePath, { recursive: true }); // a real result bundle is a directory
+  const runner = (cmd, args) => {
+    assert.equal(cmd, 'xcrun');
+    const outputPath = args[args.indexOf('--output-path') + 1];
+    mkdirSync(outputPath, { recursive: true });
+    writeFileSync(join(outputPath, '70634DCB-2F28-4B5D-8656-D5275404B510.png'), 'fake-png-bytes');
+    writeJson(join(outputPath, 'manifest.json'), REAL_XCRESULT_MANIFEST_FIXTURE);
+    return { stdout: '', status: 0 };
+  };
+  const lines = cmdMacosExport([], root, runner);
+  assert.equal(lines[0], 'MACOS_EXPORT_RESULT=OK moved=1');
+  assert.equal(
+    readFileSync(join(root, '.screens/.incoming/macos/content-view-with-model__filled__guest__mac__dark.png'), 'utf8'),
+    'fake-png-bytes',
+  );
+});
+
+// --- Apple device setup: status-bar / appearance command composition --------
+
+test('statusBarOverrideArgs: composes the fixed 9:41 override', () => {
+  assert.deepEqual(statusBarOverrideArgs('UDID-1'), [
+    'simctl', 'status_bar', 'UDID-1', 'override',
+    '--time', '9:41', '--batteryState', 'charged', '--batteryLevel', '100',
+    '--cellularBars', '4', '--wifiBars', '3',
+  ]);
+});
+
+test('appearanceArgs: composes light/dark appearance switch', () => {
+  assert.deepEqual(appearanceArgs('UDID-1', 'dark'), ['simctl', 'ui', 'UDID-1', 'appearance', 'dark']);
+  assert.deepEqual(appearanceArgs('UDID-1', 'light'), ['simctl', 'ui', 'UDID-1', 'appearance', 'light']);
+});
+
+test('findNewestIosRuntimeId: picks the highest dotted version among available iOS runtimes', () => {
+  const json = JSON.stringify({
+    runtimes: [
+      { identifier: 'com.apple.CoreSimulator.SimRuntime.iOS-16-4', version: '16.4', isAvailable: true },
+      { identifier: 'com.apple.CoreSimulator.SimRuntime.iOS-26-0', version: '26.0', isAvailable: true },
+      { identifier: 'com.apple.CoreSimulator.SimRuntime.iOS-18-0', version: '18.0', isAvailable: false },
+    ],
+  });
+  assert.equal(findNewestIosRuntimeId(json), 'com.apple.CoreSimulator.SimRuntime.iOS-26-0');
+});
+
+// --- up: seed-on-change (fingerprint unchanged + isolated DB exists -> SKIP) ---
+
+test('up: seed fingerprint unchanged from last run -> SEED=SKIP (unchanged), seed command not run', () => {
+  const root = fixture();
+  writeFile(root, 'database/seeders/ScreensDemoSeeder.php', '<?php // v1');
+  const config = {
+    platforms: ['web'],
+    web: {
+      framework: 'laravel', isolated_db: 'app_screens', fixed_now: '2026-05-12T09:41:00+02:00',
+      health_url: null, seed_command: 'php artisan migrate:fresh --seed', start_command: null,
+    },
+  };
+  writeJson(join(root, '.screens/config.json'), config);
+  writeJson(join(root, '.screens/secrets.local.json'), { demo_password: 'existing-password' });
+  const fingerprint = computeSeedFingerprint(root, config);
+  writeJson(join(root, '.screens/state.json'), { seed_fingerprint: fingerprint });
+
+  let seedCalls = 0;
+  let dbShowCalls = 0;
+  const stubRunner = (cmd, args, env) => {
+    if (cmd === 'php' && args[0] === 'artisan' && args[1] === 'db:show') {
+      dbShowCalls++;
+      // First call carries the override env (isolated db); the guard's
+      // second, no-override call resolves the real (distinct) dev db.
+      const database = (env && env.DB_DATABASE) || (dbShowCalls === 1 ? 'app_screens' : 'app');
+      return { stdout: JSON.stringify({ platform: { config: { driver: 'pgsql', database } } }), status: 0 };
+    }
+    if (cmd === 'sh' && args[1] && args[1].includes('migrate:fresh')) seedCalls++;
+    return { stdout: '', status: 0 };
+  };
+  const lines = cmdUp([], root, stubRunner);
+  assert.ok(lines.some((l) => l === 'SEED=SKIP (unchanged)'), lines.join('\n'));
+  assert.equal(seedCalls, 0);
+});
+
+test('up: seed fingerprint changed -> reseeds and stores the new fingerprint', () => {
+  const root = fixture();
+  writeFile(root, 'database/seeders/ScreensDemoSeeder.php', '<?php // v1');
+  const config = {
+    platforms: ['web'],
+    web: {
+      framework: 'laravel', isolated_db: 'app_screens', fixed_now: '2026-05-12T09:41:00+02:00',
+      health_url: null, seed_command: 'php artisan migrate:fresh --seed', start_command: null,
+    },
+  };
+  writeJson(join(root, '.screens/config.json'), config);
+  writeJson(join(root, '.screens/secrets.local.json'), { demo_password: 'existing-password' });
+  writeJson(join(root, '.screens/state.json'), { seed_fingerprint: 'stale-fingerprint' });
+
+  let seedCalls = 0;
+  let dbShowCalls = 0;
+  const stubRunner = (cmd, args, env) => {
+    if (cmd === 'php' && args[0] === 'artisan' && args[1] === 'db:show') {
+      dbShowCalls++;
+      // First call carries the override env (isolated db); the guard's
+      // second, no-override call resolves the real (distinct) dev db.
+      const database = (env && env.DB_DATABASE) || (dbShowCalls === 1 ? 'app_screens' : 'app');
+      return { stdout: JSON.stringify({ platform: { config: { driver: 'pgsql', database } } }), status: 0 };
+    }
+    if (cmd === 'sh' && args[1] && args[1].includes('migrate:fresh')) seedCalls++;
+    return { stdout: '', status: 0 };
+  };
+  const lines = cmdUp([], root, stubRunner);
+  assert.ok(lines.some((l) => l === 'SEED=OK'), lines.join('\n'));
+  assert.equal(seedCalls, 1);
+  const state = readJson(join(root, '.screens/state.json'), {});
+  assert.equal(state.seed_fingerprint, computeSeedFingerprint(root, config));
+});
+
+test('up: --full forces reseed even when the fingerprint is unchanged', () => {
+  const root = fixture();
+  writeFile(root, 'database/seeders/ScreensDemoSeeder.php', '<?php // v1');
+  const config = {
+    platforms: ['web'],
+    web: {
+      framework: 'laravel', isolated_db: 'app_screens', fixed_now: '2026-05-12T09:41:00+02:00',
+      health_url: null, seed_command: 'php artisan migrate:fresh --seed', start_command: null,
+    },
+  };
+  writeJson(join(root, '.screens/config.json'), config);
+  writeJson(join(root, '.screens/secrets.local.json'), { demo_password: 'existing-password' });
+  const fingerprint = computeSeedFingerprint(root, config);
+  writeJson(join(root, '.screens/state.json'), { seed_fingerprint: fingerprint });
+
+  let seedCalls = 0;
+  let dbShowCalls = 0;
+  const stubRunner = (cmd, args, env) => {
+    if (cmd === 'php' && args[0] === 'artisan' && args[1] === 'db:show') {
+      dbShowCalls++;
+      // First call carries the override env (isolated db); the guard's
+      // second, no-override call resolves the real (distinct) dev db.
+      const database = (env && env.DB_DATABASE) || (dbShowCalls === 1 ? 'app_screens' : 'app');
+      return { stdout: JSON.stringify({ platform: { config: { driver: 'pgsql', database } } }), status: 0 };
+    }
+    if (cmd === 'sh' && args[1] && args[1].includes('migrate:fresh')) seedCalls++;
+    return { stdout: '', status: 0 };
+  };
+  const lines = cmdUp(['--full'], root, stubRunner);
+  assert.ok(lines.some((l) => l === 'SEED=OK'), lines.join('\n'));
+  assert.equal(seedCalls, 1);
+});
+
+// --- laravelPerfEnv: PHP_CLI_SERVER_WORKERS + APP_DEBUG=false on laravel ----
+
+test('laravelPerfEnv: laravel framework -> PHP_CLI_SERVER_WORKERS=4, APP_DEBUG=false', () => {
+  assert.deepEqual(laravelPerfEnv({ framework: 'laravel' }), { PHP_CLI_SERVER_WORKERS: '4', APP_DEBUG: 'false' });
+});
+
+test('laravelPerfEnv: non-laravel framework -> {} (inert)', () => {
+  assert.deepEqual(laravelPerfEnv({ framework: 'astro' }), {});
+});
+
+// --- laravelSessionEnv: SESSION_SECURE_COOKIE=false + SESSION_EXPIRE_ON_CLOSE=true on laravel, overridable -
+
+test('laravelSessionEnv: laravel framework -> SESSION_SECURE_COOKIE=false, SESSION_EXPIRE_ON_CLOSE=true', () => {
+  assert.deepEqual(laravelSessionEnv({ framework: 'laravel' }), {
+    SESSION_SECURE_COOKIE: 'false', SESSION_EXPIRE_ON_CLOSE: 'true',
+  });
+});
+
+test('laravelSessionEnv: non-laravel framework -> {} (inert)', () => {
+  assert.deepEqual(laravelSessionEnv({ framework: 'astro' }), {});
+});
+
+test('up: default env composition order lets config.web.env override SESSION_SECURE_COOKIE and SESSION_EXPIRE_ON_CLOSE', () => {
+  // Same merge order as cmdUp's `runEnv` composition (sessionEnv first,
+  // platformConfig.env after): a project's own value wins over the default.
+  const platformConfig = {
+    framework: 'laravel',
+    env: { SESSION_SECURE_COOKIE: 'true', SESSION_EXPIRE_ON_CLOSE: 'false' },
+  };
+  const runEnv = { ...laravelSessionEnv(platformConfig), ...platformConfig.env };
+  assert.equal(runEnv.SESSION_SECURE_COOKIE, 'true');
+  assert.equal(runEnv.SESSION_EXPIRE_ON_CLOSE, 'false');
+  const noOverride = { framework: 'laravel', env: {} };
+  const defaultEnv = { ...laravelSessionEnv(noOverride), ...noOverride.env };
+  assert.equal(defaultEnv.SESSION_SECURE_COOKIE, 'false');
+  assert.equal(defaultEnv.SESSION_EXPIRE_ON_CLOSE, 'true');
+});
+
+// --- up: lock present -> FAIL ----------------------------------------------
+
+test('up: lock present -> FAIL', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { platforms: ['web'], web: { framework: 'astro' } });
+  writeFile(root, '.screens/.lock', 'pid');
+  const lines = cmdUp([], root, () => {
+    throw new Error('runner must not be called when locked');
+  });
+  assert.ok(lines.some((l) => l.startsWith('UP_RESULT=FAIL') && l.includes('locked')));
+});
+
+test('checkLock reflects the lock file directly', () => {
+  const root = fixture();
+  assert.equal(checkLock(root), false);
+  writeFile(root, '.screens/.lock', 'pid');
+  assert.equal(checkLock(root), true);
+});
+
+// --- checkLock: stale lock (dead PID) -> not locked, removed ---------------
+
+test('checkLock: lock file with a dead PID -> not locked, stale lock removed', () => {
+  const root = fixture();
+  // spawnSync is synchronous: by the time it returns, the child has already
+  // exited, so its pid is guaranteed dead for the rest of this test.
+  const dead = spawnSync(process.execPath, ['-e', '0']);
+  writeFile(root, '.screens/.lock', String(dead.pid));
+  assert.equal(checkLock(root), false);
+  assert.equal(existsSync(join(root, '.screens/.lock')), false);
+});
+
+// --- checkLock: lock file with the current (alive) PID -> FAIL (locked) ----
+
+test('checkLock: lock file with the current process PID -> locked', () => {
+  const root = fixture();
+  writeFile(root, '.screens/.lock', String(process.pid));
+  assert.equal(checkLock(root), true);
+});
+
+// --- Laravel guard: config cache present -> FAIL ----------------------------
+
+test('laravelDbGuard: config cache present -> FAIL, runner never called', () => {
+  const root = fixture();
+  writeFile(root, 'bootstrap/cache/config.php', '<?php return [];');
+  const config = { web: { isolated_db: '.screens/web/screens.sqlite' } };
+  const guard = laravelDbGuard(root, config, () => {
+    throw new Error('runner must not be called when config cache is present');
+  });
+  assert.equal(guard.ok, false);
+  assert.match(guard.reason, /config cache/);
+});
+
+// Real `php artisan db:show --json` output, captured from apps/zeit/app with
+// DB_CONNECTION=sqlite DB_DATABASE=/tmp/screens-probe.sqlite: values nest
+// under platform.config, not at the top level.
+function dbShowOutput(driver, database) {
+  return JSON.stringify({
+    platform: { config: { driver, url: null, database, prefix: '' }, name: 'SQLite', connection: 'sqlite', version: '3.53.4', open_connections: null },
+    tables: [],
+  });
+}
+
+// --- Laravel guard: resolved DB path != isolated path -> FAIL --------------
+
+test('laravelDbGuard: resolved DB path mismatch -> FAIL (stubbed db:show, real nested shape)', () => {
+  const root = fixture();
+  const config = { web: { isolated_db: '.screens/web/screens.sqlite' } };
+  const stubRunner = () => ({ stdout: dbShowOutput('sqlite', '/real/app/database.sqlite'), status: 0 });
+  const guard = laravelDbGuard(root, config, stubRunner);
+  assert.equal(guard.ok, false);
+  assert.match(guard.reason, /does not match isolated path/);
+});
+
+test('laravelDbGuard: resolved DB path matches isolated path -> OK (real nested shape)', () => {
+  const root = fixture();
+  const config = { web: { isolated_db: '.screens/web/screens.sqlite' } };
+  const stubRunner = () => ({ stdout: dbShowOutput('sqlite', join(root, '.screens/web/screens.sqlite')), status: 0 });
+  const guard = laravelDbGuard(root, config, stubRunner);
+  assert.equal(guard.ok, true);
+});
+
+// --- Laravel guard: flat (wrong) shape -> FAIL ------------------------------
+
+test('laravelDbGuard: flat-shape db:show output -> FAIL (real output nests under platform.config)', () => {
+  const root = fixture();
+  const config = { web: { isolated_db: '.screens/web/screens.sqlite' } };
+  const flatShapeRunner = () => ({
+    stdout: JSON.stringify({ driver: 'sqlite', database: join(root, '.screens/web/screens.sqlite') }),
+    status: 0,
+  });
+  const guard = laravelDbGuard(root, config, flatShapeRunner);
+  assert.equal(guard.ok, false);
+  assert.match(guard.reason, /platform\.config/);
+});
+
+// --- pgsql guard (revised 2026-09-24: zeit/events are Postgres-only) -------
+
+function pgDbShowOutput(driver, database) {
+  return JSON.stringify({
+    platform: { config: { driver, url: null, database, prefix: '' }, name: 'PostgreSQL', connection: driver, version: '16.0', open_connections: null },
+    tables: [],
+  });
+}
+
+test('laravelDbGuard: pgsql isolated_db equals the dev database -> FAIL', () => {
+  const root = fixture();
+  const config = { web: { isolated_db: 'zeit_screens' } };
+  // Both the overridden and the no-override db:show calls resolve to the
+  // same database: the override never actually isolated anything.
+  const stubRunner = () => ({ stdout: pgDbShowOutput('pgsql', 'zeit_screens'), status: 0 });
+  const guard = laravelDbGuard(root, config, stubRunner);
+  assert.equal(guard.ok, false);
+  assert.match(guard.reason, /equals the dev database/);
+});
+
+test('laravelDbGuard: pgsql isolated_db missing the _screens suffix -> FAIL', () => {
+  const root = fixture();
+  const config = { web: { isolated_db: 'zeit_isolated' } };
+  let call = 0;
+  // Dev db is distinct from the isolated one, so only the missing-suffix
+  // check (not the equals-dev-db check) can produce this FAIL.
+  const stubRunner = () => {
+    call++;
+    return { stdout: pgDbShowOutput('pgsql', call === 1 ? 'zeit_isolated' : 'zeit'), status: 0 };
+  };
+  const guard = laravelDbGuard(root, config, stubRunner);
+  assert.equal(guard.ok, false);
+  assert.match(guard.reason, /must end in _screens/);
+});
+
+test('laravelDbGuard: pgsql isolated_db valid and distinct from dev -> OK', () => {
+  const root = fixture();
+  const config = { web: { isolated_db: 'zeit_screens' } };
+  let call = 0;
+  const stubRunner = () => {
+    call++;
+    // First call carries the override env (isolated db); second call (dev
+    // check) is invoked with an empty env and resolves the real dev db.
+    if (call === 1) return { stdout: pgDbShowOutput('pgsql', 'zeit_screens'), status: 0 };
+    return { stdout: pgDbShowOutput('pgsql', 'zeit'), status: 0 };
+  };
+  const guard = laravelDbGuard(root, config, stubRunner);
+  assert.equal(guard.ok, true);
+});
+
+test('laravelDbGuard: unsupported driver (mysql) -> FAIL', () => {
+  const root = fixture();
+  const config = { web: { isolated_db: 'zeit_screens' } };
+  const stubRunner = () => ({ stdout: pgDbShowOutput('mysql', 'zeit_screens'), status: 0 });
+  const guard = laravelDbGuard(root, config, stubRunner);
+  assert.equal(guard.ok, false);
+  assert.match(guard.reason, /unsupported database driver: mysql/);
+});
+
+// --- server-side fixed clock: PHP_INI_SCAN_DIR composition ----------------
+
+test('composePhpIniScanDir: existing scan dir -> colon-joined with the additional dir', () => {
+  // Real `php --ini` output quotes the path (verified against apps/zeit/app,
+  // macOS Homebrew PHP 8.5): `Scan for additional .ini files in: "/opt/.../conf.d"`.
+  const out = composePhpIniScanDir('Scan for additional .ini files in: "/opt/homebrew/etc/php/8.4/conf.d"\n', '/repo/.screens/web/php');
+  assert.equal(out, '/opt/homebrew/etc/php/8.4/conf.d:/repo/.screens/web/php');
+});
+
+test('composePhpIniScanDir: "(none)" -> just the additional dir, no leading colon', () => {
+  const out = composePhpIniScanDir('Scan for additional .ini files in: (none)\n', '/repo/.screens/web/php');
+  assert.equal(out, '/repo/.screens/web/php');
+});
+
+test('phpFixedClockEnv: no fixed_now configured -> {} (inert), runner never called', () => {
+  const root = fixture();
+  const config = { web: { framework: 'laravel' } };
+  const env = phpFixedClockEnv(root, config, () => {
+    throw new Error('runner must not be called when fixed_now is unset');
+  });
+  assert.deepEqual(env, {});
+});
+
+test('phpFixedClockEnv: fixed_now configured on a laravel project -> PHP_INI_SCAN_DIR + SCREENS_FIXED_NOW', () => {
+  const root = fixture();
+  const config = { web: { framework: 'laravel', fixed_now: '2026-05-12T09:41:00+02:00' } };
+  const stubRunner = () => ({ stdout: 'Scan for additional .ini files in: (none)\n', status: 0 });
+  const env = phpFixedClockEnv(root, config, stubRunner);
+  assert.equal(env.SCREENS_FIXED_NOW, '2026-05-12T09:41:00+02:00');
+  assert.equal(env.PHP_INI_SCAN_DIR, join(root, '.screens/web/php'));
+});
+
+// --- trust: changed command hash -> NEEDS_CONFIRM --------------------------
+
+test('trust: command hash differs from confirmed state -> NEEDS_CONFIRM', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { web: { start_command: 'php artisan serve' } });
+  writeJson(join(root, '.screens/state.json'), { command_hash: 'stale-hash-from-before-the-edit' });
+  const lines = cmdTrust([], root);
+  assert.ok(lines.some((l) => l.startsWith('TRUST_RESULT=NEEDS_CONFIRM')));
+});
+
+test('trust: matching confirmed hash -> OK', () => {
+  const root = fixture();
+  const config = { web: { start_command: 'php artisan serve' } };
+  writeJson(join(root, '.screens/config.json'), config);
+  writeJson(join(root, '.screens/state.json'), { command_hash: computeCommandHash(config) });
+  const lines = cmdTrust([], root);
+  assert.ok(lines.some((l) => l === 'TRUST_RESULT=OK'));
+});
+
+// --- marketing: unreviewed headline -> output under _draft -----------------
+
+test('marketing: unreviewed headline routes to _draft', () => {
+  const dir = marketingTargetDir('web', 'de', '1920x1080', false);
+  assert.ok(dir.includes('_draft'));
+});
+
+test('marketing: reviewed headline does not route to _draft', () => {
+  const dir = marketingTargetDir('web', 'de', '1920x1080', true);
+  assert.ok(!dir.includes('_draft'));
+});
+
+// --- marketing: rendering routing + change detection (renderer injected) ---
+
+function marketingFixture(root, { reviewed = false } = {}) {
+  writeJson(join(root, '.screens/config.json'), {
+    output_dir: '${PROJECT_ROOT}/screenshots',
+    platforms: ['web'],
+    global_sources: [],
+    marketing: {
+      entries: [{ id: 'dashboard', headlines: { de: { text: 'Alles im Blick', reviewed } } }],
+      locales: ['de'],
+      formats: { web: '1920x1080' },
+    },
+  });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'dashboard', platform: 'web', area: 'app', view: 'dashboard', sources: [] }],
+  });
+  const sourceRel = 'web/desktop/app/dashboard/filled__admin__light.png';
+  writeFile(root, join('screenshots', sourceRel), 'catalog-bytes');
+  writeJson(join(root, '.screens/state.json'), {
+    entries: { dashboard: { pngs: { [sourceRel]: require_sha256('catalog-bytes') } } },
+  });
+  // A render-marketing.mjs must exist for the renderer's own "not
+  // scaffolded" guard, even though the injected stub renderer never reads it.
+  writeFile(root, '.screens/web/render-marketing.mjs', '// stub');
+  return sourceRel;
+}
+
+test('marketing: new entry -> renderer invoked with the resolved job, state records the render', () => {
+  const root = fixture();
+  marketingFixture(root);
+  const calls = [];
+  const stubRenderer = (_root, jobs) => {
+    calls.push(jobs);
+    return { ok: true, rendered: jobs.map((j) => ({ id: j.id, locale: j.locale, format: j.format, ok: true })) };
+  };
+
+  const lines = cmdMarketing([], root, stubRenderer);
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0][0].id, 'dashboard');
+  assert.equal(calls[0][0].headline, 'Alles im Blick');
+  assert.ok(lines.some((l) => l.startsWith('MARKETING_RENDER dashboard de 1920x1080 ->') && l.includes('_draft')), lines.join('\n'));
+  assert.ok(lines.some((l) => l.startsWith('MARKETING_RESULT=OK rendered=1')), lines.join('\n'));
+
+  const state = readJson(join(root, '.screens/state.json'), {});
+  assert.ok(state.marketing['dashboard__de__1920x1080'], 'state.marketing must record the render');
+});
+
+test('marketing: unchanged source + headline -> renderer not called, reported as skip', () => {
+  const root = fixture();
+  const sourceRel = marketingFixture(root);
+  const state = readJson(join(root, '.screens/state.json'), {});
+  state.marketing = {
+    'dashboard__de__1920x1080': {
+      sourceHash: state.entries.dashboard.pngs[sourceRel],
+      headlineText: 'Alles im Blick', reviewed: false,
+      relPath: join('_marketing', '_draft', 'web', 'de', '1920x1080', '01-dashboard.png'),
+    },
+  };
+  writeJson(join(root, '.screens/state.json'), state);
+  const stubRenderer = () => { throw new Error('renderer must not be called for an unchanged entry'); };
+
+  const lines = cmdMarketing([], root, stubRenderer);
+
+  assert.ok(lines.some((l) => l === 'MARKETING_SKIP dashboard de 1920x1080 (unchanged)'), lines.join('\n'));
+  assert.ok(lines.some((l) => l.startsWith('MARKETING_RESULT=OK rendered=0 skipped=1')), lines.join('\n'));
+});
+
+test('marketing: headline set to reviewed -> re-renders and moves out of _draft, old draft file removed', () => {
+  const root = fixture();
+  const sourceRel = marketingFixture(root, { reviewed: true });
+  const state = readJson(join(root, '.screens/state.json'), {});
+  const oldDraftRel = join('_marketing', '_draft', 'web', 'de', '1920x1080', '01-dashboard.png');
+  writeFile(root, join('screenshots', oldDraftRel), 'old-draft-bytes');
+  state.marketing = {
+    'dashboard__de__1920x1080': {
+      sourceHash: state.entries.dashboard.pngs[sourceRel],
+      headlineText: 'Alles im Blick', reviewed: false, relPath: oldDraftRel,
+    },
+  };
+  writeJson(join(root, '.screens/state.json'), state);
+  const stubRenderer = (_root, jobs) => ({ ok: true, rendered: jobs.map((j) => ({ id: j.id, locale: j.locale, format: j.format, ok: true })) });
+
+  const lines = cmdMarketing([], root, stubRenderer);
+
+  assert.ok(lines.some((l) => l.startsWith('MARKETING_RENDER dashboard de 1920x1080 ->') && !l.includes('_draft')), lines.join('\n'));
+  assert.ok(!existsSync(join(root, 'screenshots', oldDraftRel)), 'the stale _draft file must be removed on review-state flip');
+});
+
+// --- resolveMarketingBackground: DESIGN.md token source, neutral fallback --
+
+test('resolveMarketingBackground: no DESIGN.md -> neutral fallback', () => {
+  const root = fixture();
+  assert.equal(resolveMarketingBackground(root), '#f5f5f7');
+});
+
+test('resolveMarketingBackground: DESIGN.md names a token file with a background color', () => {
+  const root = fixture();
+  writeFile(root, 'DESIGN.md', 'Token source: resources/css/tokens.css');
+  writeFile(root, 'resources/css/tokens.css', ':root { --color-background: #1a2b3c; }');
+  assert.equal(resolveMarketingBackground(root), '#1a2b3c');
+});
+
+// --- darkenHex ---------------------------------------------------------
+
+test('darkenHex: multiplies each channel by (1 - amount)', () => {
+  assert.equal(darkenHex('#ffffff', 0.2), '#cccccc');
+});
+
+test('darkenHex: unparsable value passes through unchanged', () => {
+  assert.equal(darkenHex('oklch(0.9 0 0)', 0.2), 'oklch(0.9 0 0)');
+});
+
+// --- resolveMarketingGradient: oklch token pair, hex fallback -----------
+
+test('resolveMarketingGradient: oklch gray scale -> gradient of its two darkest matching tokens', () => {
+  const root = fixture();
+  writeFile(root, 'DESIGN.md', 'Token source: resources/css/tokens.css');
+  writeFile(root, 'resources/css/tokens.css', `
+    --color-gray-100: oklch(0.95 0 0);
+    --color-gray-900: oklch(0.15 0 0);
+    --color-gray-950: oklch(0.1 0 0);
+  `);
+  assert.equal(resolveMarketingGradient(root), 'linear-gradient(160deg, oklch(0.1 0 0) 0%, oklch(0.15 0 0) 100%)');
+});
+
+test('resolveMarketingGradient: no DESIGN.md -> gradient built from the neutral fallback', () => {
+  const root = fixture();
+  assert.equal(resolveMarketingGradient(root), 'linear-gradient(160deg, #f5f5f7 0%, #c9c9cb 100%)');
+});
+
+// --- backgroundIsDark: contrast flip for headline text + logo invert ----
+
+test('backgroundIsDark: near-black oklch first stop -> dark', () => {
+  assert.equal(backgroundIsDark('linear-gradient(160deg, oklch(0.1 0 0) 0%, oklch(0.15 0 0) 100%)'), true);
+});
+
+test('backgroundIsDark: light hex first stop -> not dark', () => {
+  assert.equal(backgroundIsDark('linear-gradient(160deg, #f5f5f7 0%, #c9c9cb 100%)'), false);
+});
+
+// --- resolveMarketingLayout: global default + per-entry override -------
+
+test('resolveMarketingLayout: entry override wins over the global default', () => {
+  const config = { marketing: { layout: 'browser' } };
+  assert.equal(resolveMarketingLayout(config, { layout: 'browser-phone' }), 'browser-phone');
+});
+
+test('resolveMarketingLayout: falls back to "browser" when nothing is configured', () => {
+  assert.equal(resolveMarketingLayout({}, {}), 'browser');
+});
+
+// --- resolveMarketingFont: token family + local woff2 files -------------
+
+test('resolveMarketingFont: reads --font-sans and finds local regular/semibold woff2 files', () => {
+  const root = fixture();
+  writeFile(root, 'DESIGN.md', 'Token source: resources/css/tokens.css');
+  writeFile(root, 'resources/css/tokens.css', "--font-sans: 'Inter', system-ui;");
+  writeFile(root, 'resources/fonts/inter/inter-regular.woff2', 'regular-bytes');
+  writeFile(root, 'resources/fonts/inter/inter-semibold.woff2', 'semibold-bytes');
+  const font = resolveMarketingFont(root);
+  assert.equal(font.family, 'Inter');
+  assert.ok(font.regularPath.endsWith('inter-regular.woff2'));
+  assert.ok(font.boldPath.endsWith('inter-semibold.woff2'));
+});
+
+test('resolveMarketingFont: no DESIGN.md, no font files -> system-ui with null paths', () => {
+  const root = fixture();
+  const font = resolveMarketingFont(root);
+  assert.equal(font.family, 'system-ui');
+  assert.equal(font.regularPath, null);
+  assert.equal(font.boldPath, null);
+});
+
+// --- resolveMarketingLogo: first *.svg under public/ whose name has "logo" -
+
+test('resolveMarketingLogo: finds an svg logo asset under public/', () => {
+  const root = fixture();
+  writeFile(root, 'public/images/auth/app-logo.svg', '<svg></svg>');
+  assert.ok(resolveMarketingLogo(root).endsWith('app-logo.svg'));
+});
+
+test('resolveMarketingLogo: no public/ dir -> null', () => {
+  const root = fixture();
+  assert.equal(resolveMarketingLogo(root), null);
+});
+
+// --- findMarketingSourceSet / resolveEntrySources: 2x source, 1x fallback -
+
+test('findMarketingSourceSet: both files present', () => {
+  const root = fixture();
+  writeFile(root, '.screens/.marketing-src/dashboard__desktop.png', 'd');
+  writeFile(root, '.screens/.marketing-src/dashboard__mobile.png', 'm');
+  const set = findMarketingSourceSet(root, 'dashboard');
+  assert.ok(set.desktop.endsWith('dashboard__desktop.png'));
+  assert.ok(set.mobile.endsWith('dashboard__mobile.png'));
+});
+
+test('findMarketingSourceSet: neither file present -> both null', () => {
+  const root = fixture();
+  const set = findMarketingSourceSet(root, 'dashboard');
+  assert.equal(set.desktop, null);
+  assert.equal(set.mobile, null);
+});
+
+test('resolveEntrySources: falls back to the 1x catalog PNG when no 2x source set exists', () => {
+  const root = fixture();
+  const sourceRel = 'web/desktop/app/dashboard/filled__admin__light.png';
+  writeFile(root, join('screenshots', sourceRel), 'catalog-bytes');
+  const state = { entries: { dashboard: { pngs: { [sourceRel]: require_sha256('catalog-bytes') } } } };
+  const resolved = resolveEntrySources(root, state, 'dashboard');
+  assert.ok(resolved.desktopPath.endsWith(sourceRel));
+  assert.equal(resolved.mobilePath, null);
+  assert.equal(resolved.hash, require_sha256('catalog-bytes'));
+});
+
+// --- parsePromotedFilename / buildIndexItems / buildIndexMarketing ---------
+
+test('parsePromotedFilename: state__role__theme[__locale].png', () => {
+  assert.deepEqual(parsePromotedFilename('filled__admin__light.png'), { state: 'filled', role: 'admin', theme: 'light', locale: undefined });
+  assert.deepEqual(parsePromotedFilename('filled__admin__light__de.png'), { state: 'filled', role: 'admin', theme: 'light', locale: 'de' });
+});
+
+test('buildIndexItems: every PNG in state.entries becomes one item with a screenshots/-relative path', () => {
+  const manifest = { entries: [{ id: 'dashboard', platform: 'web', area: 'app', view: 'dashboard' }] };
+  const state = {
+    entries: {
+      dashboard: {
+        pngs: {
+          'web/desktop/app/dashboard/filled__admin__light.png': 'hash1',
+          'web/mobile/app/dashboard/empty__guest__dark.png': 'hash2',
+        },
+      },
+    },
+  };
+  const items = buildIndexItems(manifest, state);
+  assert.equal(items.length, 2);
+  assert.ok(items.every((i) => !i.path.startsWith('/') && !i.path.startsWith('screenshots')));
+  assert.ok(items.some((i) => i.state === 'filled' && i.role === 'admin' && i.theme === 'light' && i.deviceClass === 'desktop'));
+  assert.ok(items.some((i) => i.state === 'empty' && i.role === 'guest' && i.theme === 'dark' && i.deviceClass === 'mobile'));
+});
+
+test('buildIndexMarketing: one item per state.marketing record, relative path only', () => {
+  const state = {
+    marketing: {
+      'dashboard__de__1920x1080': { headlineText: 'Alles im Blick', reviewed: true, relPath: '_marketing/web/de/1920x1080/01-dashboard.png' },
+    },
+  };
+  const items = buildIndexMarketing(state);
+  assert.equal(items.length, 1);
+  assert.equal(items[0].id, 'dashboard');
+  assert.equal(items[0].locale, 'de');
+  assert.equal(items[0].headline, 'Alles im Blick');
+  assert.equal(items[0].path, '_marketing/web/de/1920x1080/01-dashboard.png');
+});
+
+// --- cmdIndex: screenshots/index.html embeds every PNG, relative paths only -
+
+test('cmdIndex: writes screenshots/index.html whose embedded JSON lists every PNG in state, relative paths only', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'dashboard', platform: 'web', area: 'app', view: 'dashboard' }],
+  });
+  writeJson(join(root, '.screens/state.json'), {
+    entries: {
+      dashboard: {
+        pngs: {
+          'web/desktop/app/dashboard/filled__admin__light.png': 'hash1',
+          'web/mobile/app/dashboard/empty__guest__dark.png': 'hash2',
+        },
+      },
+    },
+    last_run: { new: 1, updated: 0, unchanged: 1, removed: 0, drift: 0, failed: 0, date: '2026-09-24', commit: 'abc123' },
+  });
+
+  const lines = cmdIndex([], root);
+
+  assert.ok(lines.includes(`INDEX_RESULT=OK path=${join(root, 'screenshots/index.html')}`), lines.join('\n'));
+  const html = readFileSync(join(root, 'screenshots/index.html'), 'utf8');
+  const match = /<script id="screens-data" type="application\/json">([\s\S]*?)<\/script>/.exec(html);
+  assert.ok(match, 'index.html must embed the screens-data JSON block');
+  const data = JSON.parse(match[1]);
+  assert.equal(data.items.length, 2);
+  assert.ok(data.items.every((i) => !i.path.startsWith('/')));
+  assert.equal(data.last_run.commit, 'abc123');
+});
+
+// --- affected: path in one entry's sources -> only that id -----------------
+
+test('affected: a path matching one entry sources -> only that id', () => {
+  const manifest = {
+    entries: [
+      { id: 'a', sources: ['resources/views/a.blade.php'] },
+      { id: 'b', sources: ['resources/views/b.blade.php'] },
+    ],
+  };
+  const config = { global_sources: [] };
+  const ids = affectedIds(manifest, config, ['resources/views/a.blade.php']);
+  assert.deepEqual(ids, ['a']);
+});
+
+// --- affected: global_sources path -> all ids -------------------------------
+
+test('affected: a global_sources path -> all ids', () => {
+  const manifest = {
+    entries: [
+      { id: 'a', sources: ['resources/views/a.blade.php'] },
+      { id: 'b', sources: ['resources/views/b.blade.php'] },
+    ],
+  };
+  const config = { global_sources: ['composer.lock'] };
+  const ids = affectedIds(manifest, config, ['composer.lock']);
+  assert.deepEqual(ids, ['a', 'b']);
+});
+
+// --- affected: unrelated path -> none ---------------------------------------
+
+test('affected: an unrelated path -> no ids', () => {
+  const manifest = {
+    entries: [
+      { id: 'a', sources: ['resources/views/a.blade.php'] },
+      { id: 'b', sources: ['resources/views/b.blade.php'] },
+    ],
+  };
+  const config = { global_sources: ['composer.lock'] };
+  const ids = affectedIds(manifest, config, ['README.md']);
+  assert.deepEqual(ids, []);
+});
+
+// --- small local helper, mirrors the sha256 hashing promoteFile uses -----
+function require_sha256(content) {
+  return createHash('sha256').update(content).digest('hex');
+}
+
+// =============================================================================
+// Android device setup (Maestro, stage e)
+// =============================================================================
+
+// --- AVD name derivation ------------------------------------------------
+
+test('androidAvdName: deterministic per repo hash + device class, underscored', () => {
+  assert.equal(androidAvdName('abcd1234', 'android-phone'), 'screens_abcd1234_android-phone');
+  assert.equal(androidAvdName('abcd1234'), 'screens_abcd1234_android-phone');
+});
+
+// --- Emulator port derivation --------------------------------------------
+
+test('androidEmulatorPort: even port in the 5554-5680 range, deterministic per hash', () => {
+  const port = androidEmulatorPort('abcd1234');
+  assert.ok(port >= 5554 && port <= 5680);
+  assert.equal(port % 2, 0);
+  assert.equal(androidEmulatorPort('abcd1234'), port);
+});
+
+test('androidEmulatorPort: different hashes usually give different ports', () => {
+  assert.notEqual(androidEmulatorPort('11110000'), androidEmulatorPort('ffffaaaa'));
+});
+
+// --- SDK resolution -------------------------------------------------------
+
+test('resolveAndroidSdkRoot: ANDROID_HOME wins when set', () => {
+  assert.equal(resolveAndroidSdkRoot({ ANDROID_HOME: '/opt/android-home' }, '/Users/x'), '/opt/android-home');
+});
+
+test('resolveAndroidSdkRoot: falls back to ANDROID_SDK_ROOT, then ~/Library/Android/sdk', () => {
+  assert.equal(resolveAndroidSdkRoot({ ANDROID_SDK_ROOT: '/opt/android-sdk-root' }, '/Users/x'), '/opt/android-sdk-root');
+  assert.equal(resolveAndroidSdkRoot({}, '/Users/x'), '/Users/x/Library/Android/sdk');
+});
+
+test('androidToolPaths: composes adb/emulator/avdmanager under the resolved SDK root', () => {
+  const tools = androidToolPaths('/sdk');
+  assert.equal(tools.adb, join('/sdk', 'platform-tools', 'adb'));
+  assert.equal(tools.emulator, join('/sdk', 'emulator', 'emulator'));
+  assert.equal(tools.avdmanager, join('/sdk', 'cmdline-tools', 'latest', 'bin', 'avdmanager'));
+});
+
+test('resolveAvdmanagerPath: sdkRoot cmdline-tools present -> uses the sdkRoot path', () => {
+  const path = resolveAvdmanagerPath('/sdk', () => true, () => false);
+  assert.equal(path, join('/sdk', 'cmdline-tools', 'latest', 'bin', 'avdmanager'));
+});
+
+test('resolveAvdmanagerPath: no sdkRoot cmdline-tools but on PATH -> falls back to the bare command (brew-only install)', () => {
+  const path = resolveAvdmanagerPath('/sdk', () => false, () => true);
+  assert.equal(path, 'avdmanager');
+});
+
+test('resolveAvdmanagerPath: neither present -> still returns the sdkRoot path (preflight already reported missing)', () => {
+  const path = resolveAvdmanagerPath('/sdk', () => false, () => false);
+  assert.equal(path, join('/sdk', 'cmdline-tools', 'latest', 'bin', 'avdmanager'));
+});
+
+// --- Preflight (each branch inverted goes red) ----------------------------
+
+test('androidToolsPreflight: reports the first missing tool, in order', () => {
+  const all = { maestro: true, java: true, emulator: true, adb: true, avdmanager: true };
+  assert.equal(androidToolsPreflight({ ...all, maestro: false }).ok, false);
+  assert.match(androidToolsPreflight({ ...all, maestro: false }).reason, /maestro not found/);
+  assert.match(androidToolsPreflight({ ...all, java: false }).reason, /java not found/);
+  assert.match(androidToolsPreflight({ ...all, emulator: false }).reason, /emulator not found/);
+  assert.match(androidToolsPreflight({ ...all, adb: false }).reason, /adb not found/);
+  assert.match(androidToolsPreflight({ ...all, avdmanager: false }).reason, /avdmanager not found/);
+  assert.equal(androidToolsPreflight(all).ok, true);
+});
+
+// --- AVD reuse -------------------------------------------------------------
+
+test('avdExists: exact match against a plain `avdmanager list avd -c` line list', () => {
+  const output = 'events_repro\nscreens_abcd1234_android-phone\n';
+  assert.equal(avdExists(output, 'screens_abcd1234_android-phone'), true);
+  assert.equal(avdExists(output, 'events_repro'), true);
+  assert.equal(avdExists(output, 'nonexistent'), false);
+  assert.equal(avdExists('', 'nonexistent'), false);
+});
+
+// --- Installed system images (real fs walk over a fixture tree) -----------
+
+test('findInstalledSystemImages: scans <sdk>/system-images/<api>/<tag>/<abi>, newest API first', () => {
+  const root = fixture();
+  mkdirSync(join(root, 'system-images/android-34/google_apis_playstore/arm64-v8a'), { recursive: true });
+  mkdirSync(join(root, 'system-images/android-37/google_apis_playstore_ps16k/arm64-v8a'), { recursive: true });
+  const images = findInstalledSystemImages(root);
+  assert.deepEqual(images, [
+    'system-images;android-37;google_apis_playstore_ps16k;arm64-v8a',
+    'system-images;android-34;google_apis_playstore;arm64-v8a',
+  ]);
+});
+
+test('findInstalledSystemImages: no system-images dir -> empty array, no throw', () => {
+  const root = fixture();
+  assert.deepEqual(findInstalledSystemImages(root), []);
+});
+
+// --- AVD create command composition ----------------------------------------
+
+test('androidAvdCreateShellCmd: pipes "no" past the custom-hardware-profile prompt', () => {
+  const cmd = androidAvdCreateShellCmd('/sdk/cmdline-tools/latest/bin/avdmanager', 'screens_abcd1234_android-phone', 'system-images;android-37;google_apis_playstore_ps16k;arm64-v8a');
+  assert.equal(cmd, 'echo no | "/sdk/cmdline-tools/latest/bin/avdmanager" create avd -n "screens_abcd1234_android-phone" -k "system-images;android-37;google_apis_playstore_ps16k;arm64-v8a" -d "pixel_6"');
+});
+
+test('androidAvdCreateShellCmd: device profile override', () => {
+  const cmd = androidAvdCreateShellCmd('/avdmanager', 'name', 'pkg', 'pixel_9');
+  assert.match(cmd, /-d "pixel_9"/);
+});
+
+// --- Demo mode + theme command composition ----------------------------------
+
+test('androidDemoModeArgs: sysui_demo_allowed first, then clock/battery/network/notifications broadcasts', () => {
+  const calls = androidDemoModeArgs('emulator-5554');
+  assert.deepEqual(calls[0], ['-s', 'emulator-5554', 'shell', 'settings', 'put', 'global', 'sysui_demo_allowed', '1']);
+  assert.ok(calls.some((c) => c.includes('clock') && c.includes('0941')));
+  assert.ok(calls.some((c) => c.includes('battery') && c.includes('100')));
+  assert.ok(calls.some((c) => c.includes('network')));
+  assert.ok(calls.some((c) => c.includes('notifications') && c.includes('false')));
+});
+
+test('androidThemeArgs: composes light/dark uimode night switch', () => {
+  assert.deepEqual(androidThemeArgs('emulator-5554', 'dark'), ['-s', 'emulator-5554', 'shell', 'cmd', 'uimode', 'night', 'yes']);
+  assert.deepEqual(androidThemeArgs('emulator-5554', 'light'), ['-s', 'emulator-5554', 'shell', 'cmd', 'uimode', 'night', 'no']);
+});
+
+test('androidExplicitIntentArgs: explicit component intent, never an implicit VIEW', () => {
+  assert.deepEqual(
+    androidExplicitIntentArgs('emulator-5554', 'de.rafaelalex.events', 'https://events.rafaelalex.de/e/x'),
+    ['-s', 'emulator-5554', 'shell', 'am', 'start', '-n', 'de.rafaelalex.events/.MainActivity', '-a', 'android.intent.action.VIEW', '-d', 'https://events.rafaelalex.de/e/x'],
+  );
+});
+
+test('androidDeepLinkUrl: production host + entry reach path, never the isolated backend host', () => {
+  assert.equal(androidDeepLinkUrl('events.rafaelalex.de', '/e/screenshot-event'), 'https://events.rafaelalex.de/e/screenshot-event');
+});
+
+// --- Boot wait ---------------------------------------------------------------
+
+test('waitForAndroidBoot: sys.boot_completed=1 -> true immediately', () => {
+  const runner = () => ({ stdout: '1\n', status: 0 });
+  assert.equal(waitForAndroidBoot('/sdk/platform-tools/adb', 'emulator-5554', 5, runner), true);
+});
+
+test('waitForAndroidBoot: never reports 1 within the timeout -> false', () => {
+  const runner = () => ({ stdout: '\n', status: 0 });
+  assert.equal(waitForAndroidBoot('/sdk/platform-tools/adb', 'emulator-5554', 0, runner), false);
+});
+
+// --- androidDeviceSetup: full composition -----------------------------------
+
+function androidFixtureSdk(root) {
+  const sdkRoot = join(root, 'sdk');
+  mkdirSync(join(sdkRoot, 'platform-tools'), { recursive: true });
+  writeFileSync(join(sdkRoot, 'platform-tools/adb'), '');
+  mkdirSync(join(sdkRoot, 'emulator'), { recursive: true });
+  writeFileSync(join(sdkRoot, 'emulator/emulator'), '');
+  mkdirSync(join(sdkRoot, 'cmdline-tools/latest/bin'), { recursive: true });
+  writeFileSync(join(sdkRoot, 'cmdline-tools/latest/bin/avdmanager'), '');
+  mkdirSync(join(sdkRoot, 'system-images/android-37/google_apis_playstore_ps16k/arm64-v8a'), { recursive: true });
+  return sdkRoot;
+}
+
+const ALL_ANDROID_TOOLS = { maestro: true, java: true, emulator: true, adb: true, avdmanager: true };
+
+test('androidDeviceSetup: reuses an existing AVD, never calls avdmanager create', () => {
+  const root = fixture();
+  androidFixtureSdk(root);
+  process.env.ANDROID_HOME = join(root, 'sdk');
+  try {
+    const hash = repoHash(root);
+    const name = androidAvdName(hash, 'android-phone');
+    let createCalled = false;
+    const runner = (cmd, args) => {
+      if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 };
+      if (Array.isArray(args) && args[0] === 'list') return { stdout: `${name}\n`, status: 0 };
+      if (cmd === 'sh') createCalled = true;
+      return { stdout: '', status: 0 };
+    };
+    const result = androidDeviceSetup(root, { android: {} }, runner, () => ALL_ANDROID_TOOLS);
+    assert.equal(result.ok, true);
+    assert.equal(result.skip, false);
+    assert.equal(result.name, name);
+    assert.equal(createCalled, false);
+    assert.match(result.startCommand, /-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect/);
+  } finally {
+    delete process.env.ANDROID_HOME;
+  }
+});
+
+test('androidDeviceSetup: no existing AVD -> creates one from the newest installed system image', () => {
+  const root = fixture();
+  androidFixtureSdk(root);
+  process.env.ANDROID_HOME = join(root, 'sdk');
+  try {
+    let createCmd = null;
+    const runner = (cmd, args) => {
+      if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 };
+      if (Array.isArray(args) && args[0] === 'list') return { stdout: '', status: 0 };
+      if (cmd === 'sh') {
+        createCmd = args[1];
+        return { stdout: '', status: 0 };
+      }
+      return { stdout: '', status: 0 };
+    };
+    const result = androidDeviceSetup(root, { android: {} }, runner, () => ALL_ANDROID_TOOLS);
+    assert.equal(result.ok, true);
+    assert.equal(result.skip, false);
+    assert.match(createCmd, /system-images;android-37;google_apis_playstore_ps16k;arm64-v8a/);
+  } finally {
+    delete process.env.ANDROID_HOME;
+  }
+});
+
+test('androidDeviceSetup: below disk threshold -> SKIP, no avdmanager calls', () => {
+  const root = fixture();
+  androidFixtureSdk(root);
+  process.env.ANDROID_HOME = join(root, 'sdk');
+  try {
+    let avdmanagerCalled = false;
+    const runner = (cmd) => {
+      if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 95 5 95%\n', status: 0 };
+      avdmanagerCalled = true;
+      return { stdout: '', status: 0 };
+    };
+    const result = androidDeviceSetup(root, {}, runner, () => ALL_ANDROID_TOOLS);
+    assert.equal(result.skip, true);
+    assert.match(result.reason, /low disk: 5 GB free/);
+    assert.equal(avdmanagerCalled, false);
+  } finally {
+    delete process.env.ANDROID_HOME;
+  }
+});
+
+test('androidDeviceSetup: missing avdmanager -> SKIP with install hint, no create attempted', () => {
+  const root = fixture();
+  androidFixtureSdk(root);
+  process.env.ANDROID_HOME = join(root, 'sdk');
+  try {
+    let createCalled = false;
+    const runner = (cmd) => {
+      if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 };
+      if (cmd === 'sh') createCalled = true;
+      return { stdout: '', status: 0 };
+    };
+    const result = androidDeviceSetup(root, {}, runner, () => ({ ...ALL_ANDROID_TOOLS, avdmanager: false }));
+    assert.equal(result.skip, true);
+    assert.match(result.reason, /avdmanager not found/);
+    assert.equal(createCalled, false);
+  } finally {
+    delete process.env.ANDROID_HOME;
+  }
+});
+
+test('androidDeviceSetup: avdmanager only on PATH (brew-only cmdline-tools, no sdkRoot/cmdline-tools) -> invoked as a bare command, not the nonexistent sdkRoot path', () => {
+  const root = fixture();
+  const sdkRoot = join(root, 'sdk');
+  mkdirSync(join(sdkRoot, 'platform-tools'), { recursive: true });
+  writeFileSync(join(sdkRoot, 'platform-tools/adb'), '');
+  mkdirSync(join(sdkRoot, 'emulator'), { recursive: true });
+  writeFileSync(join(sdkRoot, 'emulator/emulator'), '');
+  mkdirSync(join(sdkRoot, 'system-images/android-37/google_apis_playstore_ps16k/arm64-v8a'), { recursive: true });
+  // no cmdline-tools dir under sdkRoot on purpose -- brew installed
+  // avdmanager into its own keg, only reachable via PATH.
+  process.env.ANDROID_HOME = sdkRoot;
+  try {
+    const hash = repoHash(root);
+    const name = androidAvdName(hash, 'android-phone');
+    const invokedCommands = [];
+    const runner = (cmd, args) => {
+      if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 };
+      invokedCommands.push(cmd);
+      if (Array.isArray(args) && args[0] === 'list') return { stdout: '', status: 0 };
+      return { stdout: '', status: 0 };
+    };
+    const result = androidDeviceSetup(root, { android: {} }, runner, () => ALL_ANDROID_TOOLS, () => 'avdmanager');
+    assert.equal(result.ok, true);
+    assert.equal(result.skip, false);
+    assert.ok(invokedCommands.includes('avdmanager'), `expected a bare "avdmanager" invocation, got: ${invokedCommands.join(', ')}`);
+    assert.ok(!invokedCommands.some((c) => c.includes(sdkRoot)), `expected no sdkRoot-based avdmanager path, got: ${invokedCommands.join(', ')}`);
+  } finally {
+    delete process.env.ANDROID_HOME;
+  }
+});
+
+test('androidDeviceSetup: no installed system image -> SKIP with the install command, never downloads', () => {
+  const root = fixture();
+  const sdkRoot = join(root, 'sdk');
+  mkdirSync(join(sdkRoot, 'platform-tools'), { recursive: true });
+  writeFileSync(join(sdkRoot, 'platform-tools/adb'), '');
+  mkdirSync(join(sdkRoot, 'emulator'), { recursive: true });
+  writeFileSync(join(sdkRoot, 'emulator/emulator'), '');
+  mkdirSync(join(sdkRoot, 'cmdline-tools/latest/bin'), { recursive: true });
+  writeFileSync(join(sdkRoot, 'cmdline-tools/latest/bin/avdmanager'), '');
+  // no system-images written on purpose
+  process.env.ANDROID_HOME = sdkRoot;
+  try {
+    const runner = (cmd, args) => {
+      if (cmd === 'df') return { stdout: 'Filesystem 1G-blocks Used Available Capacity\n/dev/x 100 74 26 74%\n', status: 0 };
+      if (Array.isArray(args) && args[0] === 'list') return { stdout: '', status: 0 };
+      return { stdout: '', status: 0 };
+    };
+    const result = androidDeviceSetup(root, {}, runner, () => ALL_ANDROID_TOOLS);
+    assert.equal(result.skip, true);
+    assert.match(result.reason, /no Android system image installed/);
+    assert.match(result.reason, /sdkmanager/);
+  } finally {
+    delete process.env.ANDROID_HOME;
+  }
+});
+
+// --- android-navigate ---------------------------------------------------------
+
+test('cmdAndroidNavigate: composes the explicit intent for a manifest entry with a reach URL', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), {
+    android: { app_id: 'de.rafaelalex.events', deep_link_host: 'events.rafaelalex.de' },
+  });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'event-page', platform: 'android', reach: '/e/screenshot-event' }],
+  });
+  let calledArgs = null;
+  const runner = (cmd, args) => {
+    calledArgs = args;
+    return { stdout: '', status: 0 };
+  };
+  const lines = cmdAndroidNavigate(['--entry', 'event-page', '--serial', 'emulator-5554'], root, runner);
+  assert.ok(lines.some((l) => l === 'ANDROID_NAVIGATE_RESULT=OK url=https://events.rafaelalex.de/e/screenshot-event'), lines.join('\n'));
+  assert.deepEqual(calledArgs, [
+    '-s', 'emulator-5554', 'shell', 'am', 'start',
+    '-n', 'de.rafaelalex.events/.MainActivity',
+    '-a', 'android.intent.action.VIEW',
+    '-d', 'https://events.rafaelalex.de/e/screenshot-event',
+  ]);
+});
+
+test('cmdAndroidNavigate: entry with no reach URL -> SKIP, no intent sent', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), {
+    android: { app_id: 'de.rafaelalex.events', deep_link_host: 'events.rafaelalex.de' },
+  });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'steps-only', platform: 'android', steps: [] }],
+  });
+  let called = false;
+  const runner = () => {
+    called = true;
+    return { stdout: '', status: 0 };
+  };
+  const lines = cmdAndroidNavigate(['--entry', 'steps-only', '--serial', 'emulator-5554'], root, runner);
+  assert.ok(lines.some((l) => l === 'ANDROID_NAVIGATE_RESULT=SKIP (entry steps-only has no reach URL)'), lines.join('\n'));
+  assert.equal(called, false);
+});
+
+test('cmdAndroidNavigate: missing config.android.deep_link_host -> FAIL, never sends a bare-isolated-host intent', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { android: { app_id: 'de.rafaelalex.events' } });
+  writeJson(join(root, '.screens/manifest.json'), {
+    entries: [{ id: 'event-page', platform: 'android', reach: '/e/x' }],
+  });
+  const lines = cmdAndroidNavigate(['--entry', 'event-page', '--serial', 'emulator-5554'], root, () => ({ stdout: '', status: 0 }));
+  assert.ok(lines.some((l) => l.startsWith('ANDROID_NAVIGATE_RESULT=FAIL')), lines.join('\n'));
+});
+
+// --- down: process-tree teardown -----------------------------------------------
+
+test('killPortListeners: kills a listener whose cwd is under root, skips one that is not', () => {
+  const root = '/Users/rafael/Developer/apps/events';
+  const calls = [];
+  const runner = (cmd, args) => {
+    calls.push([cmd, args]);
+    if (cmd === 'lsof' && args[0] === '-ti') return { stdout: '111\n222\n', status: 0 };
+    if (cmd === 'lsof' && args.includes('111')) return { stdout: `p111\nn${root}/native\n`, status: 0 };
+    if (cmd === 'lsof' && args.includes('222')) return { stdout: 'p222\nn/some/other/project\n', status: 0 };
+    return { stdout: '', status: 0 };
+  };
+  const killed = [];
+  const originalKill = process.kill;
+  process.kill = (pid, sig) => { killed.push([pid, sig]); };
+  try {
+    killPortListeners(root, 8737, runner);
+  } finally {
+    process.kill = originalKill;
+  }
+  assert.deepEqual(killed, [[111, 'SIGTERM']]);
+});
+
+test('cmdDown --platform web: falls back to killing a lingering port listener under the pilot root', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { web: { port: 8737 } });
+  const calls = [];
+  const runner = (cmd, args) => {
+    calls.push([cmd, args]);
+    if (cmd === 'lsof' && args[0] === '-ti') return { stdout: '999\n', status: 0 };
+    if (cmd === 'lsof') return { stdout: `p999\nn${root}\n`, status: 0 };
+    return { stdout: '', status: 0 };
+  };
+  const killed = [];
+  const originalKill = process.kill;
+  process.kill = (pid, sig) => { killed.push([pid, sig]); };
+  try {
+    const lines = cmdDown(['--platform', 'web'], root, runner);
+    assert.ok(lines.includes('DOWN_RESULT=OK'));
+  } finally {
+    process.kill = originalKill;
+  }
+  assert.ok(killed.some(([pid, sig]) => pid === 999 && sig === 'SIGTERM'));
+});
+
+// --- pidFilePath: .screens/.run/<platform>.pid ------------------------------
+
+test('pidFilePath: .screens/.run/<platform>.pid', () => {
+  assert.equal(pidFilePath('/root', 'web'), join('/root', '.screens/.run', 'web.pid'));
+});
+
+test('cmdDown --platform web: kills the process recorded at the new pidfile location, removes it', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), { web: {} });
+  writeFile(root, '.screens/.run/web.pid', '555');
+  const killed = [];
+  const originalKill = process.kill;
+  process.kill = (pid, sig) => { killed.push([pid, sig]); };
+  try {
+    const lines = cmdDown(['--platform', 'web'], root, () => ({ stdout: '', status: 0 }));
+    assert.ok(lines.includes('DOWN_RESULT=OK'));
+  } finally {
+    process.kill = originalKill;
+  }
+  assert.ok(killed.some(([pid, sig]) => pid === -555 && sig === 'SIGTERM'));
+  assert.ok(!existsSync(join(root, '.screens/.run/web.pid')));
+});
+
+// --- APP_URL for a Capacitor-dependent web backend --------------------------
+
+test('androidAppUrlEnv: android depends_on web -> APP_URL set to the emulator-reachable host', () => {
+  const config = { android: { depends_on: 'web' }, web: { port: 8737 } };
+  assert.deepEqual(androidAppUrlEnv(config), { APP_URL: 'http://10.0.2.2:8737' });
+});
+
+test('androidAppUrlEnv: config.android.base_url overrides the computed default', () => {
+  const config = { android: { depends_on: 'web', base_url: 'http://10.0.2.2:9999' }, web: { port: 8737 } };
+  assert.deepEqual(androidAppUrlEnv(config), { APP_URL: 'http://10.0.2.2:9999' });
+});
+
+test('androidAppUrlEnv: no android platform -> {}, never touches APP_URL', () => {
+  assert.deepEqual(androidAppUrlEnv({ web: { port: 8737 } }), {});
+});
+
+test('androidAppUrlEnv: android.depends_on is not "web" -> {}', () => {
+  assert.deepEqual(androidAppUrlEnv({ android: { depends_on: null }, web: { port: 8737 } }), {});
+});
+
+test('androidAppUrlEnv: explicit config.web.env.APP_URL always wins, never overridden', () => {
+  const config = { android: { depends_on: 'web' }, web: { port: 8737, env: { APP_URL: 'http://localhost:9001' } } };
+  assert.deepEqual(androidAppUrlEnv(config), {});
+});
+
+// --- Demo password: no demo password in any repo ----------------------------
+
+test('ensureGitignoreEntry: appends the entry once, dedups on repeated calls', () => {
+  const root = fixture();
+  const stubRunner = () => ({ status: 1 }); // git check-ignore: not ignored yet
+  ensureGitignoreEntry(root, '/.screens/secrets.local.json', stubRunner);
+  const content1 = readFileSync(join(root, '.gitignore'), 'utf8');
+  assert.ok(content1.includes('/.screens/secrets.local.json'));
+  ensureGitignoreEntry(root, '/.screens/secrets.local.json', stubRunner);
+  const content2 = readFileSync(join(root, '.gitignore'), 'utf8');
+  const occurrences = content2.split('\n').filter((l) => l === '/.screens/secrets.local.json').length;
+  assert.equal(occurrences, 1);
+});
+
+test('ensureGitignoreEntry: already covered by git check-ignore -> no append', () => {
+  const root = fixture();
+  const stubRunner = () => ({ status: 0 }); // git check-ignore: already ignored
+  ensureGitignoreEntry(root, '/.screens/secrets.local.json', stubRunner);
+  assert.ok(!existsSync(join(root, '.gitignore')));
+});
+
+test('ensureSecretsFile: missing file -> created 0600, forceReseed true, password never logged', () => {
+  const root = fixture();
+  const originalLog = console.log;
+  const logged = [];
+  console.log = (msg) => logged.push(msg);
+  let result;
+  try {
+    result = ensureSecretsFile(root, () => ({ status: 1 }));
+  } finally {
+    console.log = originalLog;
+  }
+  assert.equal(result.forceReseed, true);
+  assert.ok(result.demoPassword && result.demoPassword.length === 24);
+  const secretsPath = join(root, '.screens/secrets.local.json');
+  assert.ok(existsSync(secretsPath));
+  assert.equal(statSync(secretsPath).mode & 0o777, 0o600);
+  assert.deepEqual(logged, ['SECRET=CREATED']);
+  assert.ok(!logged.some((l) => l.includes(result.demoPassword)));
+});
+
+test('ensureSecretsFile: existing file -> reused verbatim, no reseed forced', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/secrets.local.json'), { demo_password: 'fixed-pw', demo_password_empty: 'other-pw' });
+  const originalLog = console.log;
+  const logged = [];
+  console.log = (msg) => logged.push(msg);
+  let result;
+  try {
+    result = ensureSecretsFile(root, () => ({ status: 1 }));
+  } finally {
+    console.log = originalLog;
+  }
+  assert.deepEqual(result, { demoPassword: 'fixed-pw', demoPasswordEmpty: 'other-pw', forceReseed: false });
+  assert.deepEqual(logged, ['SECRET=REUSED']);
+});
+
+test('secretConfigGuard: config.demo_password key -> FAIL', () => {
+  assert.equal(secretConfigGuard({ demo_password: 'x' }).ok, false);
+});
+
+test('secretConfigGuard: web.env PASSWORD-like key -> FAIL', () => {
+  assert.equal(secretConfigGuard({ web: { env: { SEED_ADMIN_PASSWORD: 'x' } } }).ok, false);
+});
+
+test('secretConfigGuard: clean config -> ok', () => {
+  assert.equal(secretConfigGuard({ web: { env: { DB_CONNECTION: 'sqlite' } } }).ok, true);
+});
+
+test('secretConfigGuard: web.secret_env_aliases (names only, PASSWORD-like) -> ok, still rejects a real value in web.env', () => {
+  assert.equal(secretConfigGuard({ web: { env: { DB_CONNECTION: 'sqlite' }, secret_env_aliases: ['SEED_ADMIN_PASSWORD'] } }).ok, true);
+  assert.equal(secretConfigGuard({ web: { env: { SEED_ADMIN_PASSWORD: 'x' }, secret_env_aliases: ['SEED_ADMIN_PASSWORD'] } }).ok, false);
+});
+
+// --- demoPasswordEnv: DEMO_USER_PASSWORD + secret_env_aliases ---------------
+
+test('demoPasswordEnv: sets DEMO_USER_PASSWORD and every listed alias to the same value', () => {
+  const platformConfig = { secret_env_aliases: ['SEED_ADMIN_PASSWORD', 'DEMO_PASSWORD'] };
+  assert.deepEqual(demoPasswordEnv(platformConfig, { demoPassword: 'pw123' }), {
+    DEMO_USER_PASSWORD: 'pw123', SEED_ADMIN_PASSWORD: 'pw123', DEMO_PASSWORD: 'pw123',
+  });
+});
+
+test('demoPasswordEnv: no demo password -> {} (aliases never emitted without a value)', () => {
+  assert.deepEqual(demoPasswordEnv({ secret_env_aliases: ['SEED_ADMIN_PASSWORD'] }, {}), {});
+});
+
+test('demoPasswordEnv: no secret_env_aliases -> only DEMO_USER_PASSWORD', () => {
+  assert.deepEqual(demoPasswordEnv({}, { demoPassword: 'pw123' }), { DEMO_USER_PASSWORD: 'pw123' });
+});
+
+test('up: config.json has demo_password -> FAIL before the runner is ever called', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), {
+    platforms: ['web'], web: { framework: 'astro' }, demo_password: 'leaked',
+  });
+  const lines = cmdUp([], root, () => { throw new Error('runner must not be called'); });
+  assert.ok(lines.some((l) => l.startsWith('UP_RESULT=FAIL') && l.includes('demo_password')), lines.join('\n'));
+});
+
+test('up: config.web.env has a PASSWORD-like key -> FAIL before the runner is ever called', () => {
+  const root = fixture();
+  writeJson(join(root, '.screens/config.json'), {
+    platforms: ['web'], web: { framework: 'astro', env: { SEED_ADMIN_PASSWORD: 'leaked' } },
+  });
+  const lines = cmdUp([], root, () => { throw new Error('runner must not be called'); });
+  assert.ok(lines.some((l) => l.startsWith('UP_RESULT=FAIL') && l.includes('SEED_ADMIN_PASSWORD')), lines.join('\n'));
+});
+
+test('up: web platform with marketing.entries configured -> gitignores .screens/.marketing-src/', () => {
+  const root = fixture();
+  const config = {
+    platforms: ['web'],
+    web: { framework: 'astro', seed_command: 'echo seeding', health_url: null, start_command: null },
+    marketing: { entries: [{ id: 'dashboard' }] },
+  };
+  writeJson(join(root, '.screens/config.json'), config);
+  const stubRunner = () => ({ stdout: '', status: 1 }); // git check-ignore: not ignored yet
+  cmdUp([], root, stubRunner);
+  const gitignore = readFileSync(join(root, '.gitignore'), 'utf8');
+  assert.ok(gitignore.includes('/.screens/.marketing-src/'), gitignore);
+});
+
+test('up: no marketing.entries configured -> .screens/.marketing-src/ never gitignored', () => {
+  const root = fixture();
+  const config = {
+    platforms: ['web'],
+    web: { framework: 'astro', seed_command: 'echo seeding', health_url: null, start_command: null },
+  };
+  writeJson(join(root, '.screens/config.json'), config);
+  const stubRunner = () => ({ stdout: '', status: 1 });
+  cmdUp([], root, stubRunner);
+  const gitignore = existsSync(join(root, '.gitignore')) ? readFileSync(join(root, '.gitignore'), 'utf8') : '';
+  assert.ok(!gitignore.includes('.marketing-src'), gitignore);
+});
+
+test('up: seed step creates secrets.local.json and never leaks the password in its emitted lines', () => {
+  const root = fixture();
+  const config = {
+    platforms: ['web'],
+    web: { framework: 'astro', seed_command: 'echo seeding', health_url: null, start_command: null },
+  };
+  writeJson(join(root, '.screens/config.json'), config);
+  const stubRunner = () => ({ stdout: '', status: 0 });
+  const lines = cmdUp([], root, stubRunner);
+  const secrets = readJson(join(root, '.screens/secrets.local.json'), {});
+  assert.ok(secrets.demo_password);
+  assert.ok(!lines.some((l) => l.includes(secrets.demo_password)));
+});
+
+// --- Output root resolution: `~` expansion, output_dir override, slug ------
+
+test('expandHome: bare "~" -> home dir', () => {
+  assert.equal(expandHome('~'), FAKE_HOME);
+});
+
+test('expandHome: "~/sub" -> home dir joined with the rest', () => {
+  assert.equal(expandHome('~/custom-screens'), join(FAKE_HOME, 'custom-screens'));
+});
+
+test('expandHome: an absolute or relative path without "~" passes through unchanged', () => {
+  assert.equal(expandHome('/already/absolute'), '/already/absolute');
+  assert.equal(expandHome('relative/path'), 'relative/path');
+});
+
+// `deriveProjectSlug` keys off this user's own `~/Developer/apps/<name>/...`
+// convention (repo CLAUDE.md), not git: a platform subproject under one
+// `<name>` is routinely its OWN independent git repo (verified live:
+// `zeit/app` and `zeit/macos` are two separate repos), so every fixture
+// below is built under `FAKE_HOME/Developer/apps/...` to exercise it.
+const DEV_APPS = join(FAKE_HOME, 'Developer', 'apps');
+
+test('deriveProjectSlug: .screens root IS the family dir itself -> bare family name (layer, events)', () => {
+  const familyRoot = join(DEV_APPS, 'layer');
+  mkdirSync(join(familyRoot, '.screens'), { recursive: true });
+  assert.equal(deriveProjectSlug(familyRoot), 'layer');
+});
+
+test('deriveProjectSlug: nested .screens root, only one in the family -> bare family name (zeit/app, topf-secret/ios)', () => {
+  const appRoot = join(DEV_APPS, 'zeit', 'app');
+  mkdirSync(join(appRoot, '.screens'), { recursive: true });
+  assert.equal(deriveProjectSlug(appRoot), 'zeit');
+});
+
+test('deriveProjectSlug: nested .screens root, more than one in the family -> family name + subpath', () => {
+  const familyRoot = join(DEV_APPS, 'multi-platform');
+  const appRoot = join(familyRoot, 'app');
+  mkdirSync(join(appRoot, '.screens'), { recursive: true });
+  mkdirSync(join(familyRoot, 'ios', '.screens'), { recursive: true });
+  assert.equal(deriveProjectSlug(appRoot), 'multi-platform-app');
+});
+
+test('deriveProjectSlug: a sibling .screens under .claude/worktrees/ (an isolated checkout of the same repo) is ignored (topf-secret/ios)', () => {
+  const appRoot = join(DEV_APPS, 'topf-secret', 'ios');
+  mkdirSync(join(appRoot, '.screens'), { recursive: true });
+  mkdirSync(join(DEV_APPS, 'topf-secret', '.claude', 'worktrees', 'feature-x', 'ios', '.screens'), { recursive: true });
+  assert.equal(deriveProjectSlug(appRoot), 'topf-secret');
+});
+
+test('deriveProjectSlug: outside ~/Developer/apps/ -> falls back to the directory\'s own name', () => {
+  const root = mkdtempSync(join(tmpdir(), 'screens-slug-'));
+  assert.equal(deriveProjectSlug(root), basename(root));
+});
+
+test('resolveScreensOutputRoot: config.output_dir with "~" expansion', () => {
+  const root = mkdtempSync(join(tmpdir(), 'screens-slug-'));
+  const resolved = resolveScreensOutputRoot(root, { output_dir: '~/custom-screens' });
+  assert.equal(resolved.outputRoot, join(FAKE_HOME, 'custom-screens'));
+});
+
+test('resolveScreensOutputRoot: config.output_dir with ${PROJECT_ROOT}', () => {
+  const root = mkdtempSync(join(tmpdir(), 'screens-slug-'));
+  const resolved = resolveScreensOutputRoot(root, { output_dir: '${PROJECT_ROOT}/out' });
+  assert.equal(resolved.outputRoot, join(root, 'out'));
+});
+
+test('resolveScreensOutputRoot: no output_dir -> ~/Developer/screens/<derived slug>', () => {
+  const root = mkdtempSync(join(tmpdir(), 'screens-slug-'));
+  const resolved = resolveScreensOutputRoot(root, {});
+  assert.equal(resolved.slug, basename(root));
+  assert.equal(resolved.outputRoot, join(FAKE_HOME, 'Developer', 'screens', basename(root)));
+});
+
+test('resolveScreensOutputRoot: config.project already set -> used verbatim', () => {
+  const root = mkdtempSync(join(tmpdir(), 'screens-slug-'));
+  const resolved = resolveScreensOutputRoot(root, { project: 'pinned-slug' });
+  assert.equal(resolved.outputRoot, join(FAKE_HOME, 'Developer', 'screens', 'pinned-slug'));
+});
+
+test('planEntries persists the derived slug into config.project on first run', () => {
+  const root = fixture();
+  writeFile(root, 'view.blade.php', 'a');
+  const manifest = { entries: [{ id: 'home', sources: ['view.blade.php'] }] };
+  planEntries(root, manifest, { entries: {} }, false);
+  const config = readJson(join(root, '.screens/config.json'), {});
+  assert.equal(config.project, basename(root));
+});
+
+// --- migrate-output: relocates an existing screenshots/ into the resolved
+// output root, verifying a byte-identical sample --------------------------
+
+test('cmdMigrateOutput: moves every file, sample hash verified before/after, source dir removed', () => {
+  const root = mkdtempSync(join(tmpdir(), 'screens-test-'));
+  const centralDir = mkdtempSync(join(tmpdir(), 'screens-central-'));
+  writeJson(join(root, '.screens/config.json'), { output_dir: centralDir });
+  writeFile(root, 'screenshots/web/area/entry/filled.png', 'bytes-a');
+  writeFile(root, 'screenshots/web/area/entry/empty.png', 'bytes-b');
+
+  const lines = cmdMigrateOutput([], root);
+
+  assert.ok(lines.some((l) => l === 'MIGRATE_OUTPUT_RESULT=OK moved=2 sample_verified=true'), lines.join('\n'));
+  assert.ok(!existsSync(join(root, 'screenshots')));
+  assert.equal(readFileSync(join(centralDir, 'web/area/entry/filled.png'), 'utf8'), 'bytes-a');
+  assert.equal(readFileSync(join(centralDir, 'web/area/entry/empty.png'), 'utf8'), 'bytes-b');
+});
+
+test('cmdMigrateOutput: no screenshots/ present -> SKIP, nothing moved', () => {
+  const root = mkdtempSync(join(tmpdir(), 'screens-test-'));
+  writeJson(join(root, '.screens/config.json'), { output_dir: join(root, 'central') });
+  const lines = cmdMigrateOutput([], root);
+  assert.ok(lines.some((l) => l.startsWith('MIGRATE_OUTPUT_RESULT=SKIP')), lines.join('\n'));
+});
+
+// --- top-level index aggregation --------------------------------------------
+
+test('buildCatalogSummary: platforms deduped and sorted, count from items, project from config', () => {
+  const config = { project: 'zeit' };
+  const state = { last_run: { date: '2026-09-24' } };
+  const items = [{ platform: 'ios' }, { platform: 'web' }, { platform: 'ios' }];
+  assert.deepEqual(
+    buildCatalogSummary(config, state, items),
+    { project: 'zeit', platforms: ['ios', 'web'], count: 3, last_run: { date: '2026-09-24' } },
+  );
+});
+
+test('regenerateTopIndex: aggregates every project catalog.json into one top-level index.html', () => {
+  const centralRoot = mkdtempSync(join(tmpdir(), 'screens-central-'));
+  writeJson(join(centralRoot, 'zeit/catalog.json'), { project: 'zeit', platforms: ['ios', 'web'], count: 42, last_run: { date: '2026-09-20' } });
+  writeJson(join(centralRoot, 'layer/catalog.json'), { project: 'layer', platforms: ['macos'], count: 10, last_run: { date: '2026-09-21' } });
+
+  const count = regenerateTopIndex(centralRoot);
+
+  assert.equal(count, 2);
+  const html = readFileSync(join(centralRoot, 'index.html'), 'utf8');
+  assert.ok(html.includes('zeit'));
+  assert.ok(html.includes('layer'));
+  assert.ok(html.includes('./zeit/index.html'));
+  assert.ok(html.includes('42'));
+});
+
+test('regenerateTopIndex: no project catalogs -> zero projects, still writes an index.html', () => {
+  const centralRoot = mkdtempSync(join(tmpdir(), 'screens-central-'));
+  mkdirSync(centralRoot, { recursive: true });
+  const count = regenerateTopIndex(centralRoot);
+  assert.equal(count, 0);
+  assert.ok(existsSync(join(centralRoot, 'index.html')));
+});

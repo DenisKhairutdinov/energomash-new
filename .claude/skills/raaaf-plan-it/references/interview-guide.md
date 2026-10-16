@@ -1,0 +1,148 @@
+# Phase 1 Interview Guide (Detail)
+
+Detail for Phase 1 (understanding). Read by the orchestrator when the assessment is difficult.
+
+> `Evidence:` notes below are counts from a retired plan-it retro over per-project plan
+> logs (removed 2026-10-02); see `plan-it/SKILL.md` Phase 1.
+
+## Interview limits
+
+Scan first, then ask: at most 3 questions per round, each with a recommended default, at most 3 rounds,
+and no question the scan already answers. What is still open after round 3 goes into the plan's Open
+Questions with the assumption chosen.
+
+## Step B: Codebase Scan Table
+
+What to scan, depending on the topic:
+
+| Topic | Scan action |
+|---|---|
+| Data overhaul / schema migration | Grep all write and read sites of the field, check cache layer, trait mixins |
+| Multi-channel / multi-service | `ls` the channel/service classes, reliability status (deprecated? in tests?), monitoring sites |
+| New feature | Grep for similar features (naming search), existing patterns for lifecycle/permission/UI |
+| Refactoring / renaming | Caller list via grep, check test coverage, doc mentions |
+| Performance / caching | Find existing cache keys, invalidation pattern, N+1 hotspots |
+| Legal / tax question ("can the app do X for country Y") | Codebase scan is not enough. Websearch the rule **before** the plan is written, especially the triggering event (payment received vs. invoice issued). Never answer from intuition. |
+| Time/trigger-based concept (daily digest, recap, reminder) | Check WHEN the relevant data generation actually happens in code (BGTask/cron/gate timing) before interview round 1 — the trigger moment usually decides the design. |
+| Field extension / new model attribute | Grep **every** form variant that writes the model, not just the one named in the request (e.g. invoice + quote + recurring). One missed variant is a silent data gap. |
+| Re-implementing or relocating something that once existed | `git log -S`/`git blame` the old spot first: find out why it was removed or moved before drafting v1. A removed feature usually died for a reason the plan has to answer. |
+| "Do we already have X?" (assets, settings, uploads, flags) | A service/controller grep is not enough. Check the settings/config model fields directly (`php artisan model:show Setting`, `model:show User`, migration grep on the column name). Evidence: `signature_path` existed on the model and stayed undetected until interview round 3. |
+| Infra named in CLAUDE.md (URLs, services, hosts) | Verify it is actually live and in use before planning against it. Documented infra has been stale. |
+| "Reuses existing component X" | Open the init/method signature and check API compatibility, not just that the file exists. |
+| Migration target / refactor target | Physically open at least one call site per target, do not infer behaviour from naming or comments. Evidence: repeated in plans 6 and 7. |
+| Design-system token or shared constant | Grep for known mirror or duplicate definitions (e.g. `Brand.swift` next to `DesignTokens.swift`) as a mandatory step. A token changed in one file and not its mirror ships two values. |
+| Feature syncs data through a backend or shared store | Read the payload caps and body limits of the target store (e.g. `JSON_PAYLOAD_CAP_BYTES`, bodyLimit) BEFORE asking sync questions. Evidence: one wasted question loop. |
+| Guard, hook or middleware the change runs through (input sanitizer, trigger scoping, pre-edit hook, rate limit) | Read what the guard actually does to this change's inputs and put its effect into a **step** with a verify criterion, not only into Edge Cases. Evidence: same root-cause class three times (SanitizesInput 2026-09-12, trigger scoping 2026-07-09, hook 2026-09-23). |
+
+Every fact in the map is verified against the code or schema before it is shown, never quoted from memory.
+
+A quoted line only counts as a fact when the plan reproduces its semantics literally (e.g. "reads `default_tax_rate ?? 19`"), not just its role (e.g. "sets the rate for Kleinunternehmer"). Evidence: `CreateInvoiceDraft.php:74`.
+
+When an old, never-implemented plan is resumed, its core assumptions (exclusions, scoping) are explicitly re-checked against the current state, not carried over. Evidence: the Retainer exclusion from the 2026-07-06 plan.
+
+**Output format:** Short codebase map (3-8 bullet points) as a factual basis before the questions:
+
+```
+Before the questions — codebase state:
+- {Fact 1, e.g. "Push channels: APNs, FCM, NativePushChannel — the latter is the only active implementation"}
+- {Fact 2}
+- {Fact 3}
+```
+
+## Question Format with Own Assessment
+
+Don't just ask — directly propose the best answer based on codebase, context, typical patterns. The user only corrects or confirms.
+
+```
+{Question}
+→ My assessment: {concrete assumption/recommendation, justified in 1 sentence}
+```
+
+Examples:
+- "Who is the user here? → My assessment: Admin — because the route sits behind auth and no onboarding flow exists."
+- "How should errors be handled? → My assessment: Toast notification, since that's the existing pattern in the app."
+- "Do we need a migration? → My assessment: No — the new field is optional and has a default."
+
+## Step A Addendum: Comparing Two Systems
+
+When the question compares two systems, tools, or data sources ("why does A show X and B show Y", "A or B"), ask first whether BOTH have a future before analyzing the difference. A source that is being shut down or replaced turns the whole comparison moot. Evidence: two interview rounds spent on a numeric discrepancy whose second source was being switched off two weeks later.
+
+```
+Do both {A} and {B} stay around, or is one of them going away?
+→ My assessment: {based on cutover plans, migration commands, deprecation markers in the codebase}
+```
+
+## Number-Reduction Check
+
+When an AskUserQuestion would reduce a count ("four roles down to one", "three channels down to one"),
+check first whether the count itself is a symptom of something else (e.g. duplicate definitions that
+need reconciling) or the thing the plan is actually deciding. If it's a symptom, the question offers a
+false premise the user has no way to challenge, and the answer they give inherits that premise, not
+the underlying issue. Evidence: 2026-08-10, "reduce to one role" was accepted, and the challenge round
+then showed the four filled-surface cases were real and irreducible, not a naming accident.
+
+## Mandatory Questions (Red Flags)
+
+Two questions get skipped or deferred over and over, and both cost a whole extra round later. Ask them in round 1 or 2, never later.
+
+**Onboarding.** Whenever a plan touches a user-facing flow, permission, or setting: does this need an onboarding step, or does it work via toggle plus settings? Ask it directly, do not write "onboarding TBD" into the plan. Red flag: if onboarding first comes up in round 3+, the interview went wrong.
+
+**Where does it run.** Whenever a plan touches more than one machine, service or runtime (a repo plus an automation host, a local tool plus a cloud API, a worker plus a web app): ask in round 1 which side owns which part, before drafting anything. Put the candidates side by side, with what each one costs and what it forces. Red flag: if the plan's v1 assumes a split and the user corrects it later, the whole architecture section gets rewritten. Evidence: late-stage rewrites in two plans running.
+
+**Product constraints.** Ask in round 1 whether hard product rules limit the solution space (no CLI arguments, no config flags, no new dependencies, no extra setup step). Users state these as corrections mid-plan when nobody asks, which costs a round. Evidence: a "no custom args" rule arrived as a mid-turn correction.
+
+**Scope split.** Before proposing any MVP cut or phase split, answer for yourself: is this a real saving in complexity or differentiation, or does it tear apart something the user sees as one coherent feature? Only propose the split in the first case. When in doubt, ask in exactly those terms:
+
+```
+Split this into phase 1 / phase 2, or in one go?
+→ My assessment: {one go | split}, because {real complexity saving | it's one coherent surface}
+```
+
+**Native framework first.** For Apple-platform plans the default is the native Apple framework; a third party dependency carries the burden of proof and needs an explicit reason.
+
+```
+Native framework or third party library?
+→ My assessment: {native framework}, unless {concrete reason for the dependency}
+```
+
+**Container topology.** For multi-user or shared-data features on CloudKit: ask dual container vs single container explicitly in round 1, never assume it.
+
+```
+Dual container or single container?
+→ My assessment: {dual container | single container}, because {reason}
+```
+
+## Detecting Dependencies
+
+Before asking a question, check:
+- Does the answer depend on a still-open decision? → Clarify the dependency first.
+- Does the answer open a new branch? → Keep asking there right after the answer.
+- Are several questions independent of each other? → Then ask them in the same round.
+
+Example tree:
+```
+Who is the user? (blocks everything)
+├── Admin → Which permissions? → Does it need audit logging?
+├── End user → Onboarding needed? → Which flow?
+└── Both → Role-based views? → Shared components or separate?
+```
+
+## Tone
+
+The skill talks like a smart colleague:
+
+Good: "I notice the plan has no error handling for X. What happens if Y goes wrong?"
+Bad: "Re-grounding context: The user's plan lacks error handling. Completeness: 3/10."
+
+Good: "This sounds like a simple feature flag rather than the whole overhaul. What's the case against that?"
+Bad: "Alternative approach detected. Please evaluate tradeoffs."
+
+Good: "Who's actually the user here? Admin or end user? That changes the whole approach."
+Bad: "Target user persona not specified. Please select: A) Admin B) End user C) Both."
+
+## Default assumption: single pass
+
+Plan the feature as ONE pass unless the user says otherwise. Do not propose a scope split or a
+"phase 2 later" as the recommended answer; the user overruled every such recommendation in five
+consecutive plans (two in one session). If a split seems necessary, state it as a cost in the plan's
+Known Costs, not as a question. Evidence: retired retro trend "scope-split/defer overruled", 2026-09.
