@@ -224,6 +224,9 @@
 
   // Чипы фильтра: светло-серые плитки без рамок, при наведении серые, выбранный чёрный
   .cfilter .chip__label {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
     padding: 0.5rem 0.8rem;
     font-size: var(--fs-s);
     color: var(--c-black);
@@ -289,7 +292,9 @@
   }
 
   .cview__label {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
     padding: 0.5rem 0.9rem;
     font-size: var(--fs-s);
     font-weight: 500;
@@ -489,26 +494,53 @@
     font-variant-numeric: tabular-nums;
   }
 
-  // Сортировка: выпадающий список в тон кнопок панели
-  .csort__select {
+  // Сортировка: свой выпадающий список (scripts/modules/select.ts) в тон кнопок панели; список тёмный, как меню сайта
+  .csort .select__button {
     min-block-size: 2.75rem;
+    min-inline-size: 14.5rem;
     padding: 0.5rem 0.9rem;
-    font: inherit;
     font-size: var(--fs-s);
     font-weight: 500;
     color: var(--c-black);
-    cursor: pointer;
     background: var(--c-light);
     border: 0;
   }
 
-  .csort__select:hover {
+  .csort .select__button:hover,
+  .csort .select.is-open .select__button {
     background: var(--c-gray);
   }
 
-  .csort__select:focus-visible {
+  .csort .select__button:focus-visible {
     outline: 1px solid var(--accent);
     outline-offset: 2px;
+  }
+
+  .csort .select__chevron {
+    color: var(--c-black);
+  }
+
+  .csort .select__list {
+    inset-block-start: calc(100% + 0.25rem);
+    min-inline-size: 100%;
+    padding: 0.25rem;
+    background: var(--c-black);
+    border: 0;
+  }
+
+  .csort .select__option {
+    padding: 0.7rem 0.9rem;
+    font-weight: 400;
+    color: var(--c-white);
+  }
+
+  .csort .select__option.is-active {
+    background: color-mix(in oklch, var(--c-white) 14%, transparent);
+  }
+
+  .csort .select__option[aria-selected='true'] {
+    font-weight: 500;
+    color: var(--accent-text);
   }
 
   // ---------- Результаты: плитки в стык
@@ -937,7 +969,7 @@
     .cfilter {
       grid-template-areas: none;
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 0.75rem var(--col-gap);
+      gap: 0.25rem var(--col-gap);
       padding-block: 0.75rem;
     }
 
@@ -964,7 +996,12 @@
       grid-area: auto;
       grid-row: 1;
       grid-column: 7 / -1;
+      gap: 0.25rem;
       place-self: start;
+    }
+
+    .cfilter__status {
+      padding-block-start: 0.5rem;
     }
 
     // Назначение и наличие чипами справа от плиток типа, подписи групп скрыты визуально (остаются для скринридеров)

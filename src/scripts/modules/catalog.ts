@@ -1,6 +1,7 @@
 import { loadCatalog, photoUrl } from './catalog-data'
 import { createProductCard, type CardItem } from './product-card'
 import { isSearchMatch, parseQuery } from './search-match'
+import { enhanceSelect } from './select'
 import { getLenis } from './smooth'
 
 const GROUP_SELECTOR = '[data-catalog-group]'
@@ -151,6 +152,7 @@ export const initCatalog = (): void => {
   const moreLabel = form.querySelector<HTMLElement>('[data-catalog-more-label]')
   const viewInputs = [...form.querySelectorAll<HTMLInputElement>('input[name="view"]')]
   const sortSelect = form.querySelector<HTMLSelectElement>('[data-catalog-sort]')
+  const sortUi = sortSelect ? enhanceSelect(sortSelect, 'catalog-sort-label') : null
   const activeList = form.querySelector<HTMLElement>('[data-active-list]')
   const bar = document.querySelector<HTMLElement>('[data-filter-bar]')
   const dock = document.querySelector<HTMLElement>('[data-filter-dock]')
@@ -647,6 +649,7 @@ export const initCatalog = (): void => {
       const requestedSort = parameters.get(SORT_FIELD) ?? SORT_DEFAULT
 
       sortSelect.value = SORT_VALUES.has(requestedSort) ? requestedSort : SORT_DEFAULT
+      sortUi?.refresh()
     }
 
     syncView()
@@ -862,7 +865,10 @@ export const initCatalog = (): void => {
         headerSearch.value = ''
       }
 
-      setTimeout(update, 0)
+      setTimeout(() => {
+        sortUi?.refresh()
+        update()
+      }, 0)
     })
 
     update()
