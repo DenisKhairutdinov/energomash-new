@@ -1,39 +1,39 @@
-{% set landingPhotos = {"benzovozy": "IMG_0356.webp", "neftevozy": "DSC03243.webp", "vodovozy": "DSC03243_0.webp", "vakuumnye-cisterny": "IMG_0234.webp", "avtotoplivozapravschiki": "IMG_0603.webp", "cisterny-dlya-pitevoy-vody": "IMG_0387.webp", "avtocisterny-dlya-sbora-nefti": "IMG_0602_0.webp", "kommunalnye-vakuumnye-mashiny": "IMG_0055.webp"} %}
-{# Посадочная страница под назначение техники. Данные: src/data/landings.json (landing), счётчик моделей берётся из фильтров каталога. Шапка, описание, сценарии применения, на что смотреть при выборе, вопросы, статьи и призыв. #}
+{% set categoryPhotos = {"benzovozy": "IMG_0356.webp", "neftevozy": "DSC03243.webp", "vodovozy": "DSC03243_0.webp", "vakuumnye-cisterny": "IMG_0234.webp", "avtotoplivozapravschiki": "IMG_0603.webp", "cisterny-dlya-pitevoy-vody": "IMG_0387.webp", "avtocisterny-dlya-sbora-nefti": "IMG_0602_0.webp", "kommunalnye-vakuumnye-mashiny": "IMG_0055.webp"} %}
+{# Страница раздела по типу техники. Данные: src/data/categories.json (category), счётчик моделей берётся из фильтров каталога. Шапка, описание, сценарии применения, на что смотреть при выборе, вопросы, статьи и призыв. #}
 {% from "ip.njk" import head, sec, cta, crumbs, faq %}
 {% set purposeCount = 0 %}
 {% for filter in catalog.filters %}
   {% if filter.name == "purpose" %}
     {% for option in filter.options %}
-      {% if option.value == landing.purpose %}{% set purposeCount = option.count %}{% endif %}
+      {% if option.value == category.purpose %}{% set purposeCount = option.count %}{% endif %}
     {% endfor %}
   {% endif %}
 {% endfor %}
 <article class="ip">
-  {{ crumbs([["Каталог", "/catalog.html"], [landing.h1, "/" + landing.slug + ".html"]]) }}
+  {{ crumbs([["Каталог", "/catalog.html"], [category.h1, "/" + category.slug + ".html"]]) }}
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "{{ landing.h1 }}",
-      "description": "{{ landing.description }}",
-      "url": "{{ site.url }}/{{ landing.slug }}.html",
+      "name": "{{ category.h1 }}",
+      "description": "{{ category.description }}",
+      "url": "{{ site.url }}/{{ category.slug }}.html",
       "inLanguage": "ru",
       "isPartOf": { "@type": "WebSite", "name": "{{ site.name }}", "url": "{{ site.url }}" }
     }
   </script>
-  {{ head(landing.h1, landing.lead, landing.kicker, false, landingPhotos[landing.slug] or "IMG_4530.webp") }}
+  {{ head(category.h1, category.lead, category.kicker, false, categoryPhotos[category.slug] or "IMG_4530.webp") }}
 
   {% call sec("О технике", "land-about", "Для чего она нужна и какие бывают модели.") %}
     <div class="prose">
-      {% for paragraph in landing.intro %}<p>{{ paragraph | safe }}</p>{% endfor %}
-      <p>В каталоге по этому назначению {{ purposeCount }} моделей. <a href="/catalog.html?type={{ landing.type }}&amp;purpose={{ landing.purpose }}">Открыть подборку в каталоге</a> или посмотреть <a href="/catalog.html?type={{ landing.type }}&amp;purpose={{ landing.purpose }}&amp;in-stock=1">технику в наличии</a>.</p>
+      {% for paragraph in category.intro %}<p>{{ paragraph | safe }}</p>{% endfor %}
+      <p>В каталоге по этому назначению {{ purposeCount }} моделей. <a href="/catalog.html?type={{ category.type }}&amp;purpose={{ category.purpose }}">Открыть подборку в каталоге</a> или посмотреть <a href="/catalog.html?type={{ category.type }}&amp;purpose={{ category.purpose }}&amp;in-stock=1">технику в наличии</a>.</p>
     </div>
   {% endcall %}
 
   {% call sec("Где применяют", "land-use", "Основные сценарии работы.", true) %}
     <ul class="ip__tiles ip__tiles--2">
-      {% for use in landing.uses %}
+      {% for use in category.uses %}
         <li class="ip__tile"><h3 class="ip__tile-title">{{ use[0] }}</h3><p class="ip__tile-text">{{ use[1] }}</p></li>
       {% endfor %}
     </ul>
@@ -41,40 +41,40 @@
 
   {% call sec("На что смотреть при выборе", "land-choose", "Параметры, которые определяют комплектацию.") %}
     <ul class="ip__tiles ip__tiles--2">
-      {% for item in landing.choose %}
+      {% for item in category.choose %}
         <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">{{ loop.index }}</span><p class="ip__tile-text">{{ item }}</p></li>
       {% endfor %}
     </ul>
     <div class="prose"><p>Подробное руководство: <a href="/guide.html">«Как выбрать цистерну»</a>. Заказная конфигурация: <a href="/blog-cisterna-pod-tehzadanie.html">что можно менять в цистерне</a>.</p></div>
   {% endcall %}
 
-  {% if landing.details %}
+  {% if category.details %}
     {% call sec("Особенности комплектации", "land-details", "Из чего состоит техника и на что влияет каждый узел.", true) %}
       <ul class="ip__tiles ip__tiles--2">
-        {% for item in landing.details %}
+        {% for item in category.details %}
           <li class="ip__tile"><h3 class="ip__tile-title">{{ item[0] }}</h3><p class="ip__tile-text">{{ item[1] | safe }}</p></li>
         {% endfor %}
       </ul>
     {% endcall %}
   {% endif %}
 
-  {% if landing.mistakes %}
+  {% if category.mistakes %}
     {% call sec("Частые ошибки при выборе", "land-mistakes", "Что чаще всего упускают покупатели.") %}
       <div class="prose">
         <ul>
-          {% for item in landing.mistakes %}<li>{{ item }}</li>{% endfor %}
+          {% for item in category.mistakes %}<li>{{ item }}</li>{% endfor %}
         </ul>
       </div>
     {% endcall %}
   {% endif %}
 
   {% call sec("Вопросы", "land-faq", "Частые вопросы по этому типу техники.", true) %}
-    {{ faq(landing.faq, "land-faq") }}
+    {{ faq(category.faq, "land-faq") }}
   {% endcall %}
 
   {% call sec("Читайте также", "land-read", "Статьи блога по теме.") %}
     <ul class="ip__tiles ip__tiles--3">
-      {% for slug in landing.articles %}
+      {% for slug in category.articles %}
         {% set post = blog.bySlug[slug] %}
         <li><a class="ip__tile" href="{{ post.url }}"><span class="ip__tile-meta">{{ post.rubric }}</span><span class="ip__tile-title">{{ post.title }}</span><span class="ip__tile-text">{{ post.excerpt }}</span></a></li>
       {% endfor %}
