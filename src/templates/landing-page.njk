@@ -26,7 +26,7 @@
 
   {% call sec("О технике", "land-about", "Для чего она нужна и какие бывают модели.") %}
     <div class="prose">
-      {% for paragraph in landing.intro %}<p>{{ paragraph }}</p>{% endfor %}
+      {% for paragraph in landing.intro %}<p>{{ paragraph | safe }}</p>{% endfor %}
       <p>В каталоге по этому назначению {{ purposeCount }} моделей. <a href="/catalog.html?type={{ landing.type }}&amp;purpose={{ landing.purpose }}">Открыть подборку в каталоге</a> или посмотреть <a href="/catalog.html?type={{ landing.type }}&amp;purpose={{ landing.purpose }}&amp;in-stock=1">технику в наличии</a>.</p>
     </div>
   {% endcall %}
@@ -47,6 +47,26 @@
     </ul>
     <div class="prose"><p>Подробное руководство: <a href="/guide.html">«Как выбрать цистерну»</a>. Заказная конфигурация: <a href="/blog-cisterna-pod-tehzadanie.html">что можно менять в цистерне</a>.</p></div>
   {% endcall %}
+
+  {% if landing.details %}
+    {% call sec("Особенности комплектации", "land-details", "Из чего состоит техника и на что влияет каждый узел.", true) %}
+      <ul class="ip__tiles ip__tiles--2">
+        {% for item in landing.details %}
+          <li class="ip__tile"><h3 class="ip__tile-title">{{ item[0] }}</h3><p class="ip__tile-text">{{ item[1] | safe }}</p></li>
+        {% endfor %}
+      </ul>
+    {% endcall %}
+  {% endif %}
+
+  {% if landing.mistakes %}
+    {% call sec("Частые ошибки при выборе", "land-mistakes", "Что чаще всего упускают покупатели.") %}
+      <div class="prose">
+        <ul>
+          {% for item in landing.mistakes %}<li>{{ item }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% endcall %}
+  {% endif %}
 
   {% call sec("Вопросы", "land-faq", "Частые вопросы по этому типу техники.", true) %}
     {{ faq(landing.faq, "land-faq") }}

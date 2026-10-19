@@ -33,7 +33,26 @@
     </div>
   </section>
 
-  {% call sec("Куда поставляем", "ship-geo", "Регионы России и зарубежные страны.") %}
+  {% call sec("Что отгружаем", "ship-types", "Техника, которая чаще всего уходит заказчикам.", true) %}
+    <ul class="ip__tiles ip__tiles--3">
+      <li><a class="ip__tile" href="/benzovozy.html"><span class="ip__tile-title">Бензовозы и нефтевозы</span><span class="ip__tile-text">Полуприцепы-цистерны для топлива и нефти.</span></a></li>
+      <li><a class="ip__tile" href="/vodovozy.html"><span class="ip__tile-title">Водовозы</span><span class="ip__tile-text">Цистерны для технической и питьевой воды.</span></a></li>
+      <li><a class="ip__tile" href="/avtotoplivozapravschiki.html"><span class="ip__tile-title">Автотопливозаправщики</span><span class="ip__tile-text">Заправка техники на объектах.</span></a></li>
+      <li><a class="ip__tile" href="/vakuumnye-cisterny.html"><span class="ip__tile-title">Вакуумные цистерны</span><span class="ip__tile-text">Сбор нефти, шлама и технологических жидкостей.</span></a></li>
+      <li><a class="ip__tile" href="/kommunalnye-vakuumnye-mashiny.html"><span class="ip__tile-title">Коммунальные машины</span><span class="ip__tile-text">Откачка септиков, колодцев и сетей.</span></a></li>
+      <li><a class="ip__tile" href="/catalog.html?in-stock=1"><span class="ip__tile-title">Из наличия</span><span class="ip__tile-text">Модели, которые стоят на складе и уходят за несколько дней.</span></a></li>
+    </ul>
+  {% endcall %}
+
+  {% call sec("Как проходит отгрузка", "ship-steps", "От приёмки до передачи техники.") %}
+    <ol class="ip__tiles ip__tiles--3">
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">1</span><h3 class="ip__tile-title">Приёмка</h3><p class="ip__tile-text">Покупатель или его представитель проверяет технику на заводе, при необходимости по фото и видео: <a href="/blog-priemka-tehniki-na-zavode.html">как это устроено</a>.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">2</span><h3 class="ip__tile-title">Документы</h3><p class="ip__tile-text">Паспорт, ОТТС, сертификаты, гарантийный талон, сервисная книжка и руководство передаются вместе с техникой.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">3</span><h3 class="ip__tile-title">Доставка</h3><p class="ip__tile-text">Полуприцепы доезжают с тягачом заказчика, автоцистерны своим ходом или транспортной компанией: <a href="/delivery.html">условия доставки</a>.</p></li>
+    </ol>
+  {% endcall %}
+
+  {% call sec("Куда поставляем", "ship-geo", "Регионы России и зарубежные страны.", true) %}
     <div class="prose"><p>Техника «Энергомаш» работает от Урала до Дальнего Востока и поставляется за рубеж: в страны Азии, Центральной Африки и на Кубу. Карта регионов, куда поставлена техника, на странице <a href="/company.html">«О компании»</a>.</p></div>
   {% endcall %}
 

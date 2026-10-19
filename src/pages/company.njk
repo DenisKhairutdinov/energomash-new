@@ -6,6 +6,7 @@
 {% set pageClass = "inner" %}
 {% block content %}
 {% from "ip.njk" import head, sec, cta, crumbs %}
+{% from "plural.njk" import plural %}
 <article class="ip">
   {{ crumbs([["О заводе", "/about.html"], ["О компании", "/company.html"]]) }}
   {{ head("О компании", "ООО «Энергомаш» производит специальную технику для перевозки жидких грузов. Техника работает по всей России и поставляется за рубеж.", '<a href="/about.html">О заводе</a>', false, "92607 IMG_4579.webp", "split") }}
@@ -19,6 +20,52 @@
   {% endcall %}
 
   {% include "geography.njk" %}
+
+  {% call sec("Что выпускаем", "company-products", "Восемь направлений техники, у каждого своя страница с моделями и подбором.") %}
+    <div class="prose">
+      <p>В каталоге {{ home.catalogTotals.total }} {{ plural(home.catalogTotals.total, "модель", "модели", "моделей") }}, из них {{ home.catalogTotals.inStock }} {{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} стоят на складе и отгружаются в течение нескольких дней. Остальные изготавливаем под заказ, комплектацию можно менять под ваше задание.</p>
+    </div>
+    <ul class="ip__tiles ip__tiles--2">
+      <li><a class="ip__tile" href="/benzovozy.html"><span class="ip__tile-title">Бензовозы</span><span class="ip__tile-text">Полуприцепы-цистерны для бензина, дизельного топлива и керосина.</span></a></li>
+      <li><a class="ip__tile" href="/neftevozy.html"><span class="ip__tile-title">Нефтевозы</span><span class="ip__tile-text">Полуприцепы для нефти и тяжёлых нефтепродуктов, с подогревом и теплоизоляцией.</span></a></li>
+      <li><a class="ip__tile" href="/avtotoplivozapravschiki.html"><span class="ip__tile-title">Автотопливозаправщики</span><span class="ip__tile-text">Автоцистерны с насосом, счётчиком и рукавами для заправки техники на объекте.</span></a></li>
+      <li><a class="ip__tile" href="/vodovozy.html"><span class="ip__tile-title">Водовозы</span><span class="ip__tile-text">Цистерны для технической воды: полуприцепы и автоцистерны.</span></a></li>
+      <li><a class="ip__tile" href="/cisterny-dlya-pitevoy-vody.html"><span class="ip__tile-title">Цистерны для питьевой воды</span><span class="ip__tile-text">Техника пищевого исполнения для питьевой воды.</span></a></li>
+      <li><a class="ip__tile" href="/vakuumnye-cisterny.html"><span class="ip__tile-title">Вакуумные цистерны</span><span class="ip__tile-text">Полуприцепы для откачки и перевозки нефти, шлама и технологических жидкостей.</span></a></li>
+      <li><a class="ip__tile" href="/avtocisterny-dlya-sbora-nefti.html"><span class="ip__tile-title">Автоцистерны для сбора нефти</span><span class="ip__tile-text">Вакуумные автоцистерны для промыслов и ликвидации разливов.</span></a></li>
+      <li><a class="ip__tile" href="/kommunalnye-vakuumnye-mashiny.html"><span class="ip__tile-title">Коммунальные вакуумные машины</span><span class="ip__tile-text">Ассенизационная техника для септиков, колодцев и сетей.</span></a></li>
+    </ul>
+  {% endcall %}
+
+  {% call sec("Как мы работаем с заказчиком", "company-process", "От заявки до допуска на перевозку: пять шагов.", true) %}
+    <ol class="ip__tiles ip__tiles--3">
+      {% for step in home.process %}
+        <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">{{ loop.index }}</span><h3 class="ip__tile-title">{{ step.title }}</h3><p class="ip__tile-text">{{ step.text }}</p></li>
+      {% endfor %}
+    </ol>
+    <div class="prose"><p>Подробнее о порядке заказа читайте в статье <a href="/blog-put-zakaza.html">«Путь заказа»</a>, о лизинге — на странице <a href="/leasing.html">«Лизинг»</a>.</p></div>
+  {% endcall %}
+
+  {% call sec("Что получает заказчик", "company-guarantee", "Документы, гарантия и сервис.") %}
+    <ul class="ip__facts">
+      <li class="ip__fact"><span class="ip__fact-value">12 мес.</span><span class="ip__fact-label">гарантия или 30 000 км пробега</span></li>
+      <li class="ip__fact"><span class="ip__fact-value">{{ home.catalogTotals.inStock }}</span><span class="ip__fact-label">{{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} техники на складе</span></li>
+    </ul>
+    <div class="prose">
+      <p>Вместе с техникой заказчик получает паспорт, ОТТС, сертификаты соответствия, гарантийный талон, сервисную книжку и руководство по эксплуатации. Мы помогаем с регистрацией и допуском на перевозку опасных грузов. Список документов и пояснения — на странице <a href="/docs.html">«Сертификаты и документы»</a>, условия гарантии — на странице <a href="/services.html">«Сервис и запчасти»</a>.</p>
+    </div>
+  {% endcall %}
+
+  {% call sec("Для каких отраслей", "company-industries", "Кто покупает нашу технику.", true) %}
+    <ul class="ip__tiles ip__tiles--3">
+      <li class="ip__tile"><h3 class="ip__tile-title">Нефть и газ</h3><p class="ip__tile-text">Сбор и перевозка нефти, доставка топлива на объекты, ликвидация разливов.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Топливные компании</h3><p class="ip__tile-text">Развоз бензина и дизельного топлива с нефтебаз на АЗС.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Водоснабжение</h3><p class="ip__tile-text">Подвоз технической и питьевой воды на объекты и в посёлки.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Коммунальные службы</h3><p class="ip__tile-text">Откачка септиков, колодцев и канализационных сетей, обслуживание сетей.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Сельское хозяйство и стройка</h3><p class="ip__tile-text">Заправка техники на объектах, подвоз воды, перевозка жидких грузов.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Дилеры и подрядчики</h3><p class="ip__tile-text">Перепродажа и поставки по тендерам: <a href="/dealers.html">для дилеров</a>, <a href="/tenders.html">тендеры</a>.</p></li>
+    </ul>
+  {% endcall %}
 
   {% call sec("Где найти нас", "company-offices", "Офисы и производство.") %}
     <dl class="ip__dl ip__dl--2 ip__dl--big">
