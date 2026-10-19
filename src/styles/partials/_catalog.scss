@@ -1001,6 +1001,7 @@
     }
 
     .cfilter__status {
+      column-gap: 0.25rem;
       padding-block-start: 0.5rem;
     }
 
@@ -1025,7 +1026,9 @@
     }
 
     .cfilter__quick .cfilter__block:not([hidden]),
-    .cfilter__quick .cfilter__options {
+    .cfilter__quick .cfilter__options,
+    .cfilter__tools .cfilter__block,
+    .cfilter__tools .cfilter__options {
       display: contents;
     }
 
@@ -1043,7 +1046,8 @@
       margin-inline-start: 0;
     }
 
-    .cfilter__quick .cfilter__label {
+    .cfilter__quick .cfilter__label,
+    .cfilter__tools .cfilter__label {
       position: absolute;
       inline-size: 1px;
       block-size: 1px;
