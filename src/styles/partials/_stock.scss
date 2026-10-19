@@ -229,14 +229,15 @@
   }
 
   .stock__spec-label {
-    font-size: var(--fs-m);
+    font-size: var(--fs-s);
+    font-weight: 400;
     color: var(--paper-70);
   }
 
   .stock__spec-value {
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 3.1svh, 2.4rem);
-    font-weight: 400;
+    font-size: clamp(1.25rem, 2.4svh, 1.8rem);
+    font-weight: 300;
     font-variant-numeric: tabular-nums;
     line-height: 1;
     text-transform: uppercase;
@@ -390,7 +391,7 @@
     }
 
     .stock__spec-value {
-      font-size: clamp(1.35rem, 2.6svh, 2rem);
+      font-size: clamp(1.1rem, 2.1svh, 1.5rem);
     }
   }
 

@@ -46,9 +46,9 @@
     pointer-events: auto;
   }
 
-  // После прокрутки стекло подстраивается под фон (data-tone ставит scripts/modules/header.ts):
+  // Стекло подстраивается под фон (data-tone ставит scripts/modules/header.ts), сразу при загрузке, а не после прокрутки:
   // на тёмном фоне светлеет, на светлом темнеет. Текст везде светлый
-  .header.is-solid[data-tone='dark'] {
+  .header:not([data-tone='light']) {
     --hdr-glass: var(--paper-16);
     --hdr-glass-solid: var(--paper-20);
     --hdr-plate: var(--paper-22);
@@ -831,7 +831,7 @@
       margin-inline: -0.75rem;
       font-family: var(--font-display);
       font-size: clamp(1.3rem, 1.05rem + 0.5vw, 1.65rem);
-      font-weight: 400;
+      font-weight: 300;
       line-height: 1.05;
       color: var(--hdr-fg);
       text-transform: uppercase;
@@ -869,7 +869,7 @@
       justify-content: flex-start;
       padding-block: 0;
       font-size: clamp(1.6rem, 1.2rem + 0.8vw, 2.1rem);
-      font-weight: 400;
+      font-weight: 300;
       line-height: 1;
     }
 

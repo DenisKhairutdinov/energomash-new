@@ -33,7 +33,7 @@ export const initTiles = (root: HTMLElement): void => {
 
 /** Каталог по назначению: кадр плиток следует за курсором. */
 export const initPurposes = (): void => {
-  const root = document.querySelector<HTMLElement>('[data-purposes]')
+  const root = document.querySelector<HTMLElement>('section[data-purposes]')
 
   if (!root) {
     return

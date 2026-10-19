@@ -355,6 +355,17 @@
     border: 0;
   }
 
+  // Дорожка переключателя всегда чёрная, в обоих положениях (ползунок на ней светлый)
+  .leasing .switch__track,
+  .leasing .switch__input:checked + .switch__track {
+    background: var(--c-black);
+  }
+
+  .leasing .switch__input:checked + .switch__track::after,
+  .leasing .switch__track::after {
+    background: var(--c-white);
+  }
+
   .leasing__form {
     display: grid;
     gap: 0.25rem;
@@ -540,11 +551,6 @@
 
   .slider__number:focus {
     outline: none;
-  }
-
-  // Поле стоимости без своей рамки: фокус показывает вся плитка параметра
-  .leasing .slider:focus-within {
-    background: var(--focus-fill);
   }
 
   .slider__unit {
@@ -1175,7 +1181,7 @@
   .news__title {
     max-inline-size: 90%;
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 1rem + 1.4vw, 3rem);
+    font-size: clamp(1.3rem, 0.9rem + 0.9vw, 2.1rem);
     font-weight: 300;
     line-height: 1;
     text-transform: uppercase;
@@ -1190,7 +1196,7 @@
   }
 
   .news--lead .news__title {
-    font-size: clamp(2rem, 1rem + 2.4vw, 4.2rem);
+    font-size: clamp(1.6rem, 1rem + 1.6vw, 3rem);
   }
 
   // ---------- Заявка: белая тема без фото, слева заголовок и контакты, справа компактная светлая панель с формой.
@@ -1466,9 +1472,10 @@
       grid-column: 1 / -1;
     }
 
+    // Левая колонка тянется на высоту панели: заголовок вверху, лид и контакты внизу, как в остальных секциях
     .request {
       grid-template-columns: var(--side-x) minmax(0, 1fr);
-      align-items: center;
+      align-items: stretch;
     }
 
     .request__panel {
