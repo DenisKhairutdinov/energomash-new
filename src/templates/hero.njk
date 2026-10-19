@@ -40,29 +40,36 @@
 
   {# Ярлыки Лизинг, Субсидия, Документы, Сервис убраны с первого экрана (2026-10-19): их 7 выборов в точке решения было слишком много; они остаются в меню «Условия» и в секциях ниже #}
   <div class="hero__bottom container">
+    {# Подбор: компактная панель на всю ширину сетки в две строки (тип и назначение, затем объём, наличие и кнопка). Скрипт (modules/picker.ts)
+       меняет набор назначений и границы объёма при смене типа. Слева плитки категорий с чертежами (без счётчиков), ведут в каталог.
+       Без скрипта это обычная форма: поля type, purpose, volume-from, volume-to, in-stock уходят в каталог через адрес. #}
     <div class="hero__cats">
       <a class="cat glass" href="/catalog.html?type=semitrailer" data-hero-glass>
-        <span class="cat__head">
-          <span class="cat__title">Полуприцепы-<wbr />цистерны</span>
-          <span class="cat__count mono">{{ home.picker.types[0].count }} {{ plural(home.picker.types[0].count, "модель", "модели", "моделей") }}</span>
-        </span>
+        <span class="cat__title">Полуприцепы-<wbr />цистерны</span>
         <span class="drawing drawing--ppc cat__drawing" aria-hidden="true"></span>
         {{ icon("arrow", "cat__arrow") }}
       </a>
       <a class="cat glass" href="/catalog.html?type=chassis" data-hero-glass>
-        <span class="cat__head">
-          <span class="cat__title">Автоцистерны</span>
-          <span class="cat__count mono">{{ home.picker.types[1].count }} {{ plural(home.picker.types[1].count, "модель", "модели", "моделей") }}</span>
-        </span>
+        <span class="cat__title">Автоцистерны</span>
         <span class="drawing drawing--chassis cat__drawing" aria-hidden="true"></span>
         {{ icon("arrow", "cat__arrow") }}
       </a>
     </div>
 
-    <form class="picker glass glass--strong" action="/catalog.html" method="get" data-picker aria-labelledby="picker-title" data-hero-glass>
+    {% set firstType = home.picker.types[0] %}
+    <form
+      class="picker glass"
+      action="/catalog.html"
+      method="get"
+      data-picker
+      data-purposes="{{ home.picker.purposes | dump }}"
+      aria-labelledby="picker-title"
+      data-hero-glass
+    >
       <h2 class="picker__title" id="picker-title">Подбор по параметрам</h2>
+
       <fieldset class="picker__field picker__field--type">
-        <legend class="picker__legend mono">Тип техники</legend>
+        <legend class="visually-hidden">Тип техники</legend>
         <div class="segmented">
           {% for type in home.picker.types %}
             <label class="segmented__item">
@@ -80,27 +87,30 @@
           {% endfor %}
         </div>
       </fieldset>
-      <div class="picker__field picker__field--purpose">
-        <span class="picker__legend mono" id="picker-purpose-label">Назначение</span>
-        <select class="picker__select" name="purpose" data-picker-purpose>
-          <option value="">Любое</option>
-          {% for type in home.picker.types %}
-            <optgroup label="{{ type.title }}" data-type="{{ type.value }}">
-              {% for purpose in home.picker.purposes[type.value] %}
-                <option value="{{ purpose.value }}">{{ purpose.title }}</option>
-              {% endfor %}
-            </optgroup>
+
+      <fieldset class="picker__field picker__field--purpose">
+        <legend class="visually-hidden">Назначение</legend>
+        <div class="picker__chips" data-picker-chips>
+          {% for purpose in home.picker.purposes[firstType.value] %}
+            <label class="picker__chip">
+              <input class="picker__chip-input" type="radio" name="purpose" value="{{ purpose.value }}" />
+              <span class="picker__chip-label">{{ purpose.title }}</span>
+            </label>
           {% endfor %}
-        </select>
-      </div>
-      <fieldset class="picker__field picker__field--volume">
-        <legend class="picker__legend mono">Объём, м³</legend>
-        <div class="picker__range">
-          <input class="picker__input" type="text" inputmode="numeric" name="volume-from" placeholder="{{ home.picker.types[0].volume[0] }}" aria-label="Объём от" data-volume-from />
-          <span aria-hidden="true">–</span>
-          <input class="picker__input" type="text" inputmode="numeric" name="volume-to" placeholder="{{ home.picker.types[0].volume[1] }}" aria-label="Объём до" data-volume-to />
         </div>
       </fieldset>
+
+      <div class="picker__field picker__field--volume" role="group" aria-labelledby="picker-volume-label">
+        <span class="picker__legend mono" id="picker-volume-label">Объём, м³</span>
+        <div class="picker__slider" data-picker-slider>
+          <span class="picker__track" aria-hidden="true"></span>
+          <span class="picker__fill" aria-hidden="true"></span>
+          <input class="picker__thumb" type="range" name="volume-from" min="{{ firstType.volume[0] }}" max="{{ firstType.volume[1] }}" step="1" value="{{ firstType.volume[0] }}" aria-label="Объём от, кубометров" data-volume-from />
+          <input class="picker__thumb" type="range" name="volume-to" min="{{ firstType.volume[0] }}" max="{{ firstType.volume[1] }}" step="1" value="{{ firstType.volume[1] }}" aria-label="Объём до, кубометров" data-volume-to />
+        </div>
+        <output class="picker__volume" data-picker-volume>{{ firstType.volume[0] }}–{{ firstType.volume[1] }}&nbsp;м³</output>
+      </div>
+
       <label class="check picker__stock">
         <input class="check__input" type="checkbox" name="in-stock" value="1" />
         <span class="check__box" aria-hidden="true">{{ icon("check") }}</span>
