@@ -1,36 +1,36 @@
-{# География поставок. Отображение карты как на старом сайте: серые регионы, регионы с поставками наливаются акцентом по очереди (с запада на восток), #}
+{# География поставок (редизайн с нуля, 2026-10-17): слева колонка (заголовок, подпись, легенда, итоги цифрами), справа карта; секция невысокая, высота по содержимому, без стекла и акцентных полос. Отображение карты как на старом сайте: серые регионы, регионы с поставками наливаются акцентом по очереди (с запада на восток), #}
 {# при наведении на любой регион всплывает стеклянная карточка у курсора. Разметку карты (регионы и метка завода) отдаёт geography-map.njk, #}
 {# регионы и цифры в ней — данные-заглушки. Скрипт: scripts/modules/geography.ts #}
 <section class="geography" aria-labelledby="geography-title" data-geography data-chapter="География">
-  <div class="geography__layout container">
-    <div class="geography__text">
-      <h2 class="section-title" id="geography-title" data-split>География<br />поставок</h2>
-      <p class="section-head__text">
+  <div class="geography__head">
+    <h2 class="section-title geography__title" id="geography-title" data-split>География<br />поставок</h2>
+    <div class="geography__info">
+      <p class="geography__lead">
         Техника «Энергомаш» работает от Урала до Дальнего Востока. Наведите на регион, чтобы увидеть детали.
       </p>
       <ul class="geography__legend">
         <li class="geography__legend-item geography__legend-item--delivered">Были поставки</li>
         <li class="geography__legend-item">Пока без поставок</li>
       </ul>
-      <dl class="geography__totals">
-        <div class="geography__total">
-          <dt>Регионов</dt>
-          <dd data-geography-regions>—</dd>
-        </div>
-        <div class="geography__total">
-          <dt>Единиц техники</dt>
-          <dd data-geography-units>—</dd>
-        </div>
-      </dl>
     </div>
-    <div class="geography__stage" data-geography-stage>
-      {% include "geography-map.njk" %}
-      <div class="geography__tooltip" role="status" hidden data-geography-tooltip>
-        <span class="geography__tooltip-label mono" data-geography-tooltip-label></span>
-        <strong class="geography__tooltip-name" data-geography-tooltip-name></strong>
-        <span class="geography__tooltip-units" data-geography-tooltip-units></span>
-        <span class="geography__tooltip-cities" data-geography-tooltip-cities></span>
-      </div>
+  <dl class="geography__totals">
+    <div class="geography__total">
+      <dd data-geography-regions>—</dd>
+      <dt>Регионов</dt>
+    </div>
+    <div class="geography__total">
+      <dd data-geography-units>—</dd>
+      <dt>Единиц техники</dt>
+    </div>
+  </dl>
+  </div>
+  <div class="geography__stage" data-geography-stage>
+    {% include "geography-map.njk" %}
+    <div class="geography__tooltip" role="status" hidden data-geography-tooltip>
+      <span class="geography__tooltip-label mono" data-geography-tooltip-label></span>
+      <strong class="geography__tooltip-name" data-geography-tooltip-name></strong>
+      <span class="geography__tooltip-units" data-geography-tooltip-units></span>
+      <span class="geography__tooltip-cities" data-geography-tooltip-cities></span>
     </div>
   </div>
 </section>

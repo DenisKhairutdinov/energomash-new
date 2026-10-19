@@ -92,6 +92,11 @@
         "url": "/terms.html",
         "children": [
           {
+            "id": "delivery",
+            "title": "Доставка и оплата",
+            "url": "/delivery.html"
+          },
+          {
             "id": "leasing",
             "title": "Лизинг",
             "url": "/leasing.html"
@@ -100,6 +105,11 @@
             "id": "subsidies",
             "title": "Субсидии",
             "url": "/subsidies.html"
+          },
+          {
+            "id": "options",
+            "title": "Доработки и опции",
+            "url": "/options.html"
           },
           {
             "id": "dealers",
@@ -173,42 +183,42 @@
           {
             "id": "news",
             "title": "Новости и акции",
-            "url": "/blog-subsidiya-do-30-noyabrya.html"
+            "url": "/blog.html?rubric=news"
           },
           {
             "id": "engineering",
             "title": "Инженерные решения",
-            "url": "/blog-cisterna-pod-tehzadanie.html"
+            "url": "/blog.html?rubric=engineering"
           },
           {
             "id": "selection-guide",
             "title": "Гид по подбору",
-            "url": "/blog-lizing-kredit-ili-pokupka.html"
+            "url": "/blog.html?rubric=selection-guide"
           },
           {
             "id": "service-guide",
             "title": "Гид по сервису",
-            "url": "/blog-garantiya-chto-pokryvaet.html"
+            "url": "/blog.html?rubric=service-guide"
           },
           {
             "id": "transport-safety",
             "title": "Транспортная безопасность",
-            "url": "/blog-dopog-i-reglamenty.html"
+            "url": "/blog.html?rubric=transport-safety"
           },
           {
             "id": "factory-rhythm",
             "title": "Заводской ритм",
-            "url": "/blog-put-zakaza.html"
+            "url": "/blog.html?rubric=factory-rhythm"
           },
           {
             "id": "events",
             "title": "Мероприятия",
-            "url": "/blog-kak-stat-dilerom.html"
+            "url": "/blog.html?rubric=events"
           },
           {
             "id": "experience",
             "title": "Опыт эксплуатации",
-            "url": "/blog-grsi-i-arshin.html"
+            "url": "/blog.html?rubric=experience"
           }
         ]
       },

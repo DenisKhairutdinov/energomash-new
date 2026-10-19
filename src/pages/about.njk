@@ -1,2 +1,69 @@
-{% extends "layout.njk" %} {% set pageTitle = "О заводе" %} {% set currentPage = "about" %} {% block
-content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/about.html" %}
+{% set pageTitle = "О заводе Энергомаш: производитель цистерн" %}
+{% set pageDescription = "Завод «Энергомаш» производит полуприцепы-цистерны и автоцистерны для нефтепродуктов, воды и пищевых жидкостей. Поставки по России и за рубеж." %}
+{% set currentPage = "about" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec, cta, crumbs, band, facts %}
+<article class="ip">
+  {{ crumbs([["О заводе", "/about.html"]]) }}
+  {{ head("О заводе", "«Энергомаш» производит полуприцепы-цистерны и автоцистерны для нефтепродуктов, воды и пищевых жидкостей. Техника работает по всей России и поставляется за рубеж.", "Производитель специальной техники", false, "20211020_161246.webp", "split") }}
+
+  {% call sec("Что мы делаем", "about-what", "Автоцистерны и полуприцепы-цистерны под задачи отрасли: от доставки топлива на АЗС до работы на месторождениях.") %}
+    <div class="prose">
+      <p>Предприятие «Энергомаш» разрабатывает и выпускает специальную технику для перевозки жидких грузов, в том числе опасных. В каталоге {{ home.catalogTotals.total }} моделей полуприцепов-цистерн и автоцистерн, из них {{ home.catalogTotals.inStock }} единиц техники в наличии на складе.</p>
+      <p>Выпускаемые цистерны доставляют ГСМ на городские сети автозаправок, перевозят нефть и техническую воду в местах нефтедобычи и переработки, доставляют питьевую воду и пищевые жидкости, обслуживают коммунальные сети и помогают предотвращать разливы нефтепродуктов.</p>
+    </div>
+    <ul class="ip__tiles ip__tiles--3">
+      <li class="ip__tile"><h3 class="ip__tile-title">Топливо</h3><p class="ip__tile-text">Полуприцепы-цистерны и автотопливозаправщики для бензина, дизельного топлива и керосина.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Нефть и вода на промыслах</h3><p class="ip__tile-text">Нефтевозы, вакуумная техника для сбора нефти, цистерны для технической воды.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Питьевая вода и пищевые жидкости</h3><p class="ip__tile-text">Автоцистерны для питьевой воды и пищевых жидкостей с подготовленной внутренней поверхностью.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Коммунальные службы</h3><p class="ip__tile-text">Вакуумные машины и цистерны для городских и сельских хозяйств.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Термоизолированная техника</h3><p class="ip__tile-text">Цистерны с теплоизоляцией для нефти и воды при работе в холодном климате.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Навесное оборудование</h3><p class="ip__tile-text">Комплекты оборудования для монтажа на шасси заказчика.</p></li>
+    </ul>
+  {% endcall %}
+
+  {{ facts("IMG_2134.webp", home.facts) }}
+
+  {% call sec("Где работает техника", "about-geo", "Поставки по всей стране и в страны Азии, Центральной Африки и на Кубу.") %}
+    <div class="prose">
+      <p>Техника «Энергомаш» работает по всей России, от Урала до Дальнего Востока. Завод также поставляет цистерны за рубеж: в Азию, Центральную Африку и на Кубу. Регионы поставок и подробности по недавним отгрузкам смотрите на отдельных страницах.</p>
+    </div>
+    <ul class="ip__tiles ip__tiles--2">
+      <li><a class="ip__tile" href="/company.html"><span class="ip__tile-meta">Карта</span><span class="ip__tile-title">География поставок</span><span class="ip__tile-text">Регионы, куда поставлена техника, и число единиц.</span></a></li>
+      <li><a class="ip__tile" href="/shipments.html"><span class="ip__tile-meta">Фото</span><span class="ip__tile-title">Наши отгрузки</span><span class="ip__tile-text">Свежие поставки заказчикам: модели, города и даты.</span></a></li>
+    </ul>
+  {% endcall %}
+
+  {{ band("93704 IMG_4340.webp") }}
+
+  {% call sec("Площадки и офисы", "about-sites", "Производство в Челябинской области, офисы в Челябинске и Набережных Челнах.", true) %}
+    <dl class="ip__dl ip__dl--2 ip__dl--big">
+      <div><dt>Производство</dt><dd>Челябинская область, Мисяш, 5 км автодороги Чебаркуль–Архангельское</dd></div>
+      <div><dt>Офис в Челябинске</dt><dd>ул. Кирова, 159, офис 1709</dd></div>
+      <div><dt>Офис в Набережных Челнах</dt><dd>проспект Хасана Туфана, 12, офис 1910</dd></div>
+      <div><dt>Телефон</dt><dd><a href="tel:88001012200">8 (800) 101-22-00</a></dd></div>
+    </dl>
+    <div class="prose">
+      <p>Для сотрудников созданы условия для комфортной работы на производственных площадках и в офисах. Завод заинтересован в квалифицированных специалистах и обеспечивает профессиональный рост каждому сотруднику.</p>
+    </div>
+  {% endcall %}
+
+  {% call sec("Разделы", "about-links", "Всё, что нужно знать перед покупкой.") %}
+    <ul class="ip__tiles ip__tiles--3">
+      <li><a class="ip__tile" href="/manufacture.html"><span class="ip__tile-title">Производство</span><span class="ip__tile-text">Как делают цистерны и как проверяют перед отгрузкой.</span></a></li>
+      <li><a class="ip__tile" href="/guide.html"><span class="ip__tile-title">Как выбрать цистерну</span><span class="ip__tile-text">Пошаговый подбор по грузу, объёму, шасси и условиям работы.</span></a></li>
+      <li><a class="ip__tile" href="/services.html"><span class="ip__tile-title">Сервис и запчасти</span><span class="ip__tile-text">Гарантия 12 месяцев или 30 000 км, обслуживание и запчасти.</span></a></li>
+      <li><a class="ip__tile" href="/docs.html"><span class="ip__tile-title">Сертификаты и документы</span><span class="ip__tile-text">ОТТС, ТР ТС, ДОПОГ, ГРСИ и «Аршин».</span></a></li>
+      <li><a class="ip__tile" href="/faq.html"><span class="ip__tile-title">Вопросы и ответы</span><span class="ip__tile-text">Сроки, оплата, доставка, гарантия, документы.</span></a></li>
+      <li><a class="ip__tile" href="/company-details.html"><span class="ip__tile-title">Реквизиты</span><span class="ip__tile-text">Данные для договора и платёжных поручений.</span></a></li>
+      <li><a class="ip__tile" href="/job.html"><span class="ip__tile-title">Вакансии</span><span class="ip__tile-text">Работа на заводе и в офисах.</span></a></li>
+      <li><a class="ip__tile" href="/blog.html"><span class="ip__tile-title">Блог</span><span class="ip__tile-text">Статьи о выборе, обслуживании и перевозке опасных грузов.</span></a></li>
+    </ul>
+  {% endcall %}
+
+  {{ cta() }}
+</article>
+{% endblock %}

@@ -1,34 +1,55 @@
-// География поставок. Отображение карты перенесено со старого сайта: серые регионы с границами цвета фона,
-// регионы с поставками залиты акцентом (при появлении секции наливаются по очереди с запада на восток),
-// при наведении всплывает стеклянная карточка, у завода пульсирующая метка.
 @use 'mixins' as *;
 
+// География поставок (редизайн с нуля, 2026-10-17). Слева тёмная колонка до края четырёх колонок контейнера: заголовок, пояснение, легенда
+// и акцентная плашка с итогами у нижнего края; справа карта. Карта: серые регионы, регионы с поставками залиты акцентом (наливаются по очереди
+// при появлении секции), при наведении всплывает стеклянная карточка, у завода пульсирующая метка.
 @layer sections {
   .geography {
+    @include light-surface;
+
     // Цвет регионов без поставок заметно светлее фона секции, чтобы карта не сливалась с ним
-    --map-base: color-mix(in srgb, var(--ink-soft), var(--paper) 18%);
+    --map-base: var(--c-gray);
 
-    padding-block: var(--section-y);
-
-    @include theme-dark;
-
-    background: radial-gradient(45% 55% at 78% 40%, rgb(200 96 61 / 14%), transparent), var(--ink);
-  }
-
-  .geography__layout {
+    position: relative;
     display: grid;
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: center;
+    padding-block: calc(var(--sec-pad-y) * 3) var(--sec-pad-y);
+    color: var(--paper);
+    background: var(--ink);
   }
 
-  .geography__text {
+  // Композиция без колонок: карта крупно по центру, текст лежит поверх свободных углов карты (север и юго-запад пусты)
+  .geography__head {
+    position: absolute;
+    inset-block: calc(var(--sec-pad-y) * 2);
+    inset-inline-start: var(--edge);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2.5svh, 1.75rem);
+    max-inline-size: 26rem;
+    pointer-events: none;
+  }
+
+  .geography__head a,
+  .geography__head li {
+    pointer-events: auto;
+  }
+
+  .geography__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .geography__info {
     display: grid;
-    gap: 1.5rem;
-    align-content: start;
+    gap: 1.25rem;
   }
 
-  .geography__text .section-title {
-    font-size: var(--fs-title-s);
+  .geography__lead {
+    max-inline-size: 26rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+    color: var(--paper-85);
   }
 
   // Легенда карты: квадрат цвета региона и подпись
@@ -55,42 +76,44 @@
     background: var(--accent);
   }
 
-  // Итоги: числа акцентным цветом, подпись под числом
+  // Итоги: крупные цифры в той же колонке
   .geography__totals {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem 2rem;
+    gap: 1rem 3rem;
+    margin-block-start: auto;
   }
 
   .geography__total {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    flex-direction: column-reverse;
+    gap: 0.35rem;
   }
 
   .geography__total dt {
-    order: 2;
-    font-family: var(--font-mono);
-    font-size: var(--fs-xs);
-    color: var(--fg-2);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-size: var(--fs-s);
+    color: var(--paper-70);
   }
 
   .geography__total dd {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 1rem + 2.8vw, 4.5rem);
-    font-weight: 200;
+    font-size: clamp(2.5rem, 1rem + 3vw, 4.5rem);
+    font-weight: 230;
     font-variant-numeric: tabular-nums;
     line-height: 0.9;
     color: var(--accent-text);
   }
 
-  // Сцена повторяет пропорции viewBox: SVG, метка завода и карточка считаются от её размера
+  // Сцена повторяет пропорции viewBox: SVG, метка завода и карточка считаются от её размеров
   .geography__stage {
     position: relative;
-    inline-size: 100%;
+
+    // Карта прижата к правому краю контейнера (линия сетки), а не по центру
+    justify-self: end;
+    inline-size: calc(100% - var(--edge));
+    max-inline-size: calc(78svh * 1.6);
     aspect-ratio: 1440 / 900;
+    margin-inline-end: var(--edge);
   }
 
   .geography__svg {
@@ -112,7 +135,7 @@
 
   .geography__region:hover,
   .geography__region.is-active {
-    fill: color-mix(in oklch, var(--map-base), var(--fg) 16%);
+    fill: var(--c-light);
   }
 
   .geography__region.is-delivered {
@@ -122,7 +145,7 @@
 
   .geography__region.is-delivered:hover,
   .geography__region.is-delivered.is-active {
-    fill: color-mix(in oklch, var(--accent) 80%, transparent);
+    fill: var(--accent);
   }
 
   .geography__region:focus-visible {
@@ -181,13 +204,14 @@
     font-family: var(--font-mono);
     font-size: var(--fs-xs);
     color: var(--bg);
-    text-transform: uppercase;
     white-space: nowrap;
     background: var(--fg);
   }
 
   // Карточка региона: стеклянная плашка у курсора, положение задаёт geography.ts через translate
   .geography__tooltip {
+    @include dark-surface;
+
     position: absolute;
     inset-block-start: 0;
     inset-inline-start: 0;
@@ -200,7 +224,7 @@
     padding: 1.25rem 1.5rem;
     color: var(--paper);
     pointer-events: none;
-    background: rgb(17 15 13 / 70%);
+    background: var(--glass-dark-strong);
     backdrop-filter: var(--glass-blur-strong);
   }
 
@@ -209,7 +233,11 @@
   }
 
   .geography__tooltip-label {
+    font-family: var(--font-text);
+    font-size: var(--fs-xs);
     color: var(--accent-text);
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   // Названия длинные («Ханты-Мансийский автономный округ — Югра»), поэтому не заглавными и не крупно
@@ -226,7 +254,7 @@
 
   .geography__tooltip-cities {
     font-size: var(--fs-s);
-    color: rgb(247 246 243 / 70%);
+    color: var(--paper-70);
   }
 
   .geography__tooltip-units:empty,
@@ -243,12 +271,6 @@
 
     .geography.is-revealed .geography__region.is-delivered {
       animation: geography-region-in 0.9s var(--ease-out) var(--delay, 0s) backwards;
-    }
-  }
-
-  @media (width >= 1000px) {
-    .geography__layout {
-      grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.6fr);
     }
   }
 }

@@ -1,4 +1,4 @@
-// Шрифты (Oswald, Manrope, JetBrains Mono) и стили Lenis подключаются в scripts/main.ts
+// Шрифты (Sofia Sans Extra Condensed, Onest, JetBrains Mono; Oswald и Manrope только для classic-hero) и стили Lenis подключаются в scripts/main.ts
 @layer reset {
   *,
   *::before,
@@ -47,10 +47,19 @@
 }
 
 @layer base {
+  // Скроллбар страницы скрыт на всём сайте: прокрутка колесом, клавишами и тачем работает как раньше, а ширина окна не прыгает,
+  // когда Lenis останавливает страницу (залипание секции наличия, scripts/modules/slider.ts). Положение видно по навигатору глав
   html {
     scroll-padding-block-start: var(--header-h);
     text-size-adjust: 100%;
+    scrollbar-width: none;
   }
+
+  /* stylelint-disable selector-no-vendor-prefix */
+  html::-webkit-scrollbar {
+    display: none;
+  }
+  /* stylelint-enable selector-no-vendor-prefix */
 
   body {
     min-block-size: 100svh;
@@ -65,13 +74,24 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    font-weight: 300;
+    font-weight: 260;
     text-wrap: balance;
   }
 
   // Заголовки первого уровня везде одного тонкого веса
   h1 {
-    font-weight: 200;
+    font-weight: 220;
+  }
+
+  input,
+  textarea {
+    caret-color: var(--accent);
+  }
+
+  input[type='checkbox'],
+  input[type='radio'],
+  input[type='range'] {
+    accent-color: var(--accent);
   }
 
   p {
@@ -88,6 +108,12 @@
     background: var(--accent-deep);
   }
 
+  // Подчёркивание ссылок в тексте: тонкое, с отступом
+  a {
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
   // Диалог и панели внутри себя прокручиваются сами, плавный скролл Lenis на них не действует
   [data-lenis-prevent] {
     overscroll-behavior: contain;
@@ -98,6 +124,53 @@
   .container {
     inline-size: min(100% - 2 * var(--gutter), var(--max));
     margin-inline: auto;
+  }
+
+  // Сетка: 12 колонок от 900 px, на узких экранах колонки сливаются (все дети на всю ширину, если не заданы c-*).
+  // Все композиции секций строятся только на этой сетке: начало и ширина блока задаются колонками, не пикселями.
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+  }
+
+  .grid > * {
+    grid-column: 1 / -1;
+    min-inline-size: 0;
+  }
+
+  // Подгонка вложенной сетки под сетку родителя
+  .grid--sub {
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+  }
+
+  // Отладочная подсветка колонок (клавиша G на локальном сервере, scripts/modules/grid-overlay.ts)
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: none;
+    pointer-events: none;
+  }
+
+  .grid-overlay.is-on {
+    display: block;
+  }
+
+  .grid-overlay__cols {
+    position: relative;
+    block-size: 100%;
+  }
+
+  .grid-overlay__cols > span {
+    background: color-mix(in oklch, var(--accent) 14%, transparent);
+  }
+
+  .grid-overlay__cols {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
   }
 
   .visually-hidden {
@@ -124,13 +197,13 @@
     transform: none;
   }
 
-  // Заголовок секции: высокий тонкий Oswald капсом
+  // Заголовок секции: высокий тонкий узкий шрифт капсом
   .section-title {
     font-size: var(--fs-title);
-    font-weight: 200;
-    line-height: 0.98;
+    font-weight: 220;
+    line-height: 0.92;
     text-transform: uppercase;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 
   // Мелкая техническая подпись: данные, метки, номера

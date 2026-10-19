@@ -1,0 +1,11 @@
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-volnorezy-i-ustoychivost-cisterny.html" %}
+{% set slug = "volnorezy-i-ustoychivost-cisterny" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

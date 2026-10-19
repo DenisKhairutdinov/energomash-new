@@ -27,9 +27,12 @@ export default tseslint.config(
     },
   },
   {
-    files: ['*.config.{js,ts}', 'vite.config.ts'],
-    languageOptions: { globals: globals.node },
+    files: ['*.config.{js,ts}', 'vite.config.ts', 'vite-plugins/**/*.ts', 'scripts/**/*.mjs'],
     ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      ...tseslint.configs.disableTypeChecked.languageOptions,
+      globals: globals.node,
+    },
   },
   prettier,
 )

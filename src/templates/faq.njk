@@ -1,21 +1,24 @@
 {# Вопросы и ответы. Одновременно открыт один ответ: общий атрибут name у <details> (нативно, без скриптов). Ровная заливка без фото, вопросы крупно на плашках, ответ раскрывается плавно (CSS ::details-content). #}
+{# Редизайн с нуля, 2026-10-17: слева акцентная колонка с заголовком (закреплена при прокрутке), справа ответы плитками. #}
 <section class="faq" aria-labelledby="faq-title" data-chapter="Вопросы">
-  <div class="faq__layout container">
-    <div class="faq__intro">
-      <h2 class="section-title" id="faq-title" data-split>Вопросы<br />и ответы</h2>
-      <p class="faq__lead">Коротко о сроках, лизинге, гарантии и документах. Остальное расскажет менеджер.</p>
-      <button class="button" type="button" data-modal-open="consult">Получить консультацию</button>
+  <div class="faq__side">
+    <div class="faq__sticky">
+      <h2 class="section-title faq__title" id="faq-title" data-split>Вопросы<br />и ответы</h2>
+      <div class="faq__foot">
+        <p class="faq__lead">Коротко о сроках, лизинге, гарантии и документах. Остальное расскажет менеджер.</p>
+        <button class="button faq__button" type="button" data-modal-open="consult">Получить консультацию</button>
+      </div>
     </div>
-    <div class="faq__list">
-      {% for item in home.faq %}
-        <details class="faq__item" name="faq">
-          <summary class="faq__question">
-            <span class="faq__text">{{ item.question }}</span>
-            <span class="faq__mark" aria-hidden="true"></span>
-          </summary>
-          <div class="faq__body"><p class="faq__answer">{{ item.answer }}</p></div>
-        </details>
-      {% endfor %}
-    </div>
+  </div>
+  <div class="faq__list">
+    {% for item in home.faq %}
+      <details class="faq__item" name="faq">
+        <summary class="faq__question">
+          <span class="faq__text">{{ item.question }}</span>
+          <span class="faq__mark" aria-hidden="true"></span>
+        </summary>
+        <div class="faq__body"><p class="faq__answer">{{ item.answer }}</p></div>
+      </details>
+    {% endfor %}
   </div>
 </section>

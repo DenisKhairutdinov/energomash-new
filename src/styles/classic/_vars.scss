@@ -1,0 +1,55 @@
+// Старые токены главной (до редизайна 2026-10-17): размеры, шрифты и сетка. Действуют только внутри .classic-scope.
+// Цвета не переопределяются: старый hero берёт общую палитру сайта (пять цветов, partials/_tokens.scss). Стекло hero оставлено прежним.
+@mixin legacy-vars {
+  // Стекло старого hero как было (не трогаем)
+  --glass-dark: oklch(17% 0.008 60deg / 44%);
+  --glass-dark-strong: oklch(17% 0.008 60deg / 44%);
+  --glass-clear: oklch(17% 0.008 60deg / 44%);
+
+  // Тона hero (стекло и фото): как было
+  --paper-5: oklch(96.8% 0.004 255deg / 5%);
+  --paper-8: oklch(96.8% 0.004 255deg / 8%);
+  --paper-9: oklch(96.8% 0.004 255deg / 9%);
+  --paper-13: oklch(96.8% 0.004 255deg / 13%);
+  --paper-15: oklch(96.8% 0.004 255deg / 15%);
+  --paper-16: oklch(96.8% 0.004 255deg / 16%);
+  --paper-20: oklch(96.8% 0.004 255deg / 20%);
+  --paper-22: oklch(96.8% 0.004 255deg / 22%);
+  --paper-35: oklch(96.8% 0.004 255deg / 35%);
+  --paper-55: oklch(96.8% 0.004 255deg / 55%);
+  --paper-60: oklch(96.8% 0.004 255deg / 60%);
+  --paper-65: oklch(96.8% 0.004 255deg / 65%);
+  --paper-70: oklch(96.8% 0.004 255deg / 70%);
+  --paper-75: oklch(96.8% 0.004 255deg / 75%);
+  --paper-80: oklch(96.8% 0.004 255deg / 80%);
+  --paper-85: oklch(96.8% 0.004 255deg / 85%);
+  --paper-88: oklch(96.8% 0.004 255deg / 88%);
+  --paper-90: oklch(96.8% 0.004 255deg / 90%);
+  --fg-2: oklch(96.8% 0.004 255deg / 68%);
+  --line: oklch(96.8% 0.004 255deg / 14%);
+  --line-dark: oklch(96.8% 0.004 255deg / 14%);
+  --field: oklch(96.8% 0.004 255deg / 7%);
+  --field-hover: oklch(96.8% 0.004 255deg / 12%);
+  --btn-line: oklch(96.8% 0.004 255deg / 45%);
+  --glass-blur: blur(5px);
+  --glass-blur-strong: blur(5px) saturate(1.5);
+  --font-display: 'Oswald Variable', 'Arial Narrow', sans-serif;
+  --font-text: 'Manrope Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --fs-xs: 0.75rem;
+  --fs-s: 0.875rem;
+  --fs-m: 1rem;
+  --fs-l: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
+  --fs-xl: clamp(1.5rem, 1.15rem + 1.1vw, 2.125rem);
+  --fs-title: clamp(2.5rem, 1rem + 4.4vw, 6rem);
+  --fs-title-s: clamp(2.25rem, 1rem + 3vw, 4.25rem);
+  --fs-hero: clamp(2.75rem, 0.8rem + 6vw, 8.25rem);
+  --fs-number: clamp(3rem, 1.4rem + 5vw, 8rem);
+  --fs-mega: clamp(4rem, 0.5rem + 15vw, 22rem);
+  --gutter: clamp(1rem, 3.5vw, 3.5rem);
+  --gap: clamp(0.75rem, 1.4vw, 1.25rem);
+  --header-h: 3.5rem;
+  --max: 1680px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+}

@@ -1,28 +1,27 @@
-{# Документы и допуски: ровная сетка стеклянных блоков поверх фото. #}
+{# Документы и допуски (редизайн с нуля, 2026-10-17): слева тёмная колонка с заголовком, справа четыре плитки документов 2×2 и акцентная плашка сервиса без фото. #}
 {% from "icons.njk" import icon %}
 <section class="docs" aria-labelledby="docs-title" data-chapter="Документы">
-  <div class="docs__bg">
-    <img src="/src/assets/models/IMG_0550.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.05" />
-  </div>
-  <div class="docs__layout container">
-    <div class="docs__intro glass glass--strong">
-      <h2 class="section-title" id="docs-title" data-split>Документы<br />и допуски</h2>
+  <div class="docs__side">
+    <h2 class="section-title docs__title" id="docs-title" data-split>Документы<br />и допуски</h2>
+    <div class="docs__foot">
       <p class="docs__lead">Техника выходит с завода с полным пакетом документов для регистрации и перевозки.</p>
       <a class="button" href="/docs.html">Сертификаты и документы</a>
     </div>
+  </div>
+  <div class="docs__main">
     <ul class="docs__list">
       {% for doc in home.docs %}
-        <li class="docs__item glass">
+        <li class="docs__item">
           <span class="docs__mark" aria-hidden="true">{{ icon("check") }}</span>
-          <h3 class="docs__title">{{ doc.title }}</h3>
+          <h3 class="docs__name">{{ doc.title }}</h3>
           <p class="docs__text">{{ doc.text }}</p>
         </li>
       {% endfor %}
     </ul>
-    <aside class="service glass glass--strong">
+    <aside class="service">
       <h3 class="service__title">{{ home.service.title }}</h3>
       <p class="service__text">{{ home.service.text }}</p>
-      <a class="button button--glass" href="{{ home.service.url }}">Сервис и запчасти</a>
+      <a class="button service__button" href="{{ home.service.url }}">Сервис и запчасти</a>
     </aside>
   </div>
 </section>

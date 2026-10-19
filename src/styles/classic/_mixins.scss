@@ -1,0 +1,74 @@
+// Темы. Цвета задаются переменными, поэтому компоненты внутри (кнопки, поля, стекло) подстраиваются сами.
+// theme-dark: всегда тёмная (секции с фото, подвал, шапка, окно). theme-site: следует теме сайта (тёмная или светлая).
+@mixin theme-dark-vars {
+  --bg: var(--ink);
+  --bg-2: var(--ink-soft);
+  --fg: var(--paper);
+  --fg-2: color-mix(in oklch, var(--c-white) 68%, transparent);
+  --line: var(--line-dark);
+  --btn-ink: var(--paper);
+  --btn-ink-fg: var(--ink);
+  --field: color-mix(in oklch, var(--c-white) 7%, transparent);
+  --field-hover: color-mix(in oklch, var(--c-white) 12%, transparent);
+  --accent-text: var(--accent);
+  --btn-line: color-mix(in oklch, var(--c-white) 45%, transparent);
+  --btn-hover-bg: var(--paper);
+  --btn-hover-fg: var(--ink);
+}
+
+@mixin theme-dark {
+  @include theme-dark-vars;
+
+  color: var(--fg);
+  background: var(--bg);
+}
+
+@mixin theme-site-vars {
+  --bg: var(--site-bg);
+  --bg-2: var(--site-bg-2);
+  --fg: var(--site-fg);
+  --fg-2: var(--site-fg-2);
+  --line: var(--site-line);
+  --btn-ink: var(--site-fg);
+  --btn-ink-fg: var(--site-bg);
+  --field: var(--site-field);
+  --field-hover: var(--site-field-hover);
+  --accent-text: var(--site-accent-text);
+  --btn-line: var(--site-btn-line);
+  --btn-hover-bg: var(--site-fg);
+  --btn-hover-fg: var(--site-bg);
+}
+
+@mixin theme-site {
+  @include theme-site-vars;
+
+  color: var(--fg);
+  background: var(--bg);
+}
+
+// Стекло: полупрозрачная подложка с размытием. Размытие не анимируем (только прозрачность и transform).
+// Родитель стеклянного элемента не должен иметь opacity, filter, mask или clip-path: иначе размытие не видит фон.
+// «Морозное» стекло: ровная полупрозрачная подложка и размытие с насыщением. Без рамок и градиентов: объём даёт мягкая тень.
+@mixin glass($strength: 'dark') {
+  background: var(--glass-dark);
+  backdrop-filter: var(--glass-blur) saturate(1.5);
+
+  @if $strength == 'strong' {
+    background: var(--glass-dark-strong);
+    backdrop-filter: var(--glass-blur-strong);
+  }
+
+  @if $strength == 'clear' {
+    background: var(--glass-clear);
+    backdrop-filter: var(--glass-blur-strong);
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-dark-strong);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background: var(--ink);
+    backdrop-filter: none;
+  }
+}

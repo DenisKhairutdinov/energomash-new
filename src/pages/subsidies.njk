@@ -1,2 +1,58 @@
-{% extends "layout.njk" %} {% set pageTitle = "Субсидия Минпромторга" %} {% set currentPage =
-"terms/subsidies" %} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/subsidies.html" %}
+{% set pageTitle = "Субсидия на цистерны при лизинге" %}
+{% set pageDescription = "Субсидия на технику «Энергомаш»: 10% стоимости, до 500 000 ₽ на единицу, при покупке в лизинг по постановлению №649. Условия, пример расчёта, порядок оформления." %}
+{% set currentPage = "terms/subsidies" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec, cta, crumbs, faq %}
+<article class="ip">
+  {{ crumbs([["Условия", "/terms.html"], ["Субсидии", "/subsidies.html"]]) }}
+  {{ head("Субсидии", "Государство компенсирует 10% стоимости техники, но не больше 500 000 ₽ на единицу. Субсидия действует только при покупке в лизинг.", '<a href="/terms.html">Условия</a>', false, "IMG_0550.webp", "dark") }}
+
+  {% call sec("Условия программы", "sub-terms", "Основные параметры субсидии на технику.") %}
+    <ul class="ip__facts">
+      <li class="ip__fact"><span class="ip__fact-value">{{ home.leasing.subsidyShare }}%</span><span class="ip__fact-label">от стоимости техники</span></li>
+      <li class="ip__fact"><span class="ip__fact-value">500 000 ₽</span><span class="ip__fact-label">максимум на одну единицу</span></li>
+      <li class="ip__fact"><span class="ip__fact-value">лизинг</span><span class="ip__fact-label">только при покупке через лизинговую компанию</span></li>
+      <li class="ip__fact"><span class="ip__fact-value">30 ноября 2026</span><span class="ip__fact-label">срок текущего приёма заявок</span></li>
+    </ul>
+    <div class="prose">
+      <p>Правила программы описаны в <a href="{{ home.leasing.subsidyDoc }}" target="_blank" rel="noopener noreferrer">постановлении Правительства №649</a>. Условия могут меняться, поэтому актуальные требования сверяйте с текстом документа и с менеджером лизинговой компании.</p>
+    </div>
+  {% endcall %}
+
+  {% call sec("Пример расчёта", "sub-example", "Как субсидия уменьшает платёж.", true) %}
+    <div class="prose">
+      <p>Субсидия считается от стоимости техники: 10%, но не более 500 000 ₽ за единицу. Для дорогой цистерны действует потолок, для более дешёвой процент.</p>
+    </div>
+    <div class="ip__tiles ip__tiles--2">
+      <div class="ip__tile"><span class="ip__tile-meta">Цистерна за 4 000 000 ₽</span><span class="ip__fact-value">400 000 ₽</span><p class="ip__tile-text">10% от стоимости, ниже потолка в 500 000 ₽.</p></div>
+      <div class="ip__tile"><span class="ip__tile-meta">Цистерна за 6 000 000 ₽</span><span class="ip__fact-value">500 000 ₽</span><p class="ip__tile-text">10% составили бы 600 000 ₽, но действует ограничение на единицу.</p></div>
+    </div>
+    <div class="prose"><p>Точный платёж с учётом субсидии покажет <a href="/leasing.html">калькулятор лизинга</a>: включите переключатель «Учесть субсидию Минпромторга».</p></div>
+  {% endcall %}
+
+  {% call sec("Как получить", "sub-steps", "Порядок действий от выбора техники до выплаты.") %}
+    <ol class="ip__tiles ip__tiles--3">
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">1</span><h3 class="ip__tile-title">Модель</h3><p class="ip__tile-text">Выберите технику и комплектацию. От стоимости зависит размер субсидии.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">2</span><h3 class="ip__tile-title">Лизинговая компания</h3><p class="ip__tile-text">Определитесь с партнёром и подайте заявку с документами компании.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">3</span><h3 class="ip__tile-title">Договоры</h3><p class="ip__tile-text">После одобрения подписываются договор купли-продажи и договор лизинга.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">4</span><h3 class="ip__tile-title">Передача</h3><p class="ip__tile-text">Техника передаётся с комплектом документов, которые подтверждают покупку.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">5</span><h3 class="ip__tile-title">Субсидия</h3><p class="ip__tile-text">Порядок выплаты определяют правила программы и лизинговая компания.</p></li>
+    </ol>
+    <div class="prose"><p>Подробный разбор с типичными задержками: <a href="/blog-subsidiya-poshagovo.html">«Как оформить технику по субсидии: порядок действий»</a> и <a href="/blog-subsidiya-do-30-noyabrya.html">что успеть до 30 ноября 2026</a>.</p></div>
+  {% endcall %}
+
+  {% call sec("Вопросы", "sub-faq", "Коротко о частых вопросах.", true) %}
+    {{ faq([
+      ["Можно ли получить субсидию при оплате без лизинга?", "Нет, программа рассчитана на покупку техники в лизинг."],
+      ["На любую модель завода?", "Попадание модели в перечень определяют правила программы. Менеджер проверит выбранную модель до подписания договоров."],
+      ["Что делать, если до 30 ноября не успеть?", "Рассмотрите технику из наличия: она отгружается за несколько дней. Для техники под заказ срок изготовления начинается от четырёх недель."],
+      ["Кто подаёт документы на субсидию?", "Оформление идёт через лизинговую компанию. Завод помогает с документами на технику и коммерческим предложением."]
+    ], "sub-faq") }}
+  {% endcall %}
+
+  {{ cta("Посчитаем<br />платёж с субсидией", "Менеджер подберёт технику и лизинговую компанию и подскажет сроки.", "Получить расчёт") }}
+</article>
+{% endblock %}

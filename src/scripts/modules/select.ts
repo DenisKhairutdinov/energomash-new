@@ -35,7 +35,7 @@ export const enhanceSelect = (select: HTMLSelectElement, labelId: string): Enhan
   wrapper.className = 'select'
   button.type = 'button'
   button.className = 'select__button'
-  button.id = `${select.name}-select-button`
+  button.id = `${labelId}-button`
   button.setAttribute('aria-haspopup', 'listbox')
   button.setAttribute('aria-expanded', 'false')
   button.setAttribute('aria-labelledby', `${labelId} ${button.id}`)
@@ -43,7 +43,7 @@ export const enhanceSelect = (select: HTMLSelectElement, labelId: string): Enhan
   button.append(value, createChevron())
 
   list.className = 'select__list'
-  list.id = `${select.name}-select-list`
+  list.id = `${labelId}-list`
   list.tabIndex = -1
   list.setAttribute('role', 'listbox')
   list.setAttribute('aria-labelledby', labelId)
@@ -69,9 +69,11 @@ export const enhanceSelect = (select: HTMLSelectElement, labelId: string): Enhan
 
     if (current) {
       list.setAttribute('aria-activedescendant', current.id)
-      current.scrollIntoView({ block: 'nearest' })
     }
   }
+
+  /** Список выложен в две колонки сверху вниз: в колонке столько строк, сколько половина пунктов. */
+  const rowCount = (): number => Math.max(1, Math.ceil(items.length / 2))
 
   const close = (restoreFocus: boolean): void => {
     wrapper.classList.remove(OPEN)
@@ -112,10 +114,11 @@ export const enhanceSelect = (select: HTMLSelectElement, labelId: string): Enhan
       const item = document.createElement('li')
 
       item.className = 'select__option'
-      item.id = `${select.name}-option-${String(position)}`
+      item.id = `${labelId}-option-${String(position)}`
       item.dataset['value'] = option.value
       item.textContent = option.textContent
       item.setAttribute('role', 'option')
+      item.style.setProperty('--i', String(position))
       item.setAttribute('aria-selected', String(option.value === select.value))
       item.addEventListener('click', () => {
         choose(position)
@@ -125,6 +128,7 @@ export const enhanceSelect = (select: HTMLSelectElement, labelId: string): Enhan
     })
 
     list.replaceChildren(...items)
+    list.style.setProperty('--rows', String(rowCount()))
     value.textContent = select.selectedOptions[0]?.textContent ?? ''
   }
 
@@ -152,6 +156,14 @@ export const enhanceSelect = (select: HTMLSelectElement, labelId: string): Enhan
       case 'ArrowUp':
         event.preventDefault()
         setActive(active - 1)
+        break
+      case 'ArrowRight':
+        event.preventDefault()
+        setActive(active + rowCount())
+        break
+      case 'ArrowLeft':
+        event.preventDefault()
+        setActive(active - rowCount())
         break
       case 'Home':
         event.preventDefault()

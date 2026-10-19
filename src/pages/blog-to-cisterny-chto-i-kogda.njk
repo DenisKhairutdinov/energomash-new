@@ -1,0 +1,11 @@
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-to-cisterny-chto-i-kogda.html" %}
+{% set slug = "to-cisterny-chto-i-kogda" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

@@ -1,2 +1,11 @@
-{% extends "layout.njk" %} {% set pageTitle = "Гид по сервису" %} {% set currentPage =
-"blog/service-guide" %} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-garantiya-chto-pokryvaet.html" %}
+{% set slug = "garantiya-chto-pokryvaet" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

@@ -1,85 +1,98 @@
 @use 'mixins' as *;
 
+// Подвал: плоский тёмный блок на 12 колонках. Утверждение (1–8) и звонок (10–12), затем четыре блока по три колонки,
+// блоки подвала и правовая строка. Слово завода убрано. Разделяют блоки тонкие линии.
 @layer sections {
   .footer {
+    // Линии подвала: серый палитры, заметно тише основного (по просьбе владельца)
+    --footer-line: color-mix(in oklch, var(--c-gray) 28%, transparent);
+
     position: relative;
     overflow: clip;
 
     @include theme-dark;
-
-    background: var(--ink);
   }
 
-  // Огромное слово и чертёж цистерны над реквизитами
-  .footer__mega {
-    position: relative;
-    padding-block: clamp(3rem, 8vw, 8rem) 0;
-    padding-inline: var(--gutter);
-    overflow: clip;
+  .footer__top {
+    gap: 2rem var(--col-gap);
+    padding-block: clamp(3rem, 6vw, 6rem);
   }
 
-  .footer__word {
+  // Логотип над утверждением, по левой линии сетки; белый (маска по тому же svg, что в шапке, цвет токена --paper)
+  .footer__logo {
+    grid-column: 1 / -1;
+    justify-self: start;
+    line-height: 0;
+  }
+
+  .footer__logo-mark {
     display: block;
-    font-family: var(--font-display);
-    font-size: var(--fs-mega);
-    font-weight: 200;
-    line-height: 1;
-    text-transform: uppercase;
-    letter-spacing: -0.03em;
-    white-space: nowrap;
+    inline-size: clamp(11rem, 6vw + 6rem, 14rem);
+    aspect-ratio: 176 / 27;
+    background: var(--paper);
+    mask: url('/src/assets/images/logo.svg') center / contain no-repeat;
   }
 
-  .footer__drawing {
-    position: absolute;
-    inset-block-end: 0;
-    inset-inline-end: var(--gutter);
-    inline-size: min(52%, 46rem);
-    color: var(--accent-text);
-    opacity: 0.9;
+  // Двухтоновая фраза: яркая основа, приглушённое продолжение (приём Oxide)
+  .footer__statement {
+    max-inline-size: 22ch;
+    font-family: var(--font-display);
+    font-size: var(--fs-title-s);
+    font-weight: 240;
+    line-height: 0.98;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  .footer__statement span {
+    color: var(--fg-2);
+  }
+
+  .footer__call {
+    align-self: end;
   }
 
   .footer__grid {
-    display: grid;
-    gap: 2.5rem var(--gap);
-    padding-block: clamp(3rem, 6vw, 5rem);
+    gap: 2.5rem var(--col-gap);
+    padding-block: clamp(2.5rem, 4vw, 4rem);
+    border-block-start: 1px solid var(--footer-line);
   }
 
-  .footer__brand {
+  .footer__col {
     display: grid;
-    gap: 1rem;
+    gap: 0.75rem;
     align-content: start;
     justify-items: start;
   }
 
-  .footer__logo img {
-    inline-size: 11rem;
+  // «Разделы» и «Покупателю» стоят рядом двумя столбцами
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem var(--col-gap);
   }
 
-  .footer__lead {
-    max-inline-size: 18rem;
+  .footer__title {
+    margin-block-end: 0.5rem;
+    font-family: var(--font-text);
+    font-size: var(--fs-s);
+    font-weight: 500;
     color: var(--fg-2);
   }
 
   .footer__phone {
     font-family: var(--font-display);
     font-size: var(--fs-xl);
-    font-weight: 200;
+    font-weight: 260;
+    font-variant-numeric: tabular-nums;
     color: var(--fg);
     text-decoration: none;
   }
 
-  .footer__mail {
-    color: var(--fg-2);
-  }
-
-  .footer__title {
-    margin-block-end: 1rem;
-    color: var(--accent-text);
-  }
-
   .footer__list {
     display: grid;
-    gap: 0.4rem;
+    gap: 0.35rem;
+    justify-items: start;
   }
 
   .footer__details {
@@ -88,6 +101,7 @@
   }
 
   .footer__details dt {
+    font-size: var(--fs-s);
     color: var(--fg-2);
   }
 
@@ -95,16 +109,22 @@
     color: var(--fg);
   }
 
+  .footer__data {
+    font-family: var(--font-mono);
+    font-size: var(--fs-s);
+    font-variant-numeric: tabular-nums;
+  }
+
   .footer__more {
-    margin-block-start: 1rem;
+    margin-block-start: 0.5rem;
   }
 
   .footer__legal {
-    display: grid;
-    gap: 0.75rem 2rem;
+    gap: 0.75rem var(--col-gap);
     padding-block: 1.5rem 5rem;
     font-size: var(--fs-s);
     color: var(--fg-2);
+    border-block-start: 1px solid var(--footer-line);
   }
 
   .footer__legal ul {
@@ -113,25 +133,52 @@
     gap: 0.25rem 1.5rem;
   }
 
-  @media (width >= 700px) {
-    .footer__grid {
-      grid-template-columns: repeat(2, 1fr);
+  @media (width >= 900px) {
+    .footer__statement {
+      grid-column: 1 / span 8;
+      max-inline-size: none;
+    }
+
+    // Кнопка прижата к правому краю сетки (конец 12-й колонки)
+    .footer__call {
+      display: flex;
+      grid-column: 10 / span 3;
+      justify-content: flex-end;
+    }
+
+    // Блоки: связь 3, разделы и «Покупателю» рядом (4, два внутренних столбца), адреса 3, реквизиты 2
+    .footer__grid > .footer__col:nth-child(1),
+    .footer__grid > .footer__col:nth-child(3) {
+      grid-column: span 3;
+    }
+
+    .footer__nav {
+      grid-column: span 4;
+    }
+
+    .footer__grid > .footer__col:last-child {
+      grid-column: span 2;
+    }
+
+    .footer__legal p {
+      grid-column: 1 / span 6;
+    }
+
+    .footer__legal ul {
+      grid-column: 7 / span 6;
+      justify-content: flex-end;
     }
   }
 
-  @media (width >= 1100px) {
-    // Три правые колонки по ширине содержимого и с одинаковым зазором между ними; бренд занимает остаток
+  @media (width < 900px) {
     .footer__grid {
-      grid-template-columns: minmax(14rem, 1fr) repeat(3, max-content);
-      column-gap: clamp(2rem, 4.5vw, 5rem);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--col-gap);
     }
 
-    .footer__col {
-      max-inline-size: 22rem;
-    }
-
-    .footer__legal {
-      grid-template-columns: 1fr auto;
+    .footer__grid > .footer__col,
+    .footer__nav {
+      grid-column: span 1;
     }
   }
 }

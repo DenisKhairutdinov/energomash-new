@@ -1,2 +1,65 @@
-{% extends "layout.njk" %} {% set pageTitle = "Производство" %} {% set currentPage =
-"about/manufacture" %} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/manufacture.html" %}
+{% set pageTitle = "Производство цистерн Энергомаш" %}
+{% set pageDescription = "Как «Энергомаш» производит цистерны: площадка в Челябинской области, этапы изготовления, контроль качества и испытания перед отгрузкой, документы на технику." %}
+{% set currentPage = "about/manufacture" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec, cta, crumbs, band %}
+<article class="ip">
+  {{ crumbs([["О заводе", "/about.html"], ["Производство", "/manufacture.html"]]) }}
+  <header class="ip__head ip__head--plain mf__head">
+    <div class="ip__head-in">
+      <div class="ip__head-main">
+        <p class="ip__kicker"><a href="/about.html">О заводе</a></p>
+        <h1 class="ip__title" data-split>Производство</h1>
+      </div>
+      <div class="ip__head-side">
+        <p class="ip__lead">Цистерны изготавливают в Челябинской области: от раскроя металла и сварки до испытаний и оформления документов.</p>
+      </div>
+    </div>
+  </header>
+  <div class="mf__strip">
+    <figure class="mf__shot mf__shot--a"><img src="/src/assets/models/thumbs/IMG_4216.webp" width="1200" height="1500" alt="" decoding="async" /></figure>
+    <figure class="mf__shot mf__shot--b"><img src="/src/assets/models/thumbs/IMG_4262.webp" width="1200" height="1500" alt="" loading="lazy" decoding="async" /></figure>
+    <figure class="mf__shot mf__shot--c"><img src="/src/assets/models/thumbs/IMG_4431.webp" width="1200" height="1500" alt="" loading="lazy" decoding="async" /></figure>
+  </div>
+
+  {% call sec("Где производим", "man-where", "Производственная площадка в Челябинской области.") %}
+    <dl class="ip__dl ip__dl--2 ip__dl--big">
+      <div><dt>Производство</dt><dd>Челябинская область, Мисяш, 5 км автодороги Чебаркуль–Архангельское</dd></div>
+      <div><dt>Офисы</dt><dd>Челябинск и Набережные Челны</dd></div>
+    </dl>
+    <div class="prose"><p>Завод выпускает полуприцепы-цистерны и автоцистерны для нефтепродуктов, воды и пищевых жидкостей. В каталоге {{ home.catalogTotals.total }} моделей, и их можно менять под техническое задание заказчика.</p></div>
+  {% endcall %}
+
+  <section class="mf__process" aria-labelledby="man-steps">
+    <div class="mf__process-head">
+      <h2 class="section-title ip__h2" id="man-steps" data-split>Этапы<br />изготовления</h2>
+      <p class="ip__note">Из чего состоит производство цистерны. Подробнее: <a href="/blog-kak-delaetsya-cisterna.html">«Как делается цистерна: этапы изготовления»</a>.</p>
+    </div>
+    <ol class="mf__steps">
+      <li class="mf__step"><span class="mf__num" aria-hidden="true">01</span><h3 class="mf__step-title">Раскрой металла</h3><p class="mf__step-text">Листы раскраивают по чертежам, готовят кромки и отверстия под люки и горловины.</p></li>
+      <li class="mf__step"><span class="mf__num" aria-hidden="true">02</span><h3 class="mf__step-title">Вальцовка и сборка</h3><p class="mf__step-text">Обечайки сгибают на вальцах, собирают секции, приваривают днища и перегородки.</p></li>
+      <li class="mf__step"><span class="mf__num" aria-hidden="true">03</span><h3 class="mf__step-title">Сварка</h3><p class="mf__step-text">Швы кузова выполняются герметичными и прочными, затем зачищаются и проверяются.</p></li>
+      <li class="mf__step"><span class="mf__num" aria-hidden="true">04</span><h3 class="mf__step-title">Испытания</h3><p class="mf__step-text">Кузов испытывают на герметичность давлением или вакуумом.</p></li>
+      <li class="mf__step"><span class="mf__num" aria-hidden="true">05</span><h3 class="mf__step-title">Покрытие</h3><p class="mf__step-text">Поверхность готовят, грунтуют и красят для защиты от коррозии.</p></li>
+      <li class="mf__step"><span class="mf__num" aria-hidden="true">06</span><h3 class="mf__step-title">Монтаж и сборка</h3><p class="mf__step-text">Устанавливают арматуру, оборудование налива и слива, собирают с рамой или шасси.</p></li>
+    </ol>
+  </section>
+
+  {{ band("IMG_2798.webp") }}
+
+  {% call sec("Контроль качества", "man-quality", "Проверки перед отгрузкой.") %}
+    <ul class="ip__tiles ip__tiles--2">
+      <li class="ip__tile"><h3 class="ip__tile-title">Сварные швы</h3><p class="ip__tile-text">Осмотр и измерение швов, поиск трещин, пор и непроваров.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Герметичность</h3><p class="ip__tile-text">Испытание кузова давлением или вакуумом до покраски.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Арматура</h3><p class="ip__tile-text">Проверка люков, донных клапанов, муфт и дыхательных клапанов.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Ходовая часть</h3><p class="ip__tile-text">Проверка осей, подвески, тормозов, пневмосистемы и электрооборудования.</p></li>
+    </ul>
+    <div class="prose"><p>Каждая единица выходит к заказчику с полным пакетом документов: <a href="/docs.html">сертификаты и документы</a>. Подробнее про испытания: <a href="/blog-kontrol-kachestva-i-ispytaniya.html">«Контроль качества и испытания цистерны»</a>. Покупатель может приехать на завод на приёмку: <a href="/blog-priemka-tehniki-na-zavode.html">что проверить</a>.</p></div>
+  {% endcall %}
+
+  {{ cta() }}
+</article>
+{% endblock %}

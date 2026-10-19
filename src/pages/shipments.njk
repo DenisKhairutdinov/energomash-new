@@ -1,2 +1,42 @@
-{% extends "layout.njk" %} {% set pageTitle = "Отгрузки" %} {% set currentPage = "about/shipments"
-%} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/shipments.html" %}
+{% set pageTitle = "Наши отгрузки: цистерны у заказчиков" %}
+{% set pageDescription = "Недавние отгрузки завода «Энергомаш»: модели полуприцепов-цистерн и автоцистерн, города и даты поставок заказчикам по России." %}
+{% set currentPage = "about/shipments" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec, cta, crumbs %}
+<article class="ip">
+  {{ crumbs([["О заводе", "/about.html"], ["Наши отгрузки", "/shipments.html"]]) }}
+  {{ head("Наши отгрузки", "Свежие поставки заказчикам: модели, города и даты отгрузки. Техника «Энергомаш» работает по всей России и за рубежом.", '<a href="/about.html">О заводе</a>', false, "IMG_0550.webp", "plain") }}
+
+  <section class="ip__sec ip__sec--soft" aria-labelledby="ship-title">
+    <div class="ip__side">
+      <h2 class="section-title ip__h2" id="ship-title">Недавно<br />отгружено</h2>
+      <p class="ip__note">Список пополняется по мере отгрузок. Хотите увидеть свою технику здесь? Скажите менеджеру при заказе.</p>
+    </div>
+    <div class="ip__body">
+      <ul class="bl__list bl__list--plain">
+        {% for item in home.shipments %}
+          <li>
+            <div class="bl__card">
+              <img class="bl__image" src="/src/assets/images/{{ item.image }}" width="1024" height="768" alt="{{ item.type }} {{ item.model }}, отгрузка в {{ item.city }}" loading="lazy" decoding="async" />
+              <span class="bl__meta"><time datetime="{{ item.datetime }}">{{ item.date }}</time>, {{ item.city }}</span>
+              <span class="bl__text">
+                <span class="bl__title">{{ item.model }}</span>
+                <span class="bl__excerpt">{{ item.type }}. {% for spec in item.specs %}{{ spec[0] }} {{ spec[1] }}{% if not loop.last %} · {% endif %}{% endfor %}</span>
+              </span>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  {% call sec("Куда поставляем", "ship-geo", "Регионы России и зарубежные страны.") %}
+    <div class="prose"><p>Техника «Энергомаш» работает от Урала до Дальнего Востока и поставляется за рубеж: в страны Азии, Центральной Африки и на Кубу. Карта регионов, куда поставлена техника, на странице <a href="/company.html">«О компании»</a>.</p></div>
+  {% endcall %}
+
+  {{ cta("Закажите<br />свою цистерну", "Подберём технику из наличия или изготовим под ваше задание.", "Оставить заявку") }}
+</article>
+{% endblock %}

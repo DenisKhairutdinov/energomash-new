@@ -1,2 +1,42 @@
-{% extends "layout.njk" %} {% set pageTitle = "Тендеры" %} {% set currentPage = "terms/tenders" %}
-{% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/tenders.html" %}
+{% set pageTitle = "Тендеры и закупки цистерн" %}
+{% set pageDescription = "Участие в тендерах и закупках техники «Энергомаш»: какие документы и характеристики готовим для заявки, как запросить коммерческое предложение и технические данные." %}
+{% set currentPage = "terms/tenders" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec, cta, crumbs, faq %}
+<article class="ip">
+  {{ crumbs([["Условия", "/terms.html"], ["Тендеры", "/tenders.html"]]) }}
+  {{ head("Тендеры", "Поможем подготовить заявку для закупки цистерн: технические характеристики, коммерческое предложение и документы на технику.", '<a href="/terms.html">Условия</a>', false, "IMG_2119.webp", "plain") }}
+
+  {% call sec("Что готовим для закупки", "tenders-what", "Пакет документов под требования заказчика.") %}
+    <ul class="ip__tiles ip__tiles--2">
+      <li class="ip__tile"><h3 class="ip__tile-title">Технические характеристики</h3><p class="ip__tile-text">Объём, секции, оси, подвеска, оборудование, шасси. Параметры согласуем с техническим заданием закупки.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Коммерческое предложение</h3><p class="ip__tile-text">Цена, комплектация, сроки изготовления и поставки, условия гарантии.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Документы на технику</h3><p class="ip__tile-text">ОТТС, сертификаты соответствия, данные ДОПОГ, ГРСИ для моделей, которые к этому предназначены.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Документы компании</h3><p class="ip__tile-text">Реквизиты и карточка предприятия. Скачать карточку можно в разделе <a href="/company-details.html">«Реквизиты»</a>.</p></li>
+    </ul>
+  {% endcall %}
+
+  {% call sec("Как работаем", "tenders-steps", "От запроса до подачи заявки.", true) %}
+    <ol class="ip__tiles ip__tiles--4">
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">1</span><h3 class="ip__tile-title">Запрос</h3><p class="ip__tile-text">Пришлите техническое задание или ссылку на закупку.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">2</span><h3 class="ip__tile-title">Подбор</h3><p class="ip__tile-text">Подберём модель и комплектацию под требования.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">3</span><h3 class="ip__tile-title">Предложение</h3><p class="ip__tile-text">Подготовим коммерческое предложение и документы.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">4</span><h3 class="ip__tile-title">Сопровождение</h3><p class="ip__tile-text">Ответим на вопросы заказчика закупки и подтвердим параметры.</p></li>
+    </ol>
+    <div class="prose"><p>Как составить техническое задание на цистерну: <a href="/blog-cisterna-pod-tehzadanie.html">что можно менять в конфигурации</a>. Про допуск и документы на перевозку нефтепродуктов: <a href="/blog-dopog-i-reglamenty.html">ДОПОГ и регламенты</a>.</p></div>
+  {% endcall %}
+
+  {% call sec("Вопросы", "tenders-faq", "Что чаще всего спрашивают участники закупок.") %}
+    {{ faq([
+      ["Можно ли получить предложение под конкретное техническое задание?", "Да, отправьте задание, и мы подготовим предложение с учётом заказных параметров."],
+      ["Какие документы подтверждают соответствие техники?", "ОТТС, сертификаты соответствия, паспорт и документы ДОПОГ. Для моделей, применяемых в коммерческом учёте, предоставляем данные ГРСИ."],
+      ["Какие сроки поставки указывать?", "Для техники из наличия отгрузка за несколько дней, для заказной от четырёх недель. Точные сроки назовёт менеджер."]
+    ], "tenders-faq") }}
+  {% endcall %}
+
+  {{ cta("Нужно<br />предложение", "Отправьте техническое задание, и мы подготовим коммерческое предложение и документы.", "Запросить предложение") }}
+</article>
+{% endblock %}

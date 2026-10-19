@@ -1,2 +1,9 @@
-{% extends "layout.njk" %} {% set pageTitle = "Блог" %} {% set currentPage = "blog" %} {% block
-content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/blog.html" %}
+{% set pageTitle = "Блог о цистернах и спецтехнике" %}
+{% set pageDescription = "Статьи завода «Энергомаш»: как выбрать полуприцеп-цистерну или автоцистерну, подвеску, шины, тормоза, термоизоляцию, нижний налив, оформить лизинг и субсидию." %}
+{% set currentPage = "blog" %}
+{% set pageClass = "blog-index" %}
+{% block content %}
+  {% include "blog-index.njk" %}
+{% endblock %}

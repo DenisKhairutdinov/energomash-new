@@ -1,2 +1,8 @@
-{% extends "layout.njk" %} {% set pageTitle = "Модель" %} {% set currentPage = "catalog" %} {% block
-content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pageTitle = "Карточка модели цистерны" %}
+{% set pageDescription = "Технические характеристики модели завода «Энергомаш»: объём, секции, оси, подвеска и другие параметры. Запрос стоимости и подбор похожей техники." %}
+{% set currentPage = "catalog" %}
+{% set pageClass = "product" %}
+{% block content %}
+  {% include "product-page.njk" %}
+{% endblock %}

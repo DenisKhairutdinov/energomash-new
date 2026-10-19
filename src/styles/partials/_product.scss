@@ -1,0 +1,436 @@
+@use 'mixins' as *;
+
+// Страница модели (редизайн 2026-10-18, один вариант). Язык главной: фото во весь первый экран, на стеклянной плашке тип, название, наличие и кнопки;
+// ниже светлые характеристики плитками, тёмный блок «Для чего эта техника», светло-серые похожие модели с фото, призыв с фото на стекле (стили .ip__cta).
+@layer sections {
+  .pdp {
+    @include light-surface;
+  }
+
+  // ---------- Первый экран: слева сплошная чёрная колонка в четверть ширины (название, характеристики, кнопки), справа фото на три четверти
+  .pdp__hero {
+    position: relative;
+    display: grid;
+    min-block-size: max(100svh, 40rem);
+    overflow: clip;
+    background: var(--c-light);
+  }
+
+  .pdp__gallery {
+    position: relative;
+    display: grid;
+    min-block-size: 24rem;
+  }
+
+  .pdp__stage {
+    @include vignette(1);
+
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: clip;
+  }
+
+  .pdp__photo {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  // Нет фото: светло-серое поле, чертёж серым и подпись
+  .pdp__drawing {
+    inline-size: min(80%, 60rem);
+    color: var(--c-gray);
+  }
+
+  .pdp__soon {
+    position: absolute;
+    inset-block-end: clamp(1.5rem, 4svh, 3rem);
+    inset-inline-start: 1.5rem;
+    font-size: var(--fs-s);
+    color: var(--c-black);
+  }
+
+  .pdp__side {
+    @include dark-surface;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: calc(var(--header-h) + 1.5rem) clamp(1.25rem, 2vw, 2rem) clamp(1.25rem, 3svh, 2rem);
+    background: var(--c-black);
+  }
+
+  .pdp__back {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    align-self: flex-start;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    color: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+  }
+
+  .pdp__back-icon {
+    inline-size: 1.1rem;
+    block-size: 1.1rem;
+    transform: scaleX(-1);
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .pdp__back:hover .pdp__back-icon {
+    transform: scaleX(-1) translateX(0.3rem);
+  }
+
+  .pdp__intro {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: start;
+  }
+
+  .pdp__type {
+    font-size: var(--fs-m);
+    font-weight: 500;
+  }
+
+  .pdp__title {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1rem + 2.6vw, 4.25rem);
+    font-weight: 220;
+    line-height: 0.94;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .pdp__status {
+    padding: 0.4rem 0.7rem;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-white);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--accent);
+  }
+
+  // Характеристики: строка «название слева, значение справа», без линий
+  .pdp__specs {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+  }
+
+  .pdp__specs[hidden] {
+    display: none;
+  }
+
+  .pdp__specs > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 0.75rem;
+    align-items: baseline;
+    padding-block: 0.35rem;
+  }
+
+  .pdp__specs dt {
+    font-size: var(--fs-s);
+    color: var(--c-gray);
+  }
+
+  .pdp__specs dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 0.9rem + 0.35vw, 1.4rem);
+    font-weight: 260;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    text-align: end;
+    text-transform: uppercase;
+  }
+
+  .pdp__actions {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    padding-block-start: 0.75rem;
+    margin-block-start: auto;
+  }
+
+  .pdp__call {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 1vw, 2.25rem);
+    font-weight: 250;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  // Миниатюры на стекле справа внизу
+  .pdp__thumbs {
+    @include glass;
+
+    position: absolute;
+    inset-block-end: clamp(1.5rem, 4svh, 3rem);
+    inset-inline-end: clamp(1rem, 2vw, 2rem);
+    z-index: 2;
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    margin: 0;
+    list-style: none;
+  }
+
+  .pdp__thumbs[hidden] {
+    display: none;
+  }
+
+  .pdp__thumb {
+    inline-size: 5rem;
+    aspect-ratio: 3 / 2;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    opacity: 0.6;
+    transition: opacity 0.25s;
+  }
+
+  .pdp__thumb:hover,
+  .pdp__thumb.is-active {
+    opacity: 1;
+  }
+
+  .pdp__thumb img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .pdp__h2 {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .pdp__about-text {
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .pdp__about[hidden],
+  .pdp__related[hidden] {
+    display: none;
+  }
+
+  // ---------- Для чего эта техника: тёмная секция (важная информация), особенности белыми плитками
+  .pdp__about {
+    @include dark-surface;
+
+    display: grid;
+    gap: 1.5rem 0;
+    padding-block: calc(var(--sec-pad-y) * 2);
+    background: var(--c-black);
+  }
+
+  .pdp__about-side {
+    padding-inline: var(--edge) var(--col-gap);
+  }
+
+  .pdp__about-body {
+    display: grid;
+    gap: 1.5rem;
+    padding-inline: var(--edge);
+  }
+
+  .pdp__about-text {
+    max-inline-size: 44rem;
+  }
+
+  .pdp__features {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .pdp__features li {
+    padding: 1rem 1.25rem;
+    font-size: var(--fs-m);
+    color: var(--c-black);
+    background: var(--c-white);
+  }
+
+  // ---------- Модели нет в каталоге
+  .pdp__missing {
+    padding: calc(var(--header-h) + 4rem) var(--edge) 6rem;
+    font-size: var(--fs-m);
+  }
+
+  .pdp__missing a {
+    color: var(--accent);
+  }
+
+  // ---------- Похожие модели: светлая секция, карточки с фото сверху (фото цветное, без затемнения)
+  .pdp__related {
+    display: grid;
+    gap: 1.5rem;
+    padding-block: calc(var(--sec-pad-y) * 2);
+    background: var(--ink);
+  }
+
+  .pdp__related-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: end;
+    justify-content: space-between;
+    padding-inline: var(--edge);
+  }
+
+  .pdp__cards {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0 var(--edge);
+    margin: 0;
+    list-style: none;
+  }
+
+  .pdp__card-link {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    block-size: 100%;
+    color: var(--c-black);
+    text-decoration: none;
+    background: var(--c-light);
+    transition: background-color 0.3s var(--ease-out);
+  }
+
+  .pdp__card-link:hover,
+  .pdp__card-link:focus-visible {
+    background: var(--c-white);
+  }
+
+  .pdp__card-photo {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 2;
+    overflow: clip;
+    color: var(--c-gray);
+    background: var(--c-light);
+  }
+
+  .pdp__card-image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 1s var(--ease-out);
+  }
+
+  .pdp__card-link:hover .pdp__card-image {
+    transform: scale(1.04);
+  }
+
+  .pdp__card-body {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: clamp(0.9rem, 1.4vw, 1.25rem);
+  }
+
+  .pdp__card-head {
+    display: flex;
+    gap: 0.75rem;
+    align-items: start;
+    justify-content: space-between;
+  }
+
+  .pdp__card-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 1rem + 0.8vw, 2rem);
+    font-weight: 250;
+    line-height: 1;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .pdp__card-badge {
+    flex: none;
+    padding: 0.25rem 0.5rem;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-white);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--accent);
+  }
+
+  .pdp__card-type {
+    font-size: var(--fs-s);
+  }
+
+  .pdp__card-specs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 1rem;
+    padding-block-start: 0.4rem;
+  }
+
+  .pdp__card-spec {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .pdp__card-spec-label {
+    font-size: var(--fs-xs);
+    color: var(--c-gray);
+  }
+
+  .pdp__card-spec-value {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 260;
+    text-transform: uppercase;
+  }
+
+  @media (width >= 900px) {
+    .pdp__hero {
+      grid-template-columns: minmax(22rem, 25%) minmax(0, 1fr);
+    }
+
+    // Колонка слева, фото справа (в разметке галерея идёт первой, для узких экранов: фото сверху)
+    .pdp__side {
+      grid-row: 1;
+      grid-column: 1;
+    }
+
+    .pdp__gallery {
+      grid-row: 1;
+      grid-column: 2;
+    }
+
+    .pdp__cards {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .pdp__about {
+      grid-template-columns: var(--side-x) minmax(0, 1fr);
+    }
+
+    .pdp__about-body {
+      padding-inline: var(--col-gap) var(--edge);
+    }
+
+    .pdp__features {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pdp__back-icon {
+      transition: none;
+    }
+  }
+}

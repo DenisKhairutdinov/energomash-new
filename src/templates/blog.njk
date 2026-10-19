@@ -1,46 +1,51 @@
-{# Блог: свежая статья на весь экран с чёрно-белым фото (цвет по наведению) и стеклянной подписью, ниже три крупные карточки. #}
+{# Блог (редизайн с нуля, 2026-10-17): как «Каталог по назначению», сетка в стык на весь экран. Первая строка: тёмный блок с заголовком (до края четырёх колонок контейнера) и свежая статья крупно; вторая: четыре статьи. Фото чёрно-белые, цвет при наведении. #}
 {% from "icons.njk" import icon %}
-<section class="blog" aria-labelledby="blog-title" data-chapter="Блог">
-  <div class="blog__layout container">
-    <div class="section-head">
-      <h2 class="section-title" id="blog-title" data-split>Блог</h2>
-      <p class="section-head__text">Статьи завода о цистернах, сервисе и эксплуатации техники.</p>
-      <a class="button" href="/blog.html">Все статьи</a>
+{# Композиция карточки: сверху дата крупно акцентом и стрелка, снизу рубрика маленькой подписью и заголовок #}
+{% macro date(post) %}
+  {% set parts = post.dateShort.split(' ') %}
+  <time class="news__date" datetime="{{ post.datetime }}"><span class="news__day">{{ parts[0] }}</span><span class="news__month">{{ parts[1] }}</span></time>
+{% endmacro %}
+<section data-v="2" class="blog" aria-labelledby="blog-title" data-chapter="Блог">
+  <div class="blog__grid">
+    <div class="blog__intro">
+      <h2 class="section-title blog__title" id="blog-title" data-split>Блог</h2>
+      <div class="blog__foot">
+        <p class="blog__lead">Статьи завода о цистернах, сервисе и эксплуатации техники.</p>
+        <a class="button blog__button" href="/blog.html">Все статьи</a>
+      </div>
     </div>
-  </div>
-  {% for post in home.posts %}
-    {% if loop.first %}
-      <a class="news news--lead" href="{{ post.url }}">
-        <span class="news__frame">
-          <img class="news__image" src="/src/assets/images/{{ post.image }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
-        </span>
-        <span class="news__caption glass glass--strong">
-          <span class="news__meta mono">
-            <time datetime="{{ post.datetime }}">{{ post.date }}</time>
-            <span>{{ post.rubric }}</span>
+    {% for post in blog.posts | sort(true, false, "datetime") %}
+      {% if loop.first %}
+        <a class="news news--lead" href="{{ post.url }}" data-tile>
+          <span class="news__photo" aria-hidden="true">
+            <img class="news__image" src="/src/assets/models/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
           </span>
-          <span class="news__title">{{ post.title }}</span>
-          <span class="news__excerpt">{{ post.excerpt }}</span>
-          <span class="news__more">Читать {{ icon("arrow", "news__arrow") }}</span>
-        </span>
-      </a>
-    {% endif %}
-  {% endfor %}
-  <div class="blog__grid container">
-    {% for post in home.posts %}
-      {% if not loop.first %}
-        <a class="news" href="{{ post.url }}">
-          <span class="news__frame">
-            <img class="news__image" src="/src/assets/images/{{ post.image }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
+          {{ date(post) }}
+          {{ icon("arrow", "news__arrow") }}
+          <span class="news__bottom">
+            <span class="news__rubric">{{ post.rubric }}</span>
+            <span class="news__title">{{ post.title }}</span>
+            <span class="news__excerpt">{{ post.excerpt }}</span>
           </span>
-          <span class="news__meta mono">
-            <time datetime="{{ post.datetime }}">{{ post.date }}</time>
-            <span>{{ post.rubric }}</span>
-          </span>
-          <span class="news__title">{{ post.title }}</span>
-          <span class="news__more">Читать {{ icon("arrow", "news__arrow") }}</span>
         </a>
       {% endif %}
     {% endfor %}
+    <div class="blog__row">
+      {% for post in blog.posts | sort(true, false, "datetime") %}
+        {% if not loop.first and loop.index <= 5 %}
+          <a class="news" href="{{ post.url }}" data-tile>
+            <span class="news__photo" aria-hidden="true">
+              <img class="news__image" src="/src/assets/models/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
+            </span>
+            {{ date(post) }}
+            {{ icon("arrow", "news__arrow") }}
+            <span class="news__bottom">
+              <span class="news__rubric">{{ post.rubric }}</span>
+              <span class="news__title">{{ post.title }}</span>
+            </span>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
   </div>
 </section>

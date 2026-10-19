@@ -1,0 +1,80 @@
+{# Страница статьи блога. Метаданные берутся из src/data/blog.json (post), текст из templates/articles/<slug>.njk. Шапка с фото и стеклянной плашкой, текст в колонке чтения слева выноска «Коротко» и ссылки, внизу похожие статьи и призыв. #}
+{% from "icons.njk" import icon %}
+<article class="ip ap">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "{{ post.title }}",
+          "description": "{{ post.description }}",
+          "datePublished": "{{ post.datetime }}",
+          "dateModified": "{{ post.datetime }}",
+          "inLanguage": "ru",
+          "mainEntityOfPage": "{{ site.url }}{{ post.url }}",
+          "image": "{{ site.url }}{{ site.ogImage }}",
+          "author": { "@type": "Organization", "name": "{{ site.name }}", "url": "{{ site.url }}" },
+          "publisher": { "@type": "Organization", "name": "{{ site.name }}", "logo": { "@type": "ImageObject", "url": "{{ site.url }}{{ site.logo }}" } }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Главная", "item": "{{ site.url }}/" },
+            { "@type": "ListItem", "position": 2, "name": "Блог", "item": "{{ site.url }}/blog.html" },
+            { "@type": "ListItem", "position": 3, "name": "{{ post.rubric }}", "item": "{{ site.url }}/blog.html?rubric={{ post.rubricId }}" },
+            { "@type": "ListItem", "position": 4, "name": "{{ post.title }}", "item": "{{ site.url }}{{ post.url }}" }
+          ]
+        }
+      ]
+    }
+  </script>
+  <header class="ip__head ip__head--plain ip__head--article">
+    <div class="ip__head-in">
+      <div class="ip__head-main">
+        <p class="ip__kicker"><a href="/blog.html">Блог</a><a href="/blog.html?rubric={{ post.rubricId }}">{{ post.rubric }}</a></p>
+        <h1 class="ip__title ip__title--long" data-split>{{ post.title }}</h1>
+      </div>
+      <div class="ip__head-side">
+        <p class="ap__meta"><time datetime="{{ post.datetime }}">{{ post.date }}</time><span>{{ post.minutes }} мин. чтения</span></p>
+      </div>
+    </div>
+  </header>
+  <figure class="ap__cover">
+    <img src="/src/assets/models/{{ post.cover }}" width="2400" height="1000" alt="" decoding="async" data-parallax="0.05" />
+  </figure>
+
+  <div class="ap__sec">
+    <aside class="ap__aside" aria-label="О статье">
+      <p class="ap__aside-title">Рубрика</p>
+      <p><a class="link-arrow" href="/blog.html?rubric={{ post.rubricId }}">{{ post.rubric }}</a></p>
+      <p class="ap__aside-title">Нужна консультация</p>
+      <p><a class="link-arrow" href="tel:88001012200">8 (800) 101-22-00</a></p>
+    </aside>
+    <div class="ap__main">
+      <div class="prose">
+        <p class="ip__note">{{ post.excerpt }}</p>
+        {% include "articles/" + slug + ".njk" %}
+      </div>
+    </div>
+  </div>
+
+  <section class="ap__related" aria-labelledby="related-title">
+    <h2 class="section-title ap__related-title" id="related-title">Читайте также</h2>
+    <ul class="ap__related-list">
+      {% for relatedSlug in post.related %}
+        {% set other = blog.bySlug[relatedSlug] %}
+        <li>
+          <a class="bl__card" href="{{ other.url }}" data-tile>
+            <img class="bl__image" src="/src/assets/models/{{ other.cover }}" width="1024" height="683" alt="" loading="lazy" decoding="async" />
+            <span class="bl__meta">{{ other.dateShort }} · {{ other.rubric }}</span>
+            <span class="bl__text">
+              <span class="bl__title">{{ other.title }}</span>
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+</article>

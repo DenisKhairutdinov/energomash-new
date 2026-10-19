@@ -1,2 +1,74 @@
-{% extends "layout.njk" %} {% set pageTitle = "Как выбрать цистерну" %} {% set currentPage =
-"about/guide" %} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/guide.html" %}
+{% set pageTitle = "Как выбрать цистерну: руководство покупателя" %}
+{% set pageDescription = "Как выбрать полуприцеп-цистерну или автоцистерну: тип техники, груз, объём и секции, подвеска, шины, тормоза, ССУ, термоизоляция, налив и документы. Руководство." %}
+{% set currentPage = "about/guide" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec, cta, crumbs, faq, band %}
+<article class="ip">
+  {{ crumbs([["О заводе", "/about.html"], ["Как выбрать цистерну", "/guide.html"]]) }}
+  {{ head("Как выбрать цистерну", "Подбор техники за семь шагов: от груза и маршрута до подвески, шин и документов. К каждому шагу есть статья с подробностями.", '<a href="/about.html">О заводе</a>', true, "IMG_2119.webp", "dark") }}
+
+  {% call sec("Шаг 1. Тип техники", "guide-type", "Полуприцеп-цистерна или автоцистерна.") %}
+    <ul class="ip__tiles ip__tiles--2">
+      <li class="ip__tile"><h3 class="ip__tile-title">Полуприцеп-цистерна</h3><p class="ip__tile-text">Кузов на осях, работает с седельным тягачом. Большой объём и выгодная стоимость перевозки. Подходит для магистральных рейсов и доставки на нефтебазы.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Автоцистерна</h3><p class="ip__tile-text">Кузов на шасси грузового автомобиля с насосным оборудованием. Самостоятельная техника для заправки, сбора нефти и коммунальных задач.</p></li>
+    </ul>
+    <div class="prose"><p>Каталог разделён по типу и назначению: <a href="/catalog.html?type=semitrailer">полуприцепы-цистерны</a> и <a href="/catalog.html?type=chassis">автоцистерны</a>.</p></div>
+  {% endcall %}
+
+  {% call sec("Шаг 2. Груз и назначение", "guide-cargo", "Продукт определяет материал, оборудование и допуск.", true) %}
+    <ul class="ip__tiles ip__tiles--4">
+      <li><a class="ip__tile" href="/benzovozy.html"><span class="ip__tile-title">Светлые нефтепродукты</span><span class="ip__tile-text">Бензин, дизельное топливо, керосин.</span></a></li>
+      <li><a class="ip__tile" href="/neftevozy.html"><span class="ip__tile-title">Тёмные нефтепродукты</span><span class="ip__tile-text">Нефть, мазут, битум. Нужны изоляция и подогрев.</span></a></li>
+      <li><a class="ip__tile" href="/vodovozy.html"><span class="ip__tile-title">Техническая вода</span><span class="ip__tile-text">Промыслы, стройки, пылеподавление.</span></a></li>
+      <li><a class="ip__tile" href="/cisterny-dlya-pitevoy-vody.html"><span class="ip__tile-title">Питьевая вода</span><span class="ip__tile-text">Пищевые жидкости, подготовленная поверхность.</span></a></li>
+      <li><a class="ip__tile" href="/vakuumnye-cisterny.html"><span class="ip__tile-title">Вакуумная техника</span><span class="ip__tile-text">Откачка и перевозка жидких отходов.</span></a></li>
+      <li><a class="ip__tile" href="/avtocisterny-dlya-sbora-nefti.html"><span class="ip__tile-title">Сбор нефти</span><span class="ip__tile-text">Вакуумный набор и подогрев.</span></a></li>
+      <li><a class="ip__tile" href="/avtotoplivozapravschiki.html"><span class="ip__tile-title">Автотопливозаправщики</span><span class="ip__tile-text">Насос, счётчик, раздаточный рукав.</span></a></li>
+      <li><a class="ip__tile" href="/kommunalnye-vakuumnye-mashiny.html"><span class="ip__tile-title">Коммунальные</span><span class="ip__tile-text">Поливка, промывка, перевозка воды.</span></a></li>
+    </ul>
+  {% endcall %}
+
+  {{ band("93006 IMG_0521.webp") }}
+
+  {% call sec("Шаг 3. Объём и секции", "guide-volume", "Зависят от плотности продукта и допустимой массы.") %}
+    <div class="prose"><p>Объём ограничен допустимой массой автопоезда и плотностью груза. Секции позволяют возить несколько продуктов и снижают гидроудары. Как рассчитать, читайте в статьях <a href="/blog-kak-vybrat-obem-i-sekcii.html">«Как выбрать объём и количество секций»</a> и <a href="/blog-volnorezy-i-ustoychivost-cisterny.html">«Волнорезы и устойчивость цистерны»</a>.</p></div>
+  {% endcall %}
+
+  {% call sec("Шаг 4. Ходовая часть", "guide-chassis", "Подвеска, шины, тормоза и ССУ.", true) %}
+    <ul class="ip__tiles ip__tiles--2">
+      <li><a class="ip__tile" href="/blog-podveska-ressornaya-ili-pnevmaticheskaya.html"><span class="ip__tile-meta">Подвеска</span><span class="ip__tile-title">Рессорная или пневматическая</span><span class="ip__tile-text">Ресурс шин, плавность, обслуживание, цена.</span></a></li>
+      <li><a class="ip__tile" href="/blog-shiny-magistralnye-ili-vnedorozhnye.html"><span class="ip__tile-meta">Шины</span><span class="ip__tile-title">Магистральные или внедорожные</span><span class="ip__tile-text">Протектор, размер, износ, расход топлива.</span></a></li>
+      <li><a class="ip__tile" href="/blog-tormoza-barabannye-ili-diskovye.html"><span class="ip__tile-meta">Тормоза</span><span class="ip__tile-title">Барабанные или дисковые</span><span class="ip__tile-text">Нагрев, тормозной путь, обслуживание, цена.</span></a></li>
+      <li><a class="ip__tile" href="/blog-kak-vybrat-ssu.html"><span class="ip__tile-meta">ССУ</span><span class="ip__tile-title">Высота и совместимость с тягачом</span><span class="ip__tile-text">Как сверить высоту седла и не потерять устойчивость.</span></a></li>
+    </ul>
+  {% endcall %}
+
+  {% call sec("Шаг 5. Оборудование", "guide-equip", "Термоизоляция, налив и слив, насосы.") %}
+    <ul class="ip__tiles ip__tiles--2">
+      <li><a class="ip__tile" href="/blog-termoizolyaciya-poliuretan-ili-minvata.html"><span class="ip__tile-meta">Термоизоляция</span><span class="ip__tile-title">Пенополиуретан или минвата</span><span class="ip__tile-text">Для вязких продуктов и холодного климата.</span></a></li>
+      <li><a class="ip__tile" href="/blog-nizhniy-nalivi-rekuperaciya-parov.html"><span class="ip__tile-meta">Налив</span><span class="ip__tile-title">Нижний налив и рекуперация паров</span><span class="ip__tile-text">Требования нефтебаз и устройство оборудования.</span></a></li>
+    </ul>
+  {% endcall %}
+
+  {% call sec("Шаг 6. Документы и допуск", "guide-docs", "Что нужно для перевозки и учёта.", true) %}
+    <div class="prose"><p>Для нефтепродуктов нужны допуск ДОПОГ, маркировка и документы. Если цистерна применяется в коммерческом учёте, проверяйте записи в ГРСИ и «Аршин». Подробнее: <a href="/blog-dopog-i-reglamenty.html">«ДОПОГ и регламенты»</a>, <a href="/blog-zazemlenie-i-staticheskoe-electrichestvo.html">«Заземление и статическое электричество»</a>, <a href="/blog-grsi-i-arshin.html">«ГРСИ и Аршин»</a>, <a href="/docs.html">сертификаты и документы</a>.</p></div>
+  {% endcall %}
+
+  {% call sec("Шаг 7. Способ покупки", "guide-buy", "Лизинг, кредит или прямая оплата.") %}
+    <div class="prose"><p>Сравните способы по первоначальному взносу, налогам и итоговой цене: <a href="/blog-lizing-kredit-ili-pokupka.html">«Лизинг, кредит или прямая покупка»</a>. Если подходит лизинг, посчитайте платёж в <a href="/leasing.html">калькуляторе</a> и учтите <a href="/subsidies.html">субсидию</a>.</p></div>
+  {% endcall %}
+
+  {% call sec("Частые вопросы", "guide-faq", "Что спрашивают при выборе цистерны.", true) %}
+    {{ faq([
+      ["С чего начать выбор?", "С груза и маршрута. От них зависят тип техники, объём, секции, подвеска и шины. Менеджер поможет составить задание."],
+      ["Что лучше: полуприцеп или автоцистерна?", "Полуприцеп выгоднее для больших объёмов и магистральных рейсов, автоцистерна удобна там, где нужны своё шасси и насосное оборудование."],
+      ["Как не ошибиться с комплектацией?", "Сообщите продукт, регион, маршруты и площадки налива. По ним подбирается оборудование и допуск."]
+    ], "guide-faq") }}
+  {% endcall %}
+
+  {{ cta("Поможем<br />выбрать", "Расскажите о задаче, и менеджер подберёт технику и комплектацию.", "Оставить заявку") }}
+</article>
+{% endblock %}

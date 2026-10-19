@@ -1,2 +1,11 @@
-{% extends "layout.njk" %} {% set pageTitle = "Транспортная безопасность" %} {% set currentPage =
-"blog/transport-safety" %} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-dopog-i-reglamenty.html" %}
+{% set slug = "dopog-i-reglamenty" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

@@ -51,102 +51,44 @@
     --ratio: 260 / 100;
   }
 
-  // Зерно: статичный шум поверх страницы, без анимации
-  .grain {
-    position: fixed;
-    inset: 0;
-    z-index: 900;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 220px 220px;
-    opacity: 0.055;
-  }
-
-  // Прелоадер: чертёж «вычерчивается» слева направо, счётчик идёт до 100
-  .loader {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: none;
-    grid-template-rows: 1fr auto;
-    color: var(--paper);
-    background: var(--ink);
-    clip-path: inset(0);
-  }
-
-  .has-loader .loader {
-    display: grid;
-  }
-
-  .loader__stage {
-    display: grid;
-    place-items: center;
-    padding: var(--gutter);
-  }
-
-  .loader__drawing {
-    position: relative;
-    inline-size: min(88vw, 62rem);
-    color: var(--accent-text);
-  }
-
-  .loader__drawing .drawing {
-    clip-path: inset(0 100% 0 0);
-  }
-
-  .loader__foot {
-    display: flex;
-    gap: 1rem;
-    align-items: end;
-    justify-content: space-between;
-    padding: var(--gutter);
-  }
-
-  .loader__logo {
-    inline-size: clamp(8rem, 14vw, 12rem);
-  }
-
-  .loader__count {
-    font-family: var(--font-display);
-    font-size: var(--fs-number);
-    font-weight: 200;
-    font-variant-numeric: tabular-nums;
-    line-height: 0.8;
-  }
-
-  // Индикатор глав: вертикальный список справа, текущая глава отмечена квадратом
+  // Индикатор глав: столбец номеров справа без панели. Цвет задаёт cinema.ts (--chapters-color из токена --paper текущей секции),
+  // текущая глава акцентом и крупнее, названия глав видны у текущей и при наведении на столбец
   .chapters {
     position: fixed;
     inset-block-start: 50%;
     inset-inline-end: clamp(0.75rem, 1.6vw, 1.75rem);
     z-index: 700;
     display: none;
-    gap: 0.3rem;
-    color: var(--fg);
-    filter: drop-shadow(0 0 5px var(--site-halo));
+    gap: 0.15rem;
     transform: translateY(-50%);
   }
 
-  // Без подложки: читаемость на любом фоне даёт тень вокруг линий и подписей; названия глав видны при наведении и у текущей главы
   .chapters__item {
     display: flex;
     gap: 0.75rem;
-    align-items: center;
+    align-items: baseline;
     justify-content: flex-end;
-    padding-block: 0.3rem;
-    font-family: var(--font-mono);
-    font-size: var(--fs-xs);
+    padding-block: 0.2rem;
+    font-family: var(--font-text);
+    font-size: var(--fs-s);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
     color: inherit;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
     text-decoration: none;
-    opacity: 0.6;
-    transition: opacity 0.3s;
+    text-shadow: 0 0 10px color-mix(in oklch, var(--c-black) 35%, transparent);
   }
 
-  .chapters__item:hover,
-  .chapters__item:focus-visible {
-    opacity: 1;
+  .chapters__number {
+    min-inline-size: 2ch;
+    text-align: end;
+    transition:
+      color 0.3s,
+      font-size 0.3s var(--ease-out);
+  }
+
+  .chapters__item.is-active .chapters__number {
+    font-size: var(--fs-l);
+    color: var(--accent);
   }
 
   .chapters__name {
@@ -157,26 +99,6 @@
     transition:
       max-inline-size 0.5s var(--ease-out),
       opacity 0.4s;
-  }
-
-  // Отметка главы: горизонтальная линия, у текущей длиннее и акцентная
-  .chapters__item::after {
-    inline-size: 1rem;
-    block-size: 2px;
-    content: '';
-    background: currentcolor;
-    transition:
-      inline-size 0.4s var(--ease-out),
-      background-color 0.3s;
-  }
-
-  .chapters__item.is-active {
-    opacity: 1;
-  }
-
-  .chapters__item.is-active::after {
-    inline-size: 1.75rem;
-    background: var(--accent);
   }
 
   .chapters:hover .chapters__name,

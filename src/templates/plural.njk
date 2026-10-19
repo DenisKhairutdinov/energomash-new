@@ -1,0 +1,8 @@
+{# Склонение по числу: plural(n, "модель", "модели", "моделей"). 1, 21, 101: «модель»; 2–4, 22–24: «модели»; 5–20, 11–14, 25–30: «моделей». #}
+{% macro plural(n, one, few, many) -%}
+  {%- set last = n % 10 -%}
+  {%- set tail = n % 100 -%}
+  {%- if last == 1 and tail != 11 -%}{{ one }}
+  {%- elif last >= 2 and last <= 4 and (tail < 12 or tail > 14) -%}{{ few }}
+  {%- else -%}{{ many }}{%- endif -%}
+{%- endmacro %}

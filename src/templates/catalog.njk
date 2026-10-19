@@ -1,8 +1,9 @@
-{# Каталог как спецификация: плиты типа с огромным силуэтом, чипы назначения с живыми счётчиками, переключатель «сетка / список», #}
-{# боковая панель технических параметров. Карточка одна и та же для обоих видов, различает их атрибут data-view у списка. #}
+{# Каталог (переделан 2026-10-18): светлая тема, сверху шапка, под ней фиксированный горизонтальный фильтр (тип, назначение, наличие, вид списка; остальные параметры раскрываются кнопкой), ниже плитки моделей: крупное фото, на стеклянной плашке название и характеристики. Вариантов дизайна нет. #}
+{# Карточка одна и та же для двух видов (сетка и список), различает их атрибут data-view у списка. #}
 {# Данные: src/data/catalog.json (переменная catalog: типы и описание фильтров) и public/data/catalog.json (модели). #}
 {# Фильтрация, чтение параметров из адреса и порционный вывод карточек: scripts/modules/catalog.ts #}
 {% from "icons.njk" import icon %}
+{% from "plural.njk" import plural %}
 
 {# Список значений чипами. Значения, которых нет у выбранного типа техники, скрывает скрипт; счётчик считает скрипт #}
 {% macro chips(group) %}
@@ -65,94 +66,100 @@
 {% endmacro %}
 
 <div class="catalog">
-  <header class="catalog__head container">
-    <h1 class="catalog__title">Каталог</h1>
-    <p class="catalog__lead">Полуприцепы-цистерны и автоцистерны завода. Выберите тип, назначение и объём: список пересчитывается сразу.</p>
+  {# Шапка страницы: сплошной акцентный блок на всю ширину, огромный заголовок, пояснение и счётчик найденного #}
+  <header class="catalog__head">
+    <div class="catalog__head-in">
+      <h1 class="catalog__title" data-split>Каталог</h1>
+      <div class="catalog__head-side">
+        <p class="catalog__lead">Полуприцепы-цистерны и автоцистерны завода. Выберите тип, назначение и объём: список пересчитывается сразу.</p>
+        <p class="catalog__found" aria-live="polite"><strong data-catalog-count>{{ catalog.total }} {{ plural(catalog.total, "модель", "модели", "моделей") }}</strong></p>
+      </div>
+    </div>
   </header>
 
-  {# Тип техники: две широкие плиты, силуэт выбранного типа огромный и обрезан краем плиты #}
-  <div class="catalog__types container" role="radiogroup" aria-label="Тип техники">
-    {% for type in catalog.types %}
-      <label class="catalog__type">
-        <input
-          class="catalog__type-input"
-          type="radio"
-          name="type"
-          value="{{ type.id }}"
-          form="catalog-filter"
-          {% if loop.first %}checked{% endif %}
-        />
-        <span class="catalog__type-body">
-          <span class="catalog__type-title">{{ type.label }}</span>
-          <span class="catalog__type-count" data-type-count="{{ type.id }}">{{ type.count }} моделей</span>
-          <span class="drawing drawing--{{ 'chassis' if type.icon == 'shassi' else type.icon }} catalog__type-drawing" aria-hidden="true"></span>
-        </span>
-      </label>
-    {% endfor %}
-  </div>
+  <div class="catalog__layout">
+    {# Фильтр: горизонтальная панель над карточками, закреплена под шапкой сайта при прокрутке #}
+    <aside class="cside" aria-label="Фильтр каталога">
+      <form class="cfilter cfilter--collapsed" id="catalog-filter" action="/catalog.html" data-catalog-filter>
+        <div class="cside__types" role="radiogroup" aria-label="Тип техники">
+          {% for type in catalog.types %}
+            <label class="ctype">
+              <input class="ctype__input" type="radio" name="type" value="{{ type.id }}" {% if loop.first %}checked{% endif %} />
+              <span class="ctype__body">
+                <span class="ctype__title">{{ type.label }}</span>
+                <span class="ctype__count" data-type-count="{{ type.id }}">{{ type.count }} {{ plural(type.count, "модель", "модели", "моделей") }}</span>
+                <span class="drawing drawing--{{ 'chassis' if type.icon == 'shassi' else type.icon }} ctype__drawing" aria-hidden="true"></span>
+              </span>
+            </label>
+          {% endfor %}
+        </div>
 
-  <form class="cfilter cfilter--collapsed" id="catalog-filter" action="/catalog.html" data-catalog-filter>
-    <div class="cfilter__bar container" data-filter-bar>
-      <div class="cfilter__quick">
-        {% for item in catalog.filters %}
-          {% if item.name == "purpose" or item.name == "stock" %}{{ group(item) }}{% endif %}
-        {% endfor %}
-      </div>
-      <div class="cfilter__tools">
-        <p class="cfilter__found" aria-live="polite">Найдено: <strong data-catalog-count>{{ catalog.total }} моделей</strong></p>
-        <fieldset class="cview">
-          <legend class="visually-hidden">Вид списка</legend>
-          <label class="cview__item">
-            <input class="cview__input" type="radio" name="view" value="grid" checked />
-            <span class="cview__label">Сетка</span>
-          </label>
-          <label class="cview__item">
-            <input class="cview__input" type="radio" name="view" value="list" />
-            <span class="cview__label">Список</span>
-          </label>
-        </fieldset>
-        <button class="cfilter__open" type="button" aria-expanded="false" aria-controls="catalog-extra" data-catalog-more>
-          <span data-catalog-more-label>Все параметры</span>
-          <span class="cfilter__badge" hidden data-filter-badge></span>
-        </button>
-      </div>
-    </div>
+        <div class="cfilter__bar" data-filter-bar>
+          <div class="cfilter__quick">
+            {% for item in catalog.filters %}
+              {% if item.name == "purpose" or item.name == "stock" %}{{ group(item) }}{% endif %}
+            {% endfor %}
+          </div>
+          <div class="cfilter__tools">
+            <label class="csort">
+              <span class="visually-hidden">Сортировка</span>
+              <select class="csort__select" name="sort" data-catalog-sort>
+                <option value="rec">Сначала с фото и в наличии</option>
+                <option value="stock">В наличии сначала</option>
+                <option value="volume-asc">Объём по возрастанию</option>
+                <option value="volume-desc">Объём по убыванию</option>
+                <option value="name">По названию</option>
+              </select>
+            </label>
+            <fieldset class="cview">
+              <legend class="visually-hidden">Вид списка</legend>
+              <label class="cview__item">
+                <input class="cview__input" type="radio" name="view" value="grid" checked />
+                <span class="cview__label">Сетка</span>
+              </label>
+              <label class="cview__item">
+                <input class="cview__input" type="radio" name="view" value="list" />
+                <span class="cview__label">Список</span>
+              </label>
+            </fieldset>
+            <button class="cfilter__open" type="button" aria-expanded="false" aria-controls="catalog-extra" data-catalog-more>
+              <span data-catalog-more-label>Все параметры</span>
+              <span class="cfilter__badge" hidden data-filter-badge></span>
+            </button>
+          </div>
+        </div>
 
-    {# Остальные параметры раскрываются прямо под панелью (без боковых окон): объём, секции и технические. Обёртка нужна для плавной высоты #}
-    <div class="cfilter__extra-wrap" id="catalog-extra">
-      <div class="cfilter__extra container" data-catalog-extra>
-        {% for item in catalog.filters %}
-          {% if item.name != "purpose" and item.name != "stock" %}{{ group(item) }}{% endif %}
-        {% endfor %}
-        <div class="cfilter__extra-foot">
+        {# Строка состояния: выбранные параметры (убираются крестиком), сколько найдено, сброс. Всегда в закреплённой панели #}
+        <div class="cfilter__status">
+          <ul class="cfilter__active" aria-label="Выбранные параметры" data-active-list></ul>
+          <p class="cfilter__found" aria-live="polite">
+            Найдено: <strong data-catalog-count>{{ catalog.total }} {{ plural(catalog.total, "модель", "модели", "моделей") }}</strong>
+          </p>
           <button class="cfilter__reset" type="reset" disabled data-catalog-reset>Сбросить всё</button>
         </div>
-      </div>
+
+        {# Остальные параметры раскрываются кнопкой «Все параметры» под панелью #}
+        <div class="cfilter__extra-wrap" id="catalog-extra">
+          <div class="cfilter__extra" data-catalog-extra>
+            {% for item in catalog.filters %}
+              {% if item.name != "purpose" and item.name != "stock" %}{{ group(item) }}{% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </form>
+    </aside>
+
+    <div class="catalog__results">
+      <ul class="catalog__list" data-catalog-list data-view="grid">
+        {# Карточки выводит скрипт: загружает public/data/catalog.json и добавляет порциями по мере прокрутки #}
+      </ul>
+      {# Метка конца списка: когда она подходит к краю экрана, добавляется следующая порция #}
+      <div class="catalog__sentinel" aria-hidden="true" data-catalog-sentinel></div>
+      <p class="catalog__empty" hidden data-catalog-empty>
+        По этим параметрам техники нет. Измените условия или сбросьте фильтры.
+      </p>
+      <p class="catalog__empty" hidden data-catalog-error>Не удалось загрузить каталог. Обновите страницу.</p>
     </div>
-  </form>
-
-  <div class="catalog__results container">
-    <ul class="catalog__list" data-catalog-list data-view="grid">
-      {# Карточки выводит скрипт: загружает public/data/catalog.json и добавляет порциями по мере прокрутки #}
-    </ul>
-    {# Метка конца списка: когда она подходит к краю экрана, добавляется следующая порция #}
-    <div class="catalog__sentinel" aria-hidden="true" data-catalog-sentinel></div>
-    <p class="catalog__empty" hidden data-catalog-empty>
-      По этим параметрам техники нет. Измените условия или сбросьте фильтры.
-    </p>
-    <p class="catalog__empty" hidden data-catalog-error>Не удалось загрузить каталог. Обновите страницу.</p>
-  </div>
-
-  {# Плавающая плашка: появляется, когда верхняя панель фильтров ушла с экрана #}
-  <div class="cdock glass glass--strong" data-filter-dock>
-    <p class="cdock__count" aria-live="polite">
-      Найдено: <strong data-catalog-count>{{ catalog.total }} моделей</strong>
-    </p>
-    <button class="cdock__button" type="button" data-filter-up>
-      Фильтры
-      <span class="cfilter__badge" hidden data-filter-badge></span>
-    </button>
-    <button class="cdock__button" type="reset" form="catalog-filter" disabled data-catalog-reset>Сбросить</button>
   </div>
 
   {# Заготовка карточки: скрипт копирует её и подставляет данные модели #}
@@ -168,9 +175,9 @@
         <div class="ccard__body">
           <div class="ccard__head">
             <p class="ccard__type" data-card-type></p>
-            <h3 class="ccard__title">
+            <h2 class="ccard__title">
               <a class="ccard__link" href="/product.html" data-card-link><span data-card-model></span></a>
-            </h3>
+            </h2>
           </div>
           <ul class="ccard__specs" data-card-specs>
             <li class="ccard__spec" data-card-spec>
@@ -179,7 +186,7 @@
             </li>
           </ul>
           <div class="ccard__actions">
-            <button class="ccard__price" type="button" data-modal-open="price" data-modal-model>Узнать стоимость</button>
+            <button class="button button--compact ccard__price" type="button" data-modal-open="price" data-modal-model>Узнать стоимость</button>
             <span class="ccard__arrow" aria-hidden="true">{{ icon("arrow") }}</span>
           </div>
         </div>

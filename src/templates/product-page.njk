@@ -1,0 +1,53 @@
+{# Страница модели (редизайн 2026-10-18, один вариант). Данные модели берёт скрипт modules/product.ts из public/data/catalog.json по адресу product.html?id=… #}
+{# Первый экран: фото модели на весь экран, на стеклянной плашке тип, название, наличие и кнопки, миниатюры справа внизу. Слева сплошная чёрная колонка в четверть ширины (название, наличие, характеристики, кнопка), рядом справа фото на три четверти, не под колонкой. Ниже похожие модели карточками, затем тёмный блок «Для чего эта техника». #}
+{# Словарь подписей параметров и их значений встроен в страницу из src/data/catalog.json, описания назначений лежат в src/data/product.json. #}
+{% from "icons.njk" import icon %}
+<script type="application/json" id="catalog-dictionary">{{ catalog.filters | dump | safe }}</script>
+<script type="application/json" id="product-copy">{{ product | dump | safe }}</script>
+<article class="pdp" data-product>
+  <section class="pdp__hero" aria-labelledby="pdp-title">
+    <div class="pdp__gallery" data-pdp-gallery>
+      <div class="pdp__stage" data-pdp-stage>
+        <span class="drawing pdp__drawing" aria-hidden="true" data-pdp-drawing></span>
+        <p class="pdp__soon" hidden data-pdp-soon>Фото этой модели скоро появится</p>
+      </div>
+      <ul class="pdp__thumbs" data-pdp-thumbs hidden></ul>
+    </div>
+    <div class="pdp__side">
+      <a class="pdp__back" href="/catalog.html">{{ icon("arrow", "pdp__back-icon") }}<span>Каталог</span></a>
+      <div class="pdp__intro">
+        <p class="pdp__type" data-pdp-type>Модель</p>
+        <h1 class="pdp__title" id="pdp-title" data-pdp-title>Загрузка…</h1>
+        <p class="pdp__status" data-pdp-status hidden></p>
+      </div>
+      <dl class="pdp__specs" data-pdp-specs></dl>
+      <div class="pdp__actions">
+        <button class="button pdp__price" type="button" data-modal-open="price" data-modal-model>Узнать стоимость</button>
+        <a class="pdp__call" href="tel:88001012200">8 (800) 101-22-00</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pdp__related" aria-labelledby="pdp-related-title" hidden data-pdp-related-section>
+    <div class="pdp__related-head">
+      <h2 class="section-title pdp__h2" id="pdp-related-title" data-split>Похожие модели</h2>
+      <a class="button" href="/catalog.html">Весь каталог</a>
+    </div>
+    <ul class="pdp__cards" data-pdp-related></ul>
+  </section>
+
+  <section class="pdp__about" aria-labelledby="pdp-about-title" hidden data-pdp-about>
+    <div class="pdp__about-side">
+      <h2 class="section-title pdp__h2" id="pdp-about-title" data-pdp-about-title data-split>Для чего эта техника</h2>
+    </div>
+    <div class="pdp__about-body">
+      <p class="pdp__about-text" data-pdp-about-text></p>
+      <ul class="pdp__features" data-pdp-features></ul>
+    </div>
+  </section>
+
+
+  <p class="pdp__missing" hidden data-pdp-missing>
+    Такой модели нет в каталоге. Возможно, она снята с производства. <a href="/catalog.html">Вернуться в каталог</a>
+  </p>
+</article>

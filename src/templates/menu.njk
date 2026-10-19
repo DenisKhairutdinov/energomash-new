@@ -1,28 +1,37 @@
 {# currentPage задаётся на странице как «раздел» или «раздел/подраздел». #}
-{# Мега-меню как на старом сайте: панель на всю ширину; у каталога подразделы идут группами (заголовок «Все модели» и плитки), --i задаёт очерёдность появления ячеек. #}
+{# Меню: фон-пластина скользит за курсором от пункта к пункту, активный раздел залит акцентом (scripts/modules/header.ts). Выпадающая панель: слева название раздела и ссылка, справа подразделы; у каталога над каждым списком свой чертёж (ППЦ или шасси), который вычерчивается при открытии. #}
 {% from "icons.njk" import icon %}
 {% set currentPath = (currentPage or "").split("/") %}
-<nav class="menu" aria-label="Основное меню">
-  <ul class="menu__list">
+<nav class="menu" aria-label="Основное меню" data-menu>
+  <ul class="menu__list" data-menu-list>
     {% for item in nav.menu %}
       {% set children = nav.catalog if item.catalog else item.children %}
-      <li class="menu__item">
+      <li class="menu__item{{ ' menu__item--wide' if item.catalog }}">
         <a
-          class="menu__link{{ ' menu__link--accent' if item.accent }}{{ ' menu__link--active' if item.id == currentPath[0] }}"
+          class="menu__link{{ ' menu__link--active' if item.id == currentPath[0] }}"
           href="{{ item.url }}"
           {% if item.id == currentPage %}aria-current="page"{% endif %}
         >{{ item.title }}</a>
         {% if children %}
           <div class="menu__dropdown">
-            <div class="menu__inner container{{ '' if item.catalog else ' menu__inner--plain' }}">
+            <div class="menu__inner{{ ' menu__inner--catalog' if item.catalog else ' menu__inner--plain' }}">
+              <a class="menu__lead" href="{{ item.url }}">
+                <span class="menu__lead-title">{{ item.title }}</span>
+                <span class="menu__lead-link">Открыть раздел {{ icon("arrow", "menu__arrow") }}</span>
+              </a>
               {% if item.catalog %}
                 <div class="menu__groups">
                   {% for group in children %}
+                    {% set kind = 'ppc' if loop.first else 'chassis' %}
                     <div class="menu__group">
                       <a class="menu__group-head menu__cell" style="--i: {{ loop.index0 }}" href="{{ group.url }}{{ item.urlSuffix }}">
                         <span>{{ group.title }}</span>
                         <span class="menu__group-all">Все модели {{ icon("arrow", "menu__arrow") }}</span>
                       </a>
+                      <span class="menu__sketch menu__cell" style="--i: {{ loop.index0 + 1 }}" aria-hidden="true">
+                        <span class="drawing drawing--{{ kind }} menu__sketch-base"></span>
+                        <span class="drawing drawing--{{ kind }} menu__sketch-line"></span>
+                      </span>
                       <ul class="menu__tiles">
                         {% for leaf in group.children %}
                           <li class="menu__cell" style="--i: {{ loop.index + 1 }}">
@@ -35,15 +44,6 @@
                     </div>
                   {% endfor %}
                 </div>
-                <a class="menu__feature" href="/catalog.html?in-stock=1" tabindex="-1" aria-hidden="true">
-                  <img class="menu__preview menu__preview--0" src="/src/assets/models/IMG_4530.webp" width="2400" height="1600" alt="" loading="lazy" />
-                  <img class="menu__preview menu__preview--1" src="/src/assets/models/IMG_4431.webp" width="2400" height="1600" alt="" loading="lazy" />
-                  <img class="menu__preview menu__preview--2" src="/src/assets/models/IMG_2961.webp" width="2400" height="1600" alt="" loading="lazy" />
-                  <span class="menu__feature-caption">
-                    <span class="mono">На складе</span>
-                    <span class="menu__feature-title">{{ home.catalogTotals.inStock }} единицы</span>
-                  </span>
-                </a>
               {% else %}
                 <ul class="menu__tiles">
                   {% for child in children %}
@@ -60,5 +60,6 @@
         {% endif %}
       </li>
     {% endfor %}
+    <li class="menu__marker" data-menu-marker aria-hidden="true"></li>
   </ul>
 </nav>

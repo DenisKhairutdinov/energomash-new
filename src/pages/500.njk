@@ -1,2 +1,18 @@
-{% extends "layout.njk" %} {% set pageTitle = "Ошибка сервера" %} {% set currentPage = "" %} {%
-block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pageTitle = "Ошибка сервера" %}
+{% set pageDescription = "Что-то пошло не так на нашей стороне. Попробуйте обновить страницу чуть позже." %}
+{% set currentPage = "" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec %}
+<article class="ip">
+  {{ head("500", "Что-то пошло не так на нашей стороне. Попробуйте обновить страницу чуть позже.", "Ошибка на сервере") }}
+  {% call sec("Куда дальше", "err-links", "Полезные страницы.") %}
+    <ul class="ip__tiles ip__tiles--3">
+      <li><a class="ip__tile" href="/"><span class="ip__tile-title">Главная</span><span class="ip__tile-text">Завод, каталог по назначению, наличие.</span></a></li>
+      <li><a class="ip__tile" href="/catalog.html"><span class="ip__tile-title">Каталог</span><span class="ip__tile-text">Полуприцепы-цистерны и автоцистерны.</span></a></li>
+      <li><a class="ip__tile" href="/contacts.html"><span class="ip__tile-title">Контакты</span><span class="ip__tile-text">8 (800) 101-22-00, 1@bik55.ru.</span></a></li>
+    </ul>
+  {% endcall %}
+</article>
+{% endblock %}

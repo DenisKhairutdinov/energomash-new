@@ -1,18 +1,26 @@
 @use 'mixins' as *;
 
-// Каталог как спецификация: крупный заголовок, две плиты типа с огромным силуэтом, ряд чипов назначения со счётчиками,
-// переключатель «сетка / список», остальные параметры раскрываются под панелью. Карточка: крупное фото, подпись снизу,
-// значения плашками. Один и тот же элемент в двух видах: сетка и таблица-список. Страница следует теме сайта.
+// Каталог (переделан 2026-10-18). Светлая тема: белый фон, светло-серые плитки и серый для наведения, чёрный выбранный.
+// Сверху шапка, под ней горизонтальный фильтр, закреплённый под шапкой сайта (тип, назначение, наличие, вид списка, кнопка «Все
+// параметры», которая раскрывает остальные поля под панелью), ниже плитки моделей в стык: крупное горизонтальное фото ч/б под ровным
+// затемнением; название, тип и характеристики на стеклянной плашке (стекло не меняется). Вариантов дизайна нет, цвета только из палитры.
 @layer sections {
   .catalog {
-    padding-block-end: var(--section-y);
+    @include light-surface;
   }
 
+  // ---------- Шапка: светло-серое поле под фиксированной шапкой сайта
   .catalog__head {
+    padding-block: calc(var(--header-h) + 1.5rem) clamp(1.5rem, 4svh, 3rem);
+    color: var(--paper);
+    background: var(--ink-soft);
+  }
+
+  .catalog__head-in {
     display: grid;
-    gap: 1rem var(--gap);
+    gap: 1.25rem 3rem;
     align-items: end;
-    padding-block: 1.5rem 2rem;
+    padding-inline: var(--edge);
   }
 
   .catalog__title {
@@ -23,247 +31,281 @@
     letter-spacing: -0.02em;
   }
 
+  .catalog__head-side {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
   .catalog__lead {
     max-inline-size: 28rem;
-    color: var(--fg-2);
+    font-size: var(--fs-m);
+    line-height: 1.55;
   }
 
-  // Плиты типа: силуэт выбранного огромный, обрезан правым краем, у невыбранного приглушён
-  .catalog__types {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-  }
-
-  .catalog__type {
-    position: relative;
-    cursor: pointer;
-  }
-
-  .catalog__type-input {
-    position: absolute;
-    inset: 0;
-    margin: 0;
-    cursor: pointer;
-    opacity: 0;
-  }
-
-  .catalog__type-body {
-    position: relative;
-    display: grid;
-    gap: 0.35rem;
-    align-content: start;
-    block-size: 100%;
-    min-block-size: clamp(7rem, 12vw, 11rem);
-    padding: 1.25rem 1.5rem;
-    overflow: hidden;
-    color: var(--fg);
-    background: var(--field);
-    isolation: isolate;
-    transition:
-      background-color 0.4s var(--ease-out),
-      color 0.4s var(--ease-out);
-  }
-
-  .catalog__type:hover .catalog__type-body {
-    background: var(--field-hover);
-  }
-
-  .catalog__type-input:checked + .catalog__type-body {
-    color: var(--paper);
-    background: var(--accent-deep);
-  }
-
-  .catalog__type-input:focus-visible + .catalog__type-body {
-    outline: 1px solid var(--accent);
-    outline-offset: 3px;
-  }
-
-  .catalog__type-title {
+  .catalog__found strong {
     font-family: var(--font-display);
-    font-size: var(--fs-xl);
-    font-weight: 300;
-    line-height: 1.05;
+    font-size: clamp(2rem, 1rem + 2vw, 3.5rem);
+    font-weight: 240;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
     text-transform: uppercase;
   }
 
-  .catalog__type-count {
-    font-size: var(--fs-s);
-    opacity: 0.75;
+  // ---------- Фильтр: горизонтальная панель, закреплена под шапкой сайта
+  .cside {
+    // Закреплена у верха окна; пока шапка сайта видна (прокрутка вверх), стоит под ней, чтобы не перекрываться (--cside-top задаёт catalog.ts)
+    position: sticky;
+    inset-block-start: var(--cside-top, 0);
+    z-index: 30;
+    max-block-size: calc(100svh - var(--cside-top, 0px));
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--c-white);
+    transition: inset-block-start 0.35s var(--ease-out);
   }
 
-  .catalog__type-drawing {
-    position: absolute;
-    inset-block-end: -8%;
-    inset-inline-end: -6%;
-    z-index: -1;
-    inline-size: clamp(14rem, 34vw, 34rem);
-    opacity: 0.22;
-    transition:
-      opacity 0.5s var(--ease-out),
-      transform 0.8s var(--ease-out);
-  }
-
-  .catalog__type:hover .catalog__type-drawing {
-    transform: translateX(-0.75rem);
-  }
-
-  .catalog__type-input:checked + .catalog__type-body .catalog__type-drawing {
-    opacity: 0.5;
-  }
-
-  // Панель фильтра
-  .cfilter__bar {
-    display: flex;
-    flex-wrap: wrap;
+  // Раскладка панели по областям: тип и инструменты в первой строке, быстрые группы во второй, раскрытые параметры ниже
+  .cfilter {
+    display: grid;
+    grid-template-areas:
+      'types'
+      'quick'
+      'tools'
+      'status'
+      'extra';
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem 1.5rem;
-    align-items: center;
-    justify-content: space-between;
-    padding-block: 1.5rem 1rem;
+    align-items: start;
+    padding: 1rem var(--edge);
+  }
+
+  .cfilter__bar {
+    display: contents;
+  }
+
+  .cside__types {
+    grid-area: types;
   }
 
   .cfilter__quick {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 1.5rem;
-    align-items: center;
-    min-inline-size: 0;
+    grid-area: quick;
   }
 
   .cfilter__tools {
+    grid-area: tools;
+  }
+
+  .cfilter__extra-wrap {
+    grid-area: extra;
+  }
+
+  .cfilter__status {
+    grid-area: status;
+  }
+
+  // Тип техники: две плитки с чертежом, выбранная чёрная; силуэт обрезан краем плитки
+  .cside__types {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+
+  .ctype {
+    cursor: pointer;
+  }
+
+  .ctype__input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .ctype__body {
+    position: relative;
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+    min-inline-size: clamp(16rem, 22vw, 26rem);
+    min-block-size: 6.5rem;
+    padding: 1rem 1.25rem;
+    overflow: clip;
+    color: var(--c-black);
+    background: var(--c-light);
+    transition:
+      color 0.3s,
+      background-color 0.3s;
+  }
+
+  .ctype:hover .ctype__body {
+    background: var(--c-gray);
+  }
+
+  .ctype__input:checked + .ctype__body {
+    color: var(--c-white);
+    background: var(--c-black);
+  }
+
+  .ctype__input:focus-visible + .ctype__body {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .ctype__title {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 1rem + 0.8vw, 1.9rem);
+    font-weight: 250;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  // Количество моделей на кнопках фильтра не показываем (по просьбе владельца)
+  .ctype__count,
+  .chip__n {
+    display: none;
+  }
+
+  // Чертёж серым палитры: на светлой плитке тихий, на чёрной заметный
+  .ctype__drawing {
+    position: absolute;
+    inset-block-end: -0.5rem;
+    inset-inline-end: -1.5rem;
+    inline-size: 62%;
+    color: var(--c-gray);
+  }
+
+  // ---------- Параметры фильтра
+  .cfilter__quick {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem 1rem;
-    align-items: center;
+    gap: 1rem 2.5rem;
+    align-items: start;
   }
 
-  .cfilter__found {
-    font-size: var(--fs-s);
-    color: var(--fg-2);
-  }
-
-  .cfilter__found strong {
-    font-weight: 600;
-    color: var(--fg);
+  // Остальные параметры лежат под панелью в несколько колонок
+  .cfilter__extra {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1.25rem 1.5rem;
+    align-items: start;
+    min-block-size: 0;
+    overflow: hidden;
   }
 
   .cfilter__block {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
     min-inline-size: 0;
     padding: 0;
     margin: 0;
     border: 0;
   }
 
-  .cfilter__quick .cfilter__label {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
+  // Группы чужого типа техники скрыты атрибутом hidden: display у блока его перебивает, возвращаем
+  .cfilter__block[hidden] {
+    display: none;
+  }
+
+  .cfilter__label {
+    padding: 0;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
   }
 
   .cfilter__options {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.25rem;
   }
 
-  .cfilter__label {
-    padding: 0;
-    margin-block-end: 0.7rem;
+  // Чипы фильтра: светло-серые плитки без рамок, при наведении серые, выбранный чёрный
+  .cfilter .chip__label {
+    padding: 0.5rem 0.8rem;
     font-size: var(--fs-s);
-    font-weight: 600;
-    color: var(--fg);
-  }
-
-  // Счётчик внутри чипа: сколько моделей даст значение
-  .chip__n {
-    margin-inline-start: 0.5rem;
-    opacity: 0.55;
-  }
-
-  .chip__n:empty {
-    display: none;
-  }
-
-  .cfilter__open,
-  .cdock__button {
-    display: inline-flex;
-    gap: 0.6rem;
-    align-items: center;
-    min-block-size: 2.75rem;
-    padding: 0 1.1rem;
-    font: 500 var(--fs-s) / 1 var(--font-text);
-    color: var(--fg);
-    cursor: pointer;
-    background: var(--field);
+    color: var(--c-black);
+    background: var(--c-light);
     border: 0;
-    transition: background-color 0.3s;
   }
 
-  .cfilter__open:hover,
-  .cdock__button:hover:not(:disabled) {
-    background: var(--field-hover);
+  .cfilter .chip:hover .chip__label {
+    background: var(--c-gray);
   }
 
-  .cfilter__open[aria-expanded='true'] {
-    background: var(--field-hover);
+  .cfilter .chip__input:checked + .chip__label {
+    color: var(--c-white);
+    background: var(--c-black);
   }
 
-  .cdock__button:disabled {
-    cursor: default;
-    opacity: 0.4;
+  // Значение, которого нет у выбранных моделей, заблокировано: серый текст без заливки
+  .cfilter .chip__input:disabled + .chip__label {
+    color: var(--c-gray);
+    cursor: not-allowed;
+    background: transparent;
   }
 
-  .cfilter__badge {
-    min-inline-size: 1.4rem;
-    padding: 0.2rem 0.4rem;
-    font-family: var(--font-mono);
-    font-size: var(--fs-xs);
-    color: var(--paper);
-    text-align: center;
-    background: var(--accent-deep);
+  // Группа, в которой нет ни одного доступного значения (например, УВТ у технической воды): подпись серая, подсказка рядом
+  .cfilter__block.is-blocked .cfilter__label {
+    color: var(--c-gray);
   }
 
-  // Переключатель вида: два положения в одной плашке
+  .cfilter__block.is-blocked .cfilter__label::after {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    content: ' · нет у выбранных моделей';
+  }
+
+  .cfilter__block.is-blocked .cfilter__range-field {
+    background: transparent;
+  }
+
+  .cfilter__tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-self: start;
+  }
+
   .cview {
     display: flex;
     gap: 0.25rem;
-    padding: 0.25rem;
+    padding: 0;
     margin: 0;
-    background: var(--field);
     border: 0;
   }
 
   .cview__item {
-    position: relative;
     cursor: pointer;
   }
 
   .cview__input {
     position: absolute;
-    inset: 0;
-    margin: 0;
-    cursor: pointer;
     opacity: 0;
   }
 
   .cview__label {
-    display: grid;
-    place-items: center;
-    min-block-size: 2.25rem;
-    padding-inline: 0.9rem;
+    display: inline-block;
+    padding: 0.5rem 0.9rem;
     font-size: var(--fs-s);
     font-weight: 500;
-    color: var(--fg-2);
+    background: var(--c-light);
     transition:
-      background-color 0.25s,
-      color 0.25s;
+      color 0.25s,
+      background-color 0.25s;
+  }
+
+  .cview__item:hover .cview__label {
+    background: var(--c-gray);
   }
 
   .cview__input:checked + .cview__label {
-    color: var(--paper);
-    background: var(--accent-deep);
+    color: var(--c-white);
+    background: var(--c-black);
   }
 
   .cview__input:focus-visible + .cview__label {
@@ -271,7 +313,44 @@
     outline-offset: 2px;
   }
 
-  // Остальные параметры: плавное раскрытие под панелью (высота ряда сетки от нуля до содержимого)
+  .cfilter__open {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.5rem 0.9rem;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    color: var(--c-black);
+    cursor: pointer;
+    background: var(--c-light);
+    border: 0;
+    transition:
+      color 0.25s,
+      background-color 0.25s;
+  }
+
+  .cfilter__open:hover {
+    background: var(--c-gray);
+  }
+
+  .cfilter__open[aria-expanded='true'] {
+    color: var(--c-white);
+    background: var(--c-black);
+  }
+
+  .cfilter__badge {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 1.25rem;
+    block-size: 1.25rem;
+    padding-inline: 0.3rem;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-white);
+    background: var(--accent);
+  }
+
+  // Остальные параметры плавно раскрываются кнопкой
   .cfilter__extra-wrap {
     display: grid;
     grid-template-rows: 1fr;
@@ -286,50 +365,41 @@
       visibility 0s 0.45s;
   }
 
-  .cfilter__extra {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-    gap: 1.5rem 2.5rem;
-    min-block-size: 0;
-    padding-block: 0.5rem 1.5rem;
-    overflow: hidden;
-  }
-
-  .cfilter__extra-foot {
-    display: flex;
-    grid-column: 1 / -1;
-    align-items: end;
-  }
-
   .cfilter__range {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.25rem;
+    align-items: start;
   }
 
   .cfilter__range-field {
-    display: inline-flex;
-    gap: 0.4rem;
+    display: flex;
+    flex: 1;
+    gap: 0.5rem;
     align-items: center;
-    min-block-size: 2.75rem;
-    padding-inline: 0.8rem;
-    font-size: var(--fs-s);
-    color: var(--fg-2);
-    background: var(--field);
+    padding: 0.5rem 0.8rem;
+    background: var(--c-light);
+    transition: background-color 0.2s;
   }
 
   .cfilter__range-field:focus-within {
-    background: var(--field-hover);
+    outline: 1px solid var(--accent);
+    outline-offset: -1px;
+    background: var(--c-white);
+  }
+
+  .cfilter__range-prefix,
+  .cfilter__range-unit {
+    font-size: var(--fs-s);
   }
 
   .cfilter__range-input {
-    inline-size: 3rem;
+    inline-size: 100%;
+    min-inline-size: 0;
     padding: 0;
     font: inherit;
-    font-weight: 500;
-    color: var(--fg);
-    text-align: center;
-    background: transparent;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-black);
+    background: none;
     border: 0;
   }
 
@@ -337,21 +407,24 @@
     outline: none;
   }
 
+  .cfilter__range-input::placeholder {
+    color: var(--c-gray);
+  }
+
   .cfilter__reset {
-    min-block-size: 2.75rem;
-    padding: 0 1.1rem;
-    font: 500 var(--fs-s) / 1 var(--font-text);
-    color: var(--fg);
+    padding: 0.5rem 0.9rem;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    color: var(--c-black);
+    text-decoration: underline;
+    text-underline-offset: 4px;
     cursor: pointer;
-    background: var(--field);
+    background: none;
     border: 0;
-    transition:
-      background-color 0.3s,
-      opacity 0.3s;
   }
 
   .cfilter__reset:hover:not(:disabled) {
-    background: var(--field-hover);
+    color: var(--accent);
   }
 
   .cfilter__reset:disabled {
@@ -359,58 +432,92 @@
     opacity: 0.4;
   }
 
-  // Плавающая плашка со счётчиком: появляется, когда верхняя панель ушла с экрана
-  .cdock {
-    position: fixed;
-    inset-block-end: 1rem;
-    inset-inline-start: 50%;
-    z-index: 560;
+  // ---------- Строка состояния: выбранные параметры, сколько найдено, сброс
+  .cfilter__status {
     display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    align-items: center;
+    min-block-size: 2rem;
+  }
+
+  .cfilter__active {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    min-inline-size: 0;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  // Выбранный параметр: чёрная плашка с крестиком, при наведении акцент
+  .cfilter__tag {
+    display: inline-flex;
     gap: 0.5rem;
     align-items: center;
-    padding: 0.4rem 0.4rem 0.4rem 1.1rem;
-    color: var(--paper);
-    pointer-events: none;
-    opacity: 0;
-    transform: translate(-50%, 1.5rem);
-    transition:
-      opacity 0.35s var(--ease-out),
-      transform 0.45s var(--ease-out);
-
-    @include theme-dark-vars;
+    padding: 0.4rem 0.7rem;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--c-white);
+    cursor: pointer;
+    background: var(--c-black);
+    border: 0;
+    transition: background-color 0.25s;
   }
 
-  .cdock.is-visible {
-    pointer-events: auto;
-    opacity: 1;
-    transform: translate(-50%, 0);
+  .cfilter__tag::after {
+    font-size: var(--fs-m);
+    line-height: 1;
+    content: '×';
   }
 
-  .cdock__count {
-    margin-inline-end: 0.5rem;
+  .cfilter__tag:hover,
+  .cfilter__tag:focus-visible {
+    background: var(--accent);
+  }
+
+  .cfilter__found {
+    margin-inline-start: auto;
     font-size: var(--fs-s);
-    color: var(--fg-2);
   }
 
-  .cdock__count strong {
-    font-weight: 600;
-    color: var(--paper);
+  .cfilter__found strong {
+    font-variant-numeric: tabular-nums;
   }
 
-  .cdock__button {
-    color: var(--paper);
+  // Сортировка: выпадающий список в тон кнопок панели
+  .csort__select {
+    padding: 0.5rem 0.9rem;
+    font: inherit;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    color: var(--c-black);
+    cursor: pointer;
+    background: var(--c-light);
+    border: 0;
   }
 
-  // Результаты
+  .csort__select:hover {
+    background: var(--c-gray);
+  }
+
+  .csort__select:focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  // ---------- Результаты: плитки в стык
   .catalog__list {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: clamp(2rem, 3vw, 3rem) var(--gap);
+    gap: 0.25rem;
   }
 
   .catalog__empty {
-    padding-block: 4rem;
-    color: var(--fg-2);
+    padding: 4rem var(--edge);
+    color: var(--paper-70);
     text-align: center;
   }
 
@@ -418,14 +525,26 @@
     min-inline-size: 0;
   }
 
-  // Появление при прокрутке: фото открывается шторкой снизу, подпись выезжает следом (классы ставит catalog.ts)
+  // Появление при прокрутке: фото открывается шторкой снизу (классы ставит catalog.ts)
+  // Вся карточка слегка поднимается и проявляется, внутри фото открывается шторкой, плашка выезжает следом (тот же язык, что на главной)
+  .ccard.is-pending .ccard__inner {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+
+  .ccard.is-revealed .ccard__inner {
+    transition:
+      opacity 0.8s var(--ease-out) var(--reveal-delay, 0ms),
+      transform 0.9s var(--ease-out) var(--reveal-delay, 0ms);
+  }
+
   .ccard.is-pending .ccard__media {
     clip-path: inset(100% 0 0);
   }
 
   .ccard.is-pending .ccard__body {
     opacity: 0;
-    transform: translateY(1.25rem);
+    transform: translateY(1rem);
   }
 
   .ccard.is-revealed .ccard__media {
@@ -438,39 +557,22 @@
       transform 0.9s var(--ease-out) calc(var(--reveal-delay, 0ms) + 250ms);
   }
 
-  // Карточка-афиша: портретное фото, название огромное и заходит на фото краем (инверсия цвета по фону),
-  // значения выезжают по наведению колонкой справа поверх снимка
   .ccard__inner {
     position: relative;
-    display: grid;
-    align-content: start;
+    display: block;
+    aspect-ratio: 3 / 2;
+    overflow: clip;
+    background: var(--ink-soft);
+    isolation: isolate;
   }
 
   .ccard__media {
-    position: relative;
-    display: grid;
-    place-items: center;
-    aspect-ratio: 3 / 2;
-    overflow: hidden;
-    color: var(--accent-text);
-    background: var(--bg-2);
-  }
-
-  // Затемнение справа под колонкой значений: проявляется по наведению
-  .ccard__media::after {
     position: absolute;
     inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    content: '';
-    background: linear-gradient(to left, rgb(17 15 13 / 78%), rgb(17 15 13 / 0%) 70%);
-    opacity: 0;
-    transition: opacity 0.5s var(--ease-out);
-  }
-
-  .ccard__inner:hover .ccard__media::after,
-  .ccard__inner:focus-within .ccard__media::after {
-    opacity: 1;
+    z-index: -1;
+    display: grid;
+    place-items: center;
+    color: var(--c-gray);
   }
 
   .ccard__image {
@@ -482,102 +584,94 @@
     opacity: 0;
     transition:
       opacity 0.6s var(--ease-out),
-      transform 1.4s var(--ease-out);
+      transform 1.2s var(--ease-out);
   }
 
   .ccard__image.is-loaded {
     opacity: 1;
   }
 
-  .ccard__inner:hover .ccard__image {
-    transform: scale(1.05);
+  .ccard__inner:hover .ccard__image,
+  .ccard__inner:focus-within .ccard__image {
+    transform: scale(1.03);
   }
 
-  // Нет фото: огромный чертёж акцентным цветом, обрезанный краями кадра
+  // Нет фото: большой чертёж типа техники и подпись
   .ccard__drawing {
-    inline-size: 84%;
+    inline-size: 70%;
     margin-block-end: 3rem;
-    opacity: 0.9;
-    transform: translateX(3%);
-    transition: transform 1s var(--ease-out);
-  }
-
-  .ccard__inner:hover .ccard__drawing {
-    transform: translateX(2%);
   }
 
   .ccard__soon {
     position: absolute;
-    inset-block-start: 3.4rem;
-    inset-inline-start: 0.85rem;
+    inset-block-start: 1rem;
+    inset-inline-end: 1rem;
     font-size: var(--fs-xs);
-    color: var(--fg-2);
+    color: var(--paper-55);
   }
 
   .ccard__badge,
   .ccard__code {
     position: absolute;
-    inset-block-start: 0.75rem;
+    inset-block-start: 1rem;
     z-index: 2;
-    padding: 0.4rem 0.7rem;
+    padding: 0.45rem 0.7rem;
     font-size: var(--fs-xs);
     font-weight: 600;
-    color: var(--paper);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
   .ccard__badge {
-    inset-inline-start: 0.75rem;
-    background: var(--accent-deep);
+    inset-inline-start: 1rem;
+    color: var(--ink);
+    background: var(--accent);
   }
 
   .ccard__code {
-    inset-inline-end: 0.75rem;
-    background: #110f0d99;
-    backdrop-filter: blur(9px);
+    inset-inline-start: 1rem;
+
+    @include glass;
   }
 
+  .ccard__badge + .ccard__code {
+    inset-inline-start: 8.5rem;
+  }
+
+  // Плашка на стекле: тип и название модели, характеристики, запрос стоимости
   .ccard__body {
-    position: static;
+    position: absolute;
+    inset-block-end: clamp(0.6rem, 1.4svh, 1rem);
+    inset-inline-start: clamp(0.6rem, 1vw, 1rem);
+    z-index: 2;
     display: grid;
-    gap: 0.75rem;
-    align-content: start;
-    margin-block-start: clamp(-4.4rem, -3.6vw, -2.6rem);
+    gap: 0.5rem;
+    inline-size: fit-content;
+    max-inline-size: calc(100% - 2 * clamp(0.6rem, 1vw, 1rem));
+    padding: clamp(0.8rem, 1.6svh, 1.1rem) clamp(0.9rem, 1.3vw, 1.3rem);
+
+    @include glass;
   }
 
   .ccard__head {
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 0.6rem;
+    display: grid;
+    gap: 0.2rem;
   }
 
   .ccard__type {
-    padding-inline-start: 0.15rem;
-    font-size: var(--fs-s);
-    color: var(--fg-2);
+    font-size: var(--fs-xs);
+    color: var(--paper-75);
   }
 
-  // Название: огромный Oswald, пересекает нижний край фото, инверсия делает его читаемым и на снимке, и на фоне
   .ccard__title {
-    position: relative;
-    z-index: 3;
-    margin-inline-end: -12%;
     font-family: var(--font-display);
-    font-size: clamp(2.2rem, 1.3rem + 2.4vw, 4rem);
-    font-weight: 200;
-    line-height: 0.92;
-    color: #fff;
+    font-size: clamp(1.5rem, 1rem + 1.2vw, 2.5rem);
+    font-weight: 240;
+    line-height: 1;
     text-transform: uppercase;
-    letter-spacing: -0.01em;
-    overflow-wrap: anywhere;
-    mix-blend-mode: difference;
-    transition: transform 0.6s var(--ease-out);
   }
 
-  .ccard__inner:hover .ccard__title {
-    transform: translateX(0.6rem);
-  }
-
-  // Ссылка на название растянута на всю карточку, кнопка стоимости лежит поверх неё
+  // Вся карточка кликабельна: ссылка названия растягивается на плитку
   .ccard__link {
     color: inherit;
     text-decoration: none;
@@ -585,62 +679,30 @@
 
   .ccard__link::after {
     position: absolute;
-    inset: -40rem -2rem -8rem 0;
-    z-index: 1;
+    inset: 0;
     content: '';
   }
 
-  // Значения: технический столбец справа поверх фото, подпись приглушена, значение крупным шрифтом заголовков
   .ccard__specs {
-    position: absolute;
-    inset-block-start: 3.75rem;
-    inset-inline-end: 1rem;
-    z-index: 3;
-    display: grid;
-    gap: 1.4rem;
-    inline-size: 40%;
-    pointer-events: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
   }
 
   .ccard__spec {
-    display: grid;
-    gap: 0.1rem;
-    color: var(--paper);
-    opacity: 0;
-    transform: translateX(1.25rem);
-    transition:
-      opacity 0.4s var(--ease-out),
-      transform 0.6s var(--ease-out);
-  }
-
-  .ccard__inner:hover .ccard__spec,
-  .ccard__inner:focus-within .ccard__spec {
-    opacity: 1;
-    transform: none;
-  }
-
-  .ccard__inner:hover .ccard__spec:nth-child(2) {
-    transition-delay: 60ms;
-  }
-
-  .ccard__inner:hover .ccard__spec:nth-child(3) {
-    transition-delay: 120ms;
-  }
-
-  .ccard__inner:hover .ccard__spec:nth-child(4) {
-    transition-delay: 180ms;
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+    font-size: var(--fs-s);
+    font-variant-numeric: tabular-nums;
   }
 
   .ccard__spec-label {
     font-size: var(--fs-xs);
-    color: rgb(247 246 243 / 70%);
-  }
-
-  .ccard__spec-value {
-    font-family: var(--font-display);
-    font-size: var(--fs-xl);
-    font-weight: 300;
-    line-height: 1.05;
+    color: var(--paper-65);
   }
 
   .ccard__actions {
@@ -650,197 +712,276 @@
     justify-content: space-between;
   }
 
+  // Запрос стоимости: кнопка (акцент, белый текст, при наведении белая с чёрным) поверх растянутой ссылки карточки
   .ccard__price {
     position: relative;
-    z-index: 4;
-    padding: 0.4rem 0;
-    font: 600 var(--fs-s) / 1 var(--font-text);
-    color: var(--accent-text);
-    cursor: pointer;
-    background: transparent;
-    border: 0;
-    transition: color 0.3s;
+    z-index: 3;
   }
 
-  .ccard__price:hover {
-    color: var(--fg);
+  // Без фото плашка с названием (в сетке) сплошная чёрная: стеклу не за чем размываться, на светлом фоне белый текст иначе не читается
+  .catalog__list[data-view='grid'] .ccard__inner:not(:has(.ccard__image.is-loaded)) .ccard__body {
+    background: var(--c-black);
+    backdrop-filter: none;
   }
 
   .ccard__arrow {
-    color: var(--fg);
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
     transition: transform 0.5s var(--ease-out);
   }
 
   .ccard__arrow svg {
-    inline-size: 1.5rem;
-    block-size: 1.5rem;
+    inline-size: 100%;
+    block-size: 100%;
   }
 
   .ccard__inner:hover .ccard__arrow {
-    transform: translateX(0.35rem);
+    transform: translateX(0.3rem);
   }
 
-  // На сенсорных экранах наведения нет: значения идут под фото плашками
-  @media (hover: none) {
-    .ccard__specs {
-      position: static;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      inline-size: auto;
+  // Карточки без фото компактнее: в сетке ниже карточек с фото (они идут в конце выдачи)
+  .catalog__list[data-view='grid'] .ccard--nophoto .ccard__inner {
+    aspect-ratio: 16 / 7;
+  }
+
+  // В сетке «Узнать стоимость» у позиций не в наличии появляется при наведении (на сенсорных показана всегда), у позиций в наличии видна
+  @media (hover: hover) and (pointer: fine) {
+    .catalog__list[data-view='grid'] .ccard:not(.ccard--stock) .ccard__price {
+      opacity: 0;
+      transform: translateY(0.4rem);
+      transition:
+        opacity 0.3s var(--ease-out),
+        transform 0.3s var(--ease-out),
+        color 0.4s var(--ease-out);
     }
 
-    .ccard__spec {
-      flex-direction: row;
-      gap: 0.45rem;
-      padding: 0.45rem 0.7rem;
-      font-size: var(--fs-s);
-      background: var(--field);
+    .catalog__list[data-view='grid'] .ccard:not(.ccard--stock) .ccard__inner:hover .ccard__price,
+    .catalog__list[data-view='grid']
+      .ccard:not(.ccard--stock)
+      .ccard__inner:focus-within
+      .ccard__price {
       opacity: 1;
       transform: none;
     }
-
-    .ccard__spec-label {
-      color: var(--fg-2);
-    }
-
-    .ccard__spec-value {
-      font-family: var(--font-text);
-      font-size: var(--fs-s);
-      font-weight: 600;
-    }
-
-    .ccard__media::after {
-      display: none;
-    }
   }
 
-  // Список: строки-таблица для сравнения моделей. Фото слева, название, значения в одну строку, действия справа
-  .catalog__list[data-view='list'] {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.5rem;
+  // ---------- Вид «список»: плитка превращается в строку, фото слева, данные справа без стекла
+  .catalog__list[data-view='list'] .ccard__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 3.5fr) minmax(0, 8.5fr);
+    min-block-size: 11rem;
+    aspect-ratio: auto;
   }
 
-  @media (width >= 900px) {
-    .catalog__list[data-view='list'] .ccard__inner {
-      grid-template-columns: clamp(12rem, 20vw, 20rem) minmax(0, 1fr);
-      gap: 1.5rem;
-      align-items: center;
-      padding: 0.5rem 1.5rem 0.5rem 0.5rem;
-      background: var(--field);
-      transition: background-color 0.3s;
-    }
-
-    .catalog__list[data-view='list'] .ccard__inner:hover {
-      background: var(--field-hover);
-    }
-
-    .catalog__list[data-view='list'] .ccard__media {
-      aspect-ratio: 16 / 10;
-    }
-
-    .catalog__list[data-view='list'] .ccard__body {
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr) auto;
-      gap: 1.5rem;
-      align-items: center;
-    }
-
-    .catalog__list[data-view='list'] .ccard__title {
-      font-size: clamp(1.4rem, 1rem + 0.9vw, 2rem);
-    }
-
-    .catalog__list[data-view='list'] .ccard__specs {
-      flex-wrap: nowrap;
-      gap: 1.5rem;
-    }
-
-    .catalog__list[data-view='list'] .ccard__spec {
-      flex-direction: column;
-      gap: 0.15rem;
-      padding: 0;
-      background: transparent;
-    }
-
-    .catalog__list[data-view='list'] .ccard__actions {
-      justify-content: flex-end;
-    }
-  }
-
-  // Сетка: две колонки, на широком экране три со ступенчатым сдвигом (афишная раскладка)
-  @media (width >= 900px) {
-    .catalog__list[data-view='grid'] {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: clamp(2.5rem, 4vw, 4rem) clamp(1rem, 2vw, 2rem);
-    }
-
-    .catalog__list[data-view='grid'] .ccard:nth-child(even) {
-      margin-block-start: clamp(2rem, 6vw, 5rem);
-    }
-  }
-
-  @media (width >= 1000px) {
-    .catalog__head {
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-  }
-
-  // В списке афишные приёмы отключены: название обычное, значения колонками в строке
-  .catalog__list[data-view='list'] .ccard {
-    margin-block-start: 0;
-  }
-
+  // Фото уже прежнего (29% ширины вместо 41,7%); высота у карточек с фото и с чертежом одинаковая, на широком экране 246 px как раньше
   .catalog__list[data-view='list'] .ccard__media {
-    aspect-ratio: 16 / 10;
-  }
-
-  .catalog__list[data-view='list'] .ccard__media::after {
-    display: none;
-  }
-
-  .catalog__list[data-view='list'] .ccard__drawing {
-    inline-size: 90%;
-    transform: none;
+    position: relative;
+    z-index: 0;
+    min-block-size: 11rem;
+    aspect-ratio: 3.04 / 1;
   }
 
   .catalog__list[data-view='list'] .ccard__body {
-    margin-block-start: 0;
+    @include light-surface;
+
+    position: static;
+    align-content: center;
+    inline-size: auto;
+    max-inline-size: none;
+    padding: 1rem clamp(1rem, 2vw, 2rem);
+    background: var(--c-light);
+    backdrop-filter: none;
   }
 
-  .catalog__list[data-view='list'] .ccard__head {
-    flex-direction: column;
-  }
-
-  .catalog__list[data-view='list'] .ccard__title {
-    margin-inline-end: 0;
-    color: var(--fg);
-    mix-blend-mode: normal;
+  // Список как таблица: название, ровные колонки характеристик, запрос стоимости справа
+  .catalog__list[data-view='list'] .ccard__body {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) auto;
+    column-gap: var(--col-gap);
+    align-items: center;
   }
 
   .catalog__list[data-view='list'] .ccard__specs {
-    position: static;
-    display: flex;
-    gap: 1.5rem;
-    inline-size: auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem var(--col-gap);
   }
 
   .catalog__list[data-view='list'] .ccard__spec {
-    color: var(--fg);
-    opacity: 1;
-    transform: none;
+    display: grid;
+    gap: 0.15rem;
+    align-content: start;
   }
 
-  .catalog__list[data-view='list'] .ccard__spec-label {
-    color: var(--fg-2);
+  .catalog__list[data-view='list'] .ccard__drawing {
+    margin-block-end: 0;
   }
 
-  .catalog__list[data-view='list'] .ccard__spec-value {
-    font-family: var(--font-text);
-    font-size: var(--fs-s);
-    font-weight: 600;
+  // ---------- Широкие экраны
+  @media (width >= 900px) {
+    .catalog__head-in {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .catalog__head-in > .catalog__title {
+      grid-column: 1 / 9;
+    }
+
+    .catalog__head-in > .catalog__head-side {
+      grid-column: 9 / -1;
+    }
+
+    .catalog__list[data-view='grid'] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    // Фильтр на 12 колонках сетки сайта: типы в колонках 1–6 (каждая плитка по три), вид списка и «Все параметры» к правому краю;
+    // быстрые группы: назначение 1–8, наличие 9–12; раскрытые параметры по четыре в ряд (по три колонки)
+    .cfilter {
+      grid-template-areas: none;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+    }
+
+    .cside__types {
+      grid-area: auto;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-row: 1;
+      grid-column: 1 / span 6;
+      gap: 0.25rem;
+    }
+
+    .cside__types .ctype__body {
+      min-inline-size: 0;
+    }
+
+    .cfilter__tools {
+      grid-area: auto;
+      grid-row: 1;
+      grid-column: 7 / -1;
+      place-self: center end;
+    }
+
+    .cfilter__quick {
+      display: grid;
+      grid-area: auto;
+      grid-template-columns: subgrid;
+      grid-column: 1 / -1;
+      gap: 1rem var(--col-gap);
+    }
+
+    .cfilter__quick > .cfilter__block:nth-child(1) {
+      grid-column: 1 / span 8;
+    }
+
+    .cfilter__quick > .cfilter__block:nth-child(2) {
+      grid-column: 9 / span 4;
+    }
+
+    // Все параметры открываются панелью поверх карточек: страница не сдвигается, закрытая панель не занимает места
+    .cside {
+      max-block-size: none;
+      overflow: visible;
+    }
+
+    .cfilter__extra-wrap {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      z-index: 2;
+      display: grid;
+      visibility: visible;
+      grid-template-rows: none;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      max-block-size: calc(100svh - var(--cside-top, 0px) - 12rem);
+      padding: 1rem var(--edge) 1.5rem;
+      overflow-y: auto;
+      background: var(--c-white);
+      clip-path: inset(0 0 0 0);
+      transition:
+        clip-path 0.45s var(--ease-out),
+        visibility 0s;
+    }
+
+    .cfilter--collapsed .cfilter__extra-wrap {
+      visibility: hidden;
+      grid-template-rows: none;
+      clip-path: inset(0 0 100% 0);
+      transition:
+        clip-path 0.35s var(--ease-out),
+        visibility 0s 0.35s;
+    }
+
+    .cfilter__extra {
+      grid-template-columns: subgrid;
+      grid-column: 1 / -1;
+      gap: 1.25rem var(--col-gap);
+    }
+
+    .cfilter__extra > .cfilter__block {
+      grid-column: span 3;
+    }
+
+    // Заблокированные группы уходят в конец панели
+    .cfilter__extra > .cfilter__block.is-blocked {
+      order: 2;
+    }
+
+    .cfilter__status {
+      grid-area: auto;
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (width >= 1600px) {
+    .catalog__list[data-view='grid'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  // ---------- Узкие экраны: панель не закреплена (занимала бы пол-экрана), быстрые группы за кнопкой «Все параметры»
+  @media (width < 900px) {
+    .cside {
+      position: static;
+      max-block-size: none;
+    }
+
+    .ctype__body {
+      min-inline-size: 0;
+      min-block-size: 4.5rem;
+      padding: 0.75rem 0.9rem;
+    }
+
+    .ctype__title {
+      font-size: var(--fs-l);
+    }
+
+    .cfilter--collapsed .cfilter__quick {
+      display: none;
+    }
+
+    .catalog__list[data-view='list'] .ccard__inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .catalog__list[data-view='list'] .ccard__media {
+      aspect-ratio: 16 / 9;
+    }
+
+    .catalog__list[data-view='list'] .ccard__body {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .catalog__list[data-view='list'] .ccard__specs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-row: 2;
+      grid-column: 1 / -1;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cdock {
+    .ccard__image,
+    .cside {
       transition: none;
     }
   }

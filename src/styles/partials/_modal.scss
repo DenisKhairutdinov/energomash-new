@@ -1,3 +1,5 @@
+@use 'mixins' as *;
+
 @layer components {
   // Окно заявки по центру экрана: слева затемнённое фото с текстом, справа форма на стекле
   .modal {
@@ -10,12 +12,11 @@
     color: var(--paper);
     background: transparent;
     border: 0;
-    box-shadow: 0 2rem 6rem rgb(0 0 0 / 50%);
   }
 
   .modal::backdrop {
-    background: rgb(17 15 13 / 55%);
-    backdrop-filter: blur(5px);
+    background: color-mix(in oklch, var(--c-black) 62%, transparent);
+    backdrop-filter: blur(3px);
   }
 
   .modal[open] {
@@ -64,9 +65,9 @@
     block-size: 2.75rem;
     color: var(--paper);
     background: var(--glass-dark-strong);
-    border: 0;
+    border: 1px solid var(--line-dark);
     backdrop-filter: var(--glass-blur);
-    transition: background-color 0.3s;
+    transition: background-color 0.2s;
   }
 
   .modal__close:hover,
@@ -104,7 +105,7 @@
     inset: 0;
     z-index: -1;
     content: '';
-    background: rgb(17 15 13 / 62%);
+    background: color-mix(in oklch, var(--c-black) 62%, transparent);
   }
 
   .modal__aside-in {
@@ -114,13 +115,13 @@
 
   .modal__title {
     font-size: var(--fs-title-s);
-    font-weight: 200;
+    font-weight: 220;
     line-height: 1;
     text-transform: uppercase;
   }
 
   .modal__text {
-    color: rgb(247 246 243 / 85%);
+    color: var(--c-white);
   }
 
   .modal__model strong {
@@ -130,18 +131,33 @@
   .modal__phone {
     font-family: var(--font-display);
     font-size: var(--fs-xl);
-    font-weight: 200;
+    font-weight: 240;
+    font-variant-numeric: tabular-nums;
     color: var(--paper);
     text-decoration: none;
   }
 
+  // Форма на стекле (как плашки в шапке и наличии), внутри прежние белые прозрачности для полей; рамок у полей нет
   .modal__form {
+    @include glass-tones;
+
     display: grid;
     gap: 1.25rem;
     align-content: center;
     padding: clamp(1.5rem, 4vw, 3rem);
     background: var(--glass-dark-strong);
-    backdrop-filter: blur(14px) saturate(1.5);
+    backdrop-filter: var(--glass-blur-strong);
+  }
+
+  .modal__form .field__control,
+  .modal__form .opt__label,
+  .modal__form .check__box,
+  .modal__form .select__button {
+    border-color: transparent;
+  }
+
+  .modal__form .field__control[aria-invalid='true'] {
+    border-color: var(--err);
   }
 
   .modal__done {

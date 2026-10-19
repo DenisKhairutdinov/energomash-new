@@ -5,8 +5,7 @@ const MONTHS_IN_YEAR = 12
 // Неразрывный пробел между суммой и знаком рубля
 const NBSP = '\u00A0'
 
-const formatMoney = (value: number): string =>
-  `${Math.round(value).toLocaleString('ru-RU')}${NBSP}₽`
+const formatNumber = (value: number): string => Math.round(value).toLocaleString('ru-RU')
 
 const parseNumber = (text: string): number => Number(text.replaceAll(/\D/g, ''))
 
@@ -59,6 +58,19 @@ export const initLeasing = (): void => {
     }
   }
 
+  // Сумма и знак рубля отдельным элементом: знак набирается мельче цифр (класс money__sign)
+  const setMoney = (element: Element | null, value: number): void => {
+    if (!element) {
+      return
+    }
+
+    const sign = document.createElement('span')
+
+    sign.className = 'money__sign'
+    sign.textContent = '₽'
+    element.replaceChildren(`${formatNumber(value)}${NBSP}`, sign)
+  }
+
   const calculate = (): void => {
     const chosen = partner()
     const minAdvance = Number(chosen?.dataset['advance'] ?? 0)
@@ -82,11 +94,11 @@ export const initLeasing = (): void => {
 
     setText(advanceOut, String(advancePercent))
     setText(termOut, String(term))
-    setText(payment, formatMoney(monthly))
-    setText(advanceSum, formatMoney(advance))
-    setText(subsidySum, formatMoney(subsidy))
-    setText(total, formatMoney(advance + payments))
-    setText(overpay, formatMoney(payments - financed))
+    setMoney(payment, monthly)
+    setMoney(advanceSum, advance)
+    setMoney(subsidySum, subsidy)
+    setMoney(total, advance + payments)
+    setMoney(overpay, payments - financed)
     setText(
       note,
       `${chosen?.dataset['name'] ?? 'Партнёр'}: аванс от ${String(minAdvance)}%, срок до ${String(maxTerm)} мес., удорожание ${String(rate)}% в год. Расчёт ориентировочный.`,

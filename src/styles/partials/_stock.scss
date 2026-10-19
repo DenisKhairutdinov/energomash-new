@@ -1,468 +1,397 @@
 @use 'mixins' as *;
 
-// Наличие и каталог по назначению. Без рамок и линий: разделение пространством, заливкой и стеклом на фото.
+// Техника в наличии (редизайн с нуля, 2026-10-17). Секция на весь экран: фото техники занимает всё поле, поверх слева стеклянная
+// картотека моделей (стекло как в шапке). Выбранная модель раскрывается (тип, характеристики, ссылка), фото меняется плавным проявлением
+// «въезжает справа», над раскрытой строкой идёт индикатор автолистания. Последняя строка залита акцентом. Скрипт: slider.ts.
 @layer sections {
-  // Наличие: заголовок и управление сверху, ниже широкая сцена с кадром
   .stock {
-    padding-block: var(--section-y);
-
-    @include theme-site;
-  }
-
-  .stock__top {
-    display: grid;
-    gap: 1.5rem var(--gap);
-    align-items: end;
-    margin-block-end: clamp(1.5rem, 3vw, 2.5rem);
-  }
-
-  .stock__aside {
-    display: grid;
-    gap: 1.5rem;
-    justify-items: start;
-  }
-
-  .stock__lead {
-    max-inline-size: 30rem;
-    font-size: var(--fs-m);
-    line-height: 1.6;
-    color: var(--fg-2);
-  }
-
-  .stock__count {
-    font-family: var(--font-display);
-    font-size: var(--fs-xl);
-    font-weight: 300;
-    color: var(--accent-text);
-  }
-
-  .stock__controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    align-items: center;
-  }
-
-  .stock__nav {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  .stock__arrow {
-    display: grid;
-    place-items: center;
-    inline-size: 3.5rem;
-    block-size: 3.5rem;
-    color: var(--fg);
-    cursor: pointer;
-    background: var(--field-hover);
-    border: 0;
-    transition: background-color 0.3s;
-  }
-
-  .stock__arrow:hover,
-  .stock__arrow:focus-visible {
-    background: var(--accent-deep);
-  }
-
-  .stock__arrow svg {
-    inline-size: 1.4rem;
-    block-size: 1.4rem;
-  }
-
-  .stock__position {
-    padding-inline: 0.75rem;
-    font-variant-numeric: tabular-nums;
-    color: var(--fg-2);
-  }
-
-  .stock__viewport {
     position: relative;
-    inline-size: 100%;
-    min-block-size: 28rem;
-    max-block-size: 48rem;
-    aspect-ratio: 16 / 8;
+    display: grid;
+    min-block-size: max(100svh, 40rem);
     overflow: clip;
-    background: var(--bg-2);
+    color: var(--paper);
+    background: var(--ink);
     isolation: isolate;
   }
 
-  // Слайды лежат стопкой и плавно сменяют друг друга
-  .stock__slide {
+  // Слой фото: стопка кадров, ровное затемнение сверху
+  .stock__photos {
     position: absolute;
     inset: 0;
-    visibility: hidden;
-    opacity: 0;
-    transition:
-      opacity 0.9s var(--ease-io),
-      visibility 0s 0.9s;
+    z-index: -1;
   }
 
-  .stock__slide.is-active {
-    z-index: 2;
-    visibility: visible;
+  // Кадры в своём контексте наложения: слайдер поднимает z-index новых кадров без предела, затемнение и виньетка всегда выше них
+  .stock__frames {
+    position: absolute;
+    inset: 0;
+    isolation: isolate;
+  }
+
+  .stock__photos::after {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    content: '';
+
+    // Виньетка: центр кадра (техника) почти не затемнён, края и верх уходят в тёмное
+    background: radial-gradient(
+      ellipse 68% 72% at 62% 58%,
+      color-mix(in oklch, var(--c-black) 0%, transparent) 40%,
+      color-mix(in oklch, var(--c-black) 45%, transparent) 100%
+    );
+  }
+
+  // Кадр: новый плавно проявляется поверх прежнего (прежний остаётся полностью видимым под ним и скрывается, когда новый проявился),
+  // поэтому при быстрой смене моделей не бывает провалов и вспышек. Порядок слоёв задаёт слайдер (z-index)
+  .stock__shot {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  .stock__shot.is-active {
     opacity: 1;
-    transition:
-      opacity 0.9s var(--ease-io),
-      visibility 0s;
+    transition: opacity 0.9s var(--ease-out);
   }
 
   .stock__image {
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
-    transform: scale(1.04);
+    transform: scale(1.08);
     transition: transform 1.8s var(--ease-out);
   }
 
-  .stock__slide.is-active .stock__image {
+  .stock__shot.is-active .stock__image {
     transform: none;
   }
 
-  // Подпись модели на стекле: слева внизу, характеристики видны сразу
-  .stock__panel {
-    position: absolute;
-    inset-block-end: clamp(0.75rem, 2vw, 1.5rem);
-    inset-inline-start: var(--gutter);
-    z-index: 3;
+  // Колонка на всю высоту секции (4 колонки сетки на широких экранах): сверху заголовок, пояснение и кнопка, у нижнего края картотека моделей
+  // (под последней строкой отступ от края секции). Справа чистое фото. Стекло как в шапке и меню
+  .stock__inner {
     display: grid;
-    inline-size: min(32rem, calc(100% - 1.5rem));
-    padding: 1.25rem 1.5rem 1.5rem;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+  }
+
+  .stock__side {
+    @include glass-tones;
+
+    display: flex;
+    flex-direction: column;
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    background: oklch(17% 0.008 60deg / 44%);
+    backdrop-filter: blur(5px) saturate(1.5);
+  }
+
+  .stock__intro {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    padding: var(--sec-pad-y) 1rem 1.1rem;
+  }
+
+  .stock__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .stock__lead {
+    max-inline-size: 28rem;
+    font-size: var(--fs-m);
+    line-height: 1.6;
+    color: var(--paper-88);
+  }
+
+  .stock__count {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 300;
+    line-height: 1;
     color: var(--paper);
+  }
+
+  // Строки вплотную, без отступов панели. Выбранная строка залита (--stock-fill); пока идёт автолистание, заливка растёт слева направо
+  // поверх слабого фона (--stock-base) и становится полной к смене модели; на паузе (наведение) строка залита целиком
+  .stock__list {
+    display: grid;
+  }
+
+  .stock__item {
+    --stock-fill: var(--paper-16);
+    --stock-base: var(--paper-5);
+
+    position: relative;
+    transition: background-color 0.4s var(--ease-out);
+  }
+
+  .stock__item.is-active {
+    background: var(--stock-fill);
+  }
+
+  .stock.is-playing .stock__item.is-active {
+    background: var(--stock-base);
+  }
+
+  .stock__link {
+    position: relative;
+    z-index: 1;
+    display: block;
+    color: inherit;
     text-decoration: none;
   }
 
-  .stock__panel-head {
-    display: grid;
-    gap: 0.3rem;
-    justify-items: start;
-    padding-inline-end: 2.5rem;
+  .stock__head {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(0.5rem, 1.6svh, 0.9rem) 1rem;
   }
 
-  .stock__badge {
-    padding: 0.3rem 0.6rem;
-    margin-block-end: 0.5rem;
-    color: var(--paper);
-    background: var(--accent-deep);
-  }
-
-  .stock__type {
-    font-size: var(--fs-s);
-    color: var(--fg-2);
+  // Вся строка модели ссылка: подсветка при наведении и фокусе на всей площади
+  .stock__item:not(.is-active) .stock__link:hover,
+  .stock__item:not(.is-active) .stock__link:focus-visible {
+    background: var(--paper-8);
   }
 
   .stock__model {
+    min-inline-size: 0;
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
-    font-weight: 200;
-    line-height: 1.05;
+    font-size: clamp(1.6rem, 4.2svh, 3.4rem);
+    font-weight: 260;
+    line-height: 1;
     text-transform: uppercase;
   }
 
-  // Характеристики раскрываются по наведению или фокусу, как в блоке отгруженной техники; на сенсорных экранах видны сразу
-  .stock__details {
+  .stock__badge {
+    flex: none;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    color: var(--paper-75);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  // Раскрытие строки без анимации высоты в пикселях: grid-template-rows 0fr → 1fr
+  .stock__body {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.6s var(--ease-out);
+    transition: grid-template-rows 0.55s var(--ease-out);
+  }
+
+  .stock__item.is-active .stock__body {
+    grid-template-rows: 1fr;
+  }
+
+  .stock__body-in {
+    display: grid;
+    visibility: hidden;
+    gap: 1rem;
+    min-block-size: 0;
+    padding-inline: 1rem;
+    overflow: clip;
+    opacity: 0;
+    transition:
+      opacity 0.3s,
+      visibility 0s 0.55s;
+  }
+
+  .stock__item.is-active .stock__body-in {
+    visibility: visible;
+    padding-block-end: 0.85rem;
+    opacity: 1;
+    transition:
+      opacity 0.5s var(--ease-out) 0.15s,
+      visibility 0s;
+  }
+
+  .stock__type {
+    font-size: var(--fs-m);
+    color: var(--paper-85);
   }
 
   .stock__specs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem 1.5rem;
-    min-block-size: 0;
-    overflow: hidden;
-    transition: padding-block-start 0.6s var(--ease-out);
-  }
-
-  .stock__panel:hover .stock__details,
-  .stock__panel:focus-visible .stock__details {
-    grid-template-rows: 1fr;
-  }
-
-  .stock__panel:hover .stock__specs,
-  .stock__panel:focus-visible .stock__specs {
-    padding-block-start: 1.25rem;
-  }
-
-  @media (hover: none) {
-    .stock__details {
-      grid-template-rows: 1fr;
-    }
-
-    .stock__specs {
-      padding-block-start: 1.25rem;
-    }
+    gap: 1rem 1.5rem;
+    padding-block: 0.25rem;
   }
 
   .stock__spec {
     display: grid;
-    gap: 0.1rem;
+    gap: 0.2rem;
   }
 
   .stock__spec-label {
-    color: var(--fg-2);
+    font-size: var(--fs-m);
+    color: var(--paper-70);
   }
 
   .stock__spec-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.1svh, 2.4rem);
+    font-weight: 260;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .stock__more {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-self: start;
     font-size: var(--fs-s);
     font-weight: 500;
+    color: var(--paper);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    transition: color 0.25s;
   }
 
-  .stock__panel-icon {
-    position: absolute;
-    inset-block-start: 1.25rem;
-    inset-inline-end: 1.25rem;
-    inline-size: 1.5rem;
-    block-size: 1.5rem;
+  .stock__link:hover .stock__more,
+  .stock__link:focus-visible .stock__more {
     color: var(--accent-text);
-    transition: transform 0.5s var(--ease-out);
   }
 
-  .stock__panel:hover .stock__panel-icon {
+  .stock__more-icon {
+    inline-size: 1.1rem;
+    block-size: 1.1rem;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .stock__link:hover .stock__more-icon,
+  .stock__link:focus-visible .stock__more-icon {
     transform: translateX(0.3rem);
   }
 
-  .stock__slide--rest {
-    display: grid;
-    background: var(--bg-2);
+  // Индикатор автолистания: заливка всей строки слева направо за время показа модели
+  .stock__progress {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: clip;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .stock__progress::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background: var(--stock-fill);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .stock.is-playing .stock__item.is-active .stock__progress {
+    opacity: 1;
+  }
+
+  .stock.is-playing .stock__item.is-active .stock__progress::after {
+    animation: stock-progress var(--autoplay, 6s) linear forwards;
+  }
+
+  // Последняя строка: белое поле с тёмным текстом, при наведении заливается акцентом
+  .stock__item--rest {
+    background: var(--paper);
+    transition: background-color 0.3s var(--ease-out);
+  }
+
+  .stock__item--rest:hover,
+  .stock__item--rest:focus-within {
+    background: var(--accent);
   }
 
   .stock__rest {
-    display: grid;
+    display: flex;
     gap: 1rem;
-    place-content: center;
-    padding: 2rem;
-    color: var(--paper);
-    text-align: center;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(0.5rem, 1.6svh, 0.9rem) 1rem;
+    color: var(--ink);
     text-decoration: none;
-  }
-
-  .stock__rest-label {
-    color: var(--fg-2);
   }
 
   .stock__rest-title {
     font-family: var(--font-display);
-    font-size: var(--fs-title-s);
-    font-weight: 200;
+    font-size: clamp(1.6rem, 4.2svh, 3.4rem);
+    font-weight: 260;
     line-height: 1;
     text-transform: uppercase;
   }
 
   .stock__rest-icon {
-    inline-size: 3rem;
-    block-size: 3rem;
-    margin-inline: auto;
-    color: var(--accent-text);
-    transition: transform 0.6s var(--ease-out);
-  }
-
-  .stock__rest:hover .stock__rest-icon {
-    transform: translateX(0.5rem);
-  }
-
-  @media (width >= 900px) {
-    .stock__top {
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    }
-  }
-
-  @media (width < 700px) {
-    .stock__viewport {
-      min-block-size: 32rem;
-      aspect-ratio: auto;
-    }
-  }
-
-  // Каталог по назначению: панели-полосы на всю ширину экрана, наведение раскрывает панель и возвращает снимку цвет
-  .purposes {
-    padding-block: var(--section-y) 0;
-
-    @include theme-site;
-  }
-
-  .purposes__head {
-    display: grid;
-    gap: 1.25rem var(--gap);
-    align-items: end;
-    margin-block-end: clamp(1.5rem, 3vw, 2.5rem);
-  }
-
-  .purposes__head > .button {
-    justify-self: start;
-  }
-
-  .purposes__text {
-    max-inline-size: 28rem;
-    color: var(--fg-2);
-  }
-
-  .purposes__list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .purposes__item {
-    position: relative;
     flex: none;
-    block-size: 9rem;
-    overflow: clip;
-    transition: block-size 0.7s var(--ease-io);
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    color: var(--ink);
+    transition: transform 0.5s var(--ease-out);
   }
 
-  .purposes__item:has(.is-active) {
-    block-size: 18rem;
+  .stock__rest:hover .stock__rest-icon,
+  .stock__rest:focus-visible .stock__rest-icon {
+    transform: translateX(0.4rem);
   }
 
-  .purposes__link {
-    position: absolute;
-    inset: 0;
-    display: block;
-    color: var(--paper);
-    text-decoration: none;
+  // Низкие окна (ноутбук): плотнее отступы, чтобы колонка с раскрытой моделью помещалась в экран
+  @media (height < 820px) {
+    .stock__intro {
+      gap: 0.6rem;
+      padding-block-end: 0.75rem;
+    }
+
+    .stock__head,
+    .stock__rest {
+      padding-block: 0.4rem;
+    }
+
+    .stock__specs {
+      gap: 0.6rem 1.5rem;
+    }
+
+    .stock__body-in {
+      gap: 0.5rem;
+    }
   }
 
-  .purposes__link::after {
-    position: absolute;
-    inset: 0;
-    content: '';
-    background: rgb(17 15 13 / 38%);
-    transition: background-color 0.8s var(--ease-io);
-  }
-
-  .purposes__link.is-active::after {
-    background: rgb(17 15 13 / 22%);
-  }
-
-  .purposes__img {
-    position: absolute;
-    inset: 0;
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-    filter: grayscale(1);
-    transform: scale(1.05);
-    transition:
-      filter 0.9s var(--ease-io),
-      transform 1.4s var(--ease-out);
-  }
-
-  .purposes__link.is-active .purposes__img {
-    filter: none;
-    transform: none;
-  }
-
-  .purposes__count {
-    position: absolute;
-    inset-block-start: 1.25rem;
-    inset-inline-start: 1.25rem;
-    z-index: 1;
-    padding: 0.4rem 0.7rem;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-
-  .purposes__link.is-active .purposes__count {
-    opacity: 1;
-  }
-
-  .purposes__icon {
-    position: absolute;
-    inset-block-start: 1.25rem;
-    inset-inline-end: 1.25rem;
-    z-index: 1;
-    inline-size: 1.75rem;
-    block-size: 1.75rem;
-    color: var(--paper);
-    opacity: 0;
-    transform: translateX(-0.5rem);
-    transition:
-      opacity 0.4s,
-      transform 0.6s var(--ease-out);
-  }
-
-  .purposes__link.is-active .purposes__icon {
-    opacity: 1;
-    transform: none;
-  }
-
-  .purposes__name {
-    position: absolute;
-    z-index: 1;
-    font-family: var(--font-display);
-    font-weight: 200;
-    line-height: 1.05;
-    text-transform: uppercase;
-  }
-
-  // Свёрнутая панель: название стоит вертикально, раскрытая: крупно по горизонтали
-  .purposes__name--v {
-    display: none;
-  }
-
-  .purposes__name--h {
-    inset-block-end: 1.25rem;
-    inset-inline: 1.25rem;
-    font-size: clamp(2rem, 1.2rem + 2.2vw, 3.5rem);
-  }
-
+  // Ширина колонки по сетке: пять колонок на средних экранах, четыре на широких (от 1280 px)
+  // Текст колонки стоит на левом краю контейнера, как у остальных секций: стекло выступает за край на отступ колонки (1rem)
   @media (width >= 900px) {
-    .purposes__head {
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+    .stock__side {
+      grid-column: 1 / span 5;
+      margin-inline-start: -1rem;
+    }
+  }
+
+  @media (width >= 1280px) {
+    .stock__side {
+      grid-column: 1 / span 4;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stock__shot.is-active,
+    .stock__image,
+    .stock__body {
+      transition: none;
     }
 
-    .purposes__head > .button {
-      justify-self: end;
-    }
-
-    .purposes__list {
-      flex-direction: row;
-      block-size: clamp(30rem, 82svh, 52rem);
-    }
-
-    .purposes__item,
-    .purposes__item:has(.is-active) {
-      flex: 1 1 0;
-      min-inline-size: 0;
-      block-size: auto;
-      transition: flex-grow 0.8s var(--ease-io);
-    }
-
-    .purposes__item:has(.is-active) {
-      flex-grow: 6;
-    }
-
-    .purposes__name--v {
-      inset-block-end: 1.5rem;
-      inset-inline-start: 1.25rem;
-      display: block;
-      font-size: clamp(1.4rem, 1rem + 0.9vw, 2rem);
-      white-space: nowrap;
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      transition: opacity 0.4s;
-    }
-
-    .purposes__name--h {
-      inset-block-end: 1.75rem;
-      inset-inline: 1.75rem;
-      opacity: 0;
-      transform: translateY(0.75rem);
-      transition:
-        opacity 0.5s 0.3s,
-        transform 0.7s 0.3s var(--ease-out);
-    }
-
-    .purposes__link.is-active .purposes__name--v {
-      opacity: 0;
-    }
-
-    .purposes__link.is-active .purposes__name--h {
-      opacity: 1;
+    .stock__image {
       transform: none;
     }
+  }
+}
+
+@keyframes stock-progress {
+  to {
+    transform: scaleX(1);
   }
 }

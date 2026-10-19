@@ -1,38 +1,41 @@
 {% from "icons.njk" import icon %}
-{# Заявка: фото на весь экран под затемнением, огромное заявление, форма на стекле с быстрым выбором типа техники и груза. #}
+{# Заявка (переделана 2026-10-18): светлая тема без фото, слева заголовок и контакты, справа компактная панель с формой. #}
 <section class="request" id="request" aria-labelledby="request-title" data-chapter="Заявка">
-  <img class="request__bg" src="/src/assets/models/IMG_4496.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.05" />
-  <div class="request__layout container">
-    <h2 class="request__title" id="request-title" data-split>Расскажите<br />о задаче</h2>
-    <div class="request__bottom">
-      <div class="request__intro">
+  <div class="request__photo">
+    <div class="request__intro">
+      <h2 class="section-title request__title" id="request-title" data-split>Расскажите<br />о задаче</h2>
+      <div class="request__contact">
         <p class="request__lead">Какой груз возите, на каком шасси и в каком регионе работаете. Подберём модель и пришлём предложение с ценой и сроками.</p>
         <ul class="request__contacts">
           <li><a class="request__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a></li>
           <li><a class="request__mail" href="mailto:{{ home.contacts.email }}">{{ home.contacts.email }}</a></li>
         </ul>
       </div>
-      <form class="request__form glass" action="#" method="post" novalidate data-request-form>
+    </div>
+  </div>
+  <div class="request__panel">
+    <form class="request__form" action="#" method="post" novalidate data-request-form>
         <input type="hidden" name="kind" value="request" />
         <input type="hidden" name="model" value="" />
         <fieldset class="request__group">
-          <legend class="request__legend mono">Тип техники</legend>
-          <div class="request__chips">
+          <legend class="request__legend">Тип техники</legend>
+          <div class="opts">
             {% for type in home.picker.types %}
-              <label class="chip">
-                <input class="chip__input" type="radio" name="type" value="{{ type.value }}" />
-                <span class="chip__label">{{ type.title }}</span>
+              <label class="opt">
+                <input class="opt__input" type="radio" name="type" value="{{ type.value }}" />
+                <span class="opt__label">{{ type.title }}</span>
               </label>
             {% endfor %}
           </div>
         </fieldset>
         <fieldset class="request__group">
-          <legend class="request__legend mono">Что возите</legend>
-          <div class="request__chips">
-            {% for item in home.purposes %}
-              <label class="chip">
-                <input class="chip__input" type="checkbox" name="cargo" value="{{ item.title }}" />
-                <span class="chip__label">{{ item.title }}</span>
+          <legend class="request__legend">Что возите</legend>
+          <div class="opts">
+            {# Свой список груза (не общий home.purposes): без АТЗ, сбора нефти и вакуумных, с пищевыми жидкостями #}
+            {% for cargo in ["Тёмные нефтепродукты", "Светлые нефтепродукты", "Техническая вода", "Пищевые жидкости"] %}
+              <label class="opt">
+                <input class="opt__input" type="checkbox" name="cargo" value="{{ cargo }}" />
+                <span class="opt__label">{{ cargo }}</span>
               </label>
             {% endfor %}
           </div>
@@ -49,7 +52,7 @@
           </label>
           <label class="field field--wide">
             <span class="field__label">Задача</span>
-            <textarea class="field__control field__control--area" name="comment" rows="3" placeholder="Объём, шасси, регион"></textarea>
+            <textarea class="field__control field__control--area" name="comment" rows="2" placeholder="Объём, шасси, регион"></textarea>
           </label>
         </div>
         <div class="request__footer">
@@ -63,6 +66,5 @@
         </div>
         <p class="request__done" hidden data-form-done role="status">Заявка отправлена. Мы свяжемся с вами в ближайшее рабочее время.</p>
       </form>
-    </div>
   </div>
 </section>

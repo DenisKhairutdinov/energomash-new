@@ -1,0 +1,11 @@
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-shiny-magistralnye-ili-vnedorozhnye.html" %}
+{% set slug = "shiny-magistralnye-ili-vnedorozhnye" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

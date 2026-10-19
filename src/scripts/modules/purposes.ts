@@ -1,6 +1,37 @@
-const ACTIVE = 'is-active'
+const HOVER_QUERY = '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)'
 
-/** Каталог по назначению: наведение или фокус на строке показывает её фото (окно справа или фон главы). */
+/** Вариант 1: пока курсор над плиткой, кадр слегка смещается вслед за ним (до 1.5%), при уходе возвращается. */
+export const initTiles = (root: HTMLElement): void => {
+  if (!matchMedia(HOVER_QUERY).matches) {
+    return
+  }
+
+  for (const tile of root.querySelectorAll<HTMLElement>('[data-tile]')) {
+    let frame = 0
+
+    tile.addEventListener('pointermove', (event) => {
+      if (frame !== 0) {
+        return
+      }
+
+      frame = window.requestAnimationFrame(() => {
+        frame = 0
+
+        const box = tile.getBoundingClientRect()
+
+        tile.style.setProperty('--px', String(((event.clientX - box.left) / box.width - 0.5) * 2))
+        tile.style.setProperty('--py', String(((event.clientY - box.top) / box.height - 0.5) * 2))
+      })
+    })
+
+    tile.addEventListener('pointerleave', () => {
+      tile.style.setProperty('--px', '0')
+      tile.style.setProperty('--py', '0')
+    })
+  }
+}
+
+/** Каталог по назначению: кадр плиток следует за курсором. */
 export const initPurposes = (): void => {
   const root = document.querySelector<HTMLElement>('[data-purposes]')
 
@@ -8,27 +39,5 @@ export const initPurposes = (): void => {
     return
   }
 
-  const items = [...root.querySelectorAll<HTMLElement>('[data-purposes-item]')]
-  const images = [...root.querySelectorAll<HTMLElement>('[data-purposes-img]')]
-
-  const activate = (index: number): void => {
-    for (const [position, image] of images.entries()) {
-      image.classList.toggle(ACTIVE, position === index)
-    }
-
-    for (const [position, item] of items.entries()) {
-      item.classList.toggle(ACTIVE, position === index)
-    }
-  }
-
-  for (const [index, item] of items.entries()) {
-    item.addEventListener('pointerenter', () => {
-      activate(index)
-    })
-    item.addEventListener('focus', () => {
-      activate(index)
-    })
-  }
-
-  activate(0)
+  initTiles(root)
 }

@@ -1,17 +1,21 @@
-// Тёмные полноэкранные главы, стекло, пин-скролл. Текст: Manrope.
+// Редизайн 2026-10-17: плоский минимализм. Заголовки Sofia Sans Extra Condensed, текст Onest, данные JetBrains Mono.
 @use 'partials/layers';
+@use 'partials/fonts';
 @use 'partials/tokens';
 @use 'partials/base';
 @use 'partials/components';
+@use 'classic';
 @use 'partials/modal';
 @use 'partials/effects';
 @use 'partials/header';
-@use 'partials/hero';
 @use 'partials/stock';
-@use 'partials/story';
+@use 'partials/purposes';
 @use 'partials/geography';
-@use 'partials/trust';
+@use 'partials/sections';
 @use 'partials/footer';
 @use 'partials/wow';
 @use 'partials/catalog';
+@use 'partials/product';
+@use 'partials/pages';
+@use 'partials/variants-home';
 @use 'partials/site';

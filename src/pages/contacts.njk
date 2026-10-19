@@ -1,2 +1,62 @@
-{% extends "layout.njk" %} {% set pageTitle = "Контакты" %} {% set currentPage = "contacts" %} {%
-block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/contacts.html" %}
+{% set pageTitle = "Контакты завода Энергомаш" %}
+{% set pageDescription = "Контакты завода «Энергомаш»: телефон 8 800 101-22-00, email 1@bik55.ru, офисы в Челябинске и Набережных Челнах, производство в Мисяше Челябинской области." %}
+{% set currentPage = "contacts" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import crumbs %}
+<article class="ip">
+  {{ crumbs([["Контакты", "/contacts.html"]]) }}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Контакты завода «Энергомаш»",
+      "url": "{{ site.url }}/contacts.html",
+      "mainEntity": { "@type": "Organization", "name": "{{ site.name }}", "telephone": "{{ site.phone }}", "email": "{{ site.email }}" }
+    }
+  </script>
+  <header class="ip__head ip__head--plain ip__head--contacts">
+    <div class="ip__head-in">
+      <div class="ip__head-main">
+        <p class="ip__kicker">Мы на связи</p>
+        <h1 class="ip__title" data-split>Контакты</h1>
+      </div>
+      <div class="ip__head-side">
+        <a class="ct__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
+        <p class="ip__lead">Звоните или пишите: подберём технику, посчитаем лизинг и ответим на вопросы по документам и сервису.</p>
+        <ul class="ct__links">
+          <li><a href="mailto:{{ home.contacts.email }}">{{ home.contacts.email }}</a></li>
+          <li><a href="mailto:lizing@bik55.ru">lizing@bik55.ru</a></li>
+          <li><a href="{{ home.contacts.max }}" target="_blank" rel="noopener noreferrer">Max</a></li>
+          <li><a href="{{ home.contacts.vk }}" target="_blank" rel="noopener noreferrer">ВКонтакте</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  {# Карта: виджет Яндекс Карт без ключа, адрес ищется по тексту (src/scripts/modules/contacts-map.ts подставляет его при выборе офиса). Точные адреса и метки нужно подтвердить у заказчика. #}
+  <section class="ct" aria-labelledby="contacts-map-title" data-contacts-map>
+    <h2 class="visually-hidden" id="contacts-map-title">Адреса и карта</h2>
+    <div class="ct__list">
+      {% set places = [
+        ["Офис в Челябинске", "ул. Кирова, 159, офис 1709", "Челябинск, улица Кирова, 159"],
+        ["Офис в Набережных Челнах", "проспект Хасана Туфана, 12, офис 1910", "Набережные Челны, проспект Хасана Туфана, 12"],
+        ["Производство", "Челябинская область, Мисяш, 5 км автодороги Чебаркуль–Архангельское", "Мисяш, Челябинская область"]
+      ] %}
+      {% for place in places %}
+        <button class="ct__place{{ ' is-active' if loop.first }}" type="button" data-map-query="{{ place[2] }}" aria-pressed="{{ 'true' if loop.first else 'false' }}">
+          <span class="ct__place-title">{{ place[0] }}</span>
+          <span class="ct__place-text">{{ place[1] }}</span>
+        </button>
+      {% endfor %}
+      <p class="ct__note">Если вы приезжаете на производство на приёмку техники, согласуйте время с менеджером заранее: <a href="/blog-priemka-tehniki-na-zavode.html">что проверить при приёмке</a>. <a href="/company-details.html">Реквизиты предприятия</a></p>
+    </div>
+    <div class="ct__map">
+      <iframe class="ct__frame" title="Карта: адреса завода «Энергомаш»" src="https://yandex.ru/map-widget/v1/?text={{ places[0][2] | urlencode }}&z=14&l=map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen data-map-frame></iframe>
+    </div>
+  </section>
+
+</article>
+{% endblock %}

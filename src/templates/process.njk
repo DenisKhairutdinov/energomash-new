@@ -1,21 +1,20 @@
-{# Путь заказа: пять шагов (последовательность, поэтому нумерация оправдана). Липкая стопка карточек на всю ширину: каждая следующая накрывает предыдущую (приём с Cuberto). #}
-{% set photos = ["IMG_4974.webp", "IMG_0550.webp", "IMG_2134.webp", "IMG_4496.webp", "IMG_4530.webp"] %}
-<section class="process" aria-labelledby="process-title" data-process data-chapter="Заказ">
-  <div class="process__head container">
-    <h2 class="section-title" id="process-title" data-split>Как<br />купить</h2>
-    <p class="process__lead">От звонка до передачи техники. Менеджер ведёт сделку на каждом шаге.</p>
-    <button class="button" type="button" data-modal-open="call">Заказать звонок</button>
+{# Путь заказа (редизайн с нуля, 2026-10-17): пять шагов, последовательность, поэтому номера оправданы. #}
+{# Тёмная секция без фото, мозаика: слева крупная плитка первого шага, справа четыре плитки; название шага видно всегда, описание появляется при наведении или фокусе (на сенсорных экранах показано всегда). Акцент только в кнопке. #}
+<section data-v="3" class="process" aria-labelledby="process-title" data-process data-chapter="Заказ">
+  <div class="process__head">
+    <h2 class="section-title process__title" id="process-title" data-split>Как<br />купить</h2>
+    <div class="process__foot">
+      <p class="process__lead">От звонка до передачи техники. Менеджер ведёт сделку на каждом шаге.</p>
+      <button class="button process__button" type="button" data-modal-open="call">Оставить заявку</button>
+    </div>
   </div>
-  <ol class="process__stack">
+  <ol class="process__list">
     {% for step in home.process %}
-      <li class="process__card" style="--i: {{ loop.index0 }}">
-        <img class="process__photo" src="/src/assets/models/{{ photos[loop.index0] }}" width="2400" height="1600" alt="" loading="lazy" />
-        <div class="process__body container">
-          <span class="process__number" aria-hidden="true">{{ loop.index }}</span>
-          <div class="process__text-box glass glass--strong">
-            <h3 class="process__title">{{ step.title }}</h3>
-            <p class="process__text">{{ step.text }}</p>
-          </div>
+      <li class="process__item" tabindex="0">
+        <span class="process__number" aria-hidden="true">{{ loop.index }}</span>
+        <div class="process__body">
+          <h3 class="process__step">{{ step.title }}</h3>
+          <p class="process__text">{{ step.text }}</p>
         </div>
       </li>
     {% endfor %}

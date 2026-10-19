@@ -1,0 +1,96 @@
+{# Макросы внутренних страниц (стили partials/_pages.scss). head — акцентная шапка, sec — секция с колонкой заголовка, cta — призыв, crumbs — микроразметка «хлебных крошек». #}
+
+{# Шапка страницы, четыре вида (variant), чтобы страницы не повторяли одну композицию:
+   plain  — светло-серое поле и крупный заголовок (по умолчанию, без photo);
+   dark   — чёрное поле, гигантский заголовок и навигация по разделам страницы (строится скриптом jump.ts из заголовков секций);
+   split  — слева заголовок и текст, справа фото до края экрана на всю высоту шапки; split-r — зеркально (фото слева);
+   photo  — фото на весь экран и стеклянная плашка (по умолчанию, если передан photo).
+   photo — имя файла из src/assets/models/thumbs. #}
+{% macro head(title, lead="", kicker="", long=false, photo="", variant="") %}
+  {% set kind = variant or ("photo" if photo else "plain") %}
+  <header class="ip__head ip__head--{{ kind }}">
+    {% if photo and kind != "plain" and kind != "dark" %}
+      {% if kind == "photo" %}
+        <img class="ip__head-bg" src="/src/assets/models/thumbs/{{ photo }}" width="1600" height="900" alt="" decoding="async" data-parallax="0.05" />
+      {% else %}
+        <div class="ip__head-photo"><img src="/src/assets/models/thumbs/{{ photo }}" width="1600" height="1000" alt="" decoding="async" data-parallax="0.05" /></div>
+      {% endif %}
+    {% endif %}
+    <div class="ip__head-in">
+      <div class="ip__head-main">
+        {% if kicker %}<p class="ip__kicker">{{ kicker | safe }}</p>{% endif %}
+        <h1 class="ip__title{{ ' ip__title--long' if long }}" data-split>{{ title | safe }}</h1>
+      </div>
+      {% if lead or kind == "dark" %}
+        <div class="ip__head-side">
+          {% if lead %}<p class="ip__lead">{{ lead | safe }}</p>{% endif %}
+          {% if kind == "dark" %}<nav class="ip__jump" aria-label="Разделы страницы" data-jump></nav>{% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </header>
+{% endmacro %}
+
+{# Секция: колонка заголовка слева, содержимое справа. Фоны чередуются сами (белый, светло-серый); soft=true делает секцию тёмной (для особо важного). #}
+{% macro sec(title, id, note="", soft=false) %}
+  <section class="ip__sec{{ ' ip__sec--soft' if soft }}" aria-labelledby="{{ id }}">
+    <div class="ip__side">
+      <h2 class="section-title ip__h2" id="{{ id }}" data-split>{{ title | safe }}</h2>
+      {% if note %}<p class="ip__note">{{ note | safe }}</p>{% endif %}
+    </div>
+    <div class="ip__body">{{ caller() }}</div>
+  </section>
+{% endmacro %}
+
+{# Фото-вставка между секциями: снимок на всю ширину с параллаксом; caption (необязательно) на стеклянной плашке. #}
+{% macro band(photo, caption="") %}
+  <figure class="ip__band">
+    <img class="ip__band-img" src="/src/assets/models/thumbs/{{ photo }}" width="1600" height="900" alt="" loading="lazy" decoding="async" data-parallax="0.08" />
+    {% if caption %}<figcaption class="ip__band-cap">{{ caption | safe }}</figcaption>{% endif %}
+  </figure>
+{% endmacro %}
+
+{# Цифры завода: чёрная секция, гигантские числа с подсчётом при появлении, подписи под ними (данные передаёт страница: home.facts). #}
+{% macro facts(photo, items, title="Завод в цифрах") %}
+  <section class="ip__nums" aria-labelledby="facts-title">
+    <div class="ip__nums-head">
+      <h2 class="section-title ip__h2" id="facts-title" data-split>{{ title }}</h2>
+      <p class="ip__note">Данные каталога и склада на сегодня.</p>
+    </div>
+    <ul class="ip__nums-list">
+      {% for fact in items %}
+        <li class="ip__num">
+          <span class="ip__num-value"><span data-count="{{ fact.value }}">{{ fact.value }}</span>{% if fact.suffix %}<span class="ip__num-unit">{{ fact.suffix }}</span>{% endif %}</span>
+          <span class="ip__num-label">{{ fact.label }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endmacro %}
+
+{# Призыв внизу: на всех страницах вместо него перед футером стоит форма заявки с главной (layout.njk), макрос оставлен пустым для совместимости страниц. #}
+{% macro cta() %}{% endmacro %}
+
+{% macro crumbs(items) %}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Главная", "item": "{{ site.url }}/" }
+        {% for item in items %},{ "@type": "ListItem", "position": {{ loop.index + 1 }}, "name": "{{ item[0] }}", "item": "{{ site.url }}{{ item[1] }}" }{% endfor %}
+      ]
+    }
+  </script>
+{% endmacro %}
+
+{% macro faq(items, name="faq") %}
+  <div class="ip__faq">
+    {% for item in items %}
+      <details class="faq__item" name="{{ name }}">
+        <summary class="faq__question"><span class="faq__text">{{ item[0] }}</span><span class="faq__mark" aria-hidden="true"></span></summary>
+        <div class="faq__body"><p class="faq__answer">{{ item[1] | safe }}</p></div>
+      </details>
+    {% endfor %}
+  </div>
+{% endmacro %}

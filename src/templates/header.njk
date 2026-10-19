@@ -1,4 +1,4 @@
-{# Шапка: логотип, мега-меню, инструменты (поиск, почта, Max, VK), телефон и звонок. Ссылки Max и VK в home.json, ключ contacts: заменить адресами страниц завода. #}
+{# Шапка (редизайн с нуля, 2026-10-17): плавающая стеклянная лента с отступом от краёв; меню, справа телефон, значки и акцентная кнопка звонка заподлицо с краем ленты. Ссылки Max и VK в home.json, ключ contacts: заменить адресами страниц завода. #}
 {% from "icons.njk" import icon %}
 <header class="header" data-header>
   <div class="header__bar container">
@@ -18,6 +18,7 @@
     <div class="header__panel" id="site-menu" data-menu-panel>
       {% include "menu.njk" %}
       <div class="header__contacts">
+        <a class="header__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
         <div class="header__tools">
           <button
             class="header__tool"
@@ -42,13 +43,12 @@
             <span class="mask-icon mask-icon--vk" aria-hidden="true"></span>
           </a>
         </div>
-        <a class="header__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
-        <button class="button button--compact" type="button" data-modal-open="call">Заказать звонок</button>
+        <button class="button button--compact header__cta" type="button" data-modal-open="call">Заказать звонок</button>
       </div>
     </div>
   </div>
-  <form class="header__search" id="site-search" action="/catalog.html" method="get" role="search" data-search>
-    <div class="header__search-inner container">
+  <form class="header__search container" id="site-search" action="/catalog.html" method="get" role="search" data-search>
+    <div class="header__search-inner">
       <label class="visually-hidden" for="site-search-input">Поиск по каталогу</label>
       {{ icon("search", "header__search-icon") }}
       <input

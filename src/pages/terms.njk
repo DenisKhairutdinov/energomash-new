@@ -1,2 +1,48 @@
-{% extends "layout.njk" %} {% set pageTitle = "Условия" %} {% set currentPage = "terms" %} {% block
-content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/terms.html" %}
+{% set pageTitle = "Условия покупки цистерн" %}
+{% set pageDescription = "Условия покупки техники «Энергомаш»: оплата, доставка, лизинг и субсидия, доработки и опции, гарантия 12 месяцев или 30 000 км, работа с дилерами и закупками." %}
+{% set currentPage = "terms" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec, cta, crumbs, band %}
+<article class="ip">
+  {{ crumbs([["Условия", "/terms.html"]]) }}
+  {{ head("Условия", "Как купить технику «Энергомаш»: оплата, лизинг и субсидия, доставка, доработки, гарантия. Менеджер ведёт сделку от заявки до передачи техники.", "Покупателю и партнёрам", false, "IMG_4496.webp", "dark") }}
+
+  {% call sec("Основные условия", "terms-main", "Коротко о том, что важно знать до заявки.") %}
+    <ul class="ip__facts">
+      <li class="ip__fact"><span class="ip__fact-value">12 мес.</span><span class="ip__fact-label">гарантия или 30 000 км пробега, что наступит раньше</span></li>
+      <li class="ip__fact"><span class="ip__fact-value">от 4 нед.</span><span class="ip__fact-label">изготовление техники под заказ</span></li>
+      <li class="ip__fact"><span class="ip__fact-value">{{ home.catalogTotals.inStock }}</span><span class="ip__fact-label">единиц техники в наличии, отгрузка за несколько дней</span></li>
+      <li class="ip__fact"><span class="ip__fact-value">10%</span><span class="ip__fact-label">субсидия при лизинге, до 500 000 ₽ на единицу</span></li>
+    </ul>
+  {% endcall %}
+
+  {{ band("IMG_2134.webp") }}
+
+  {% call sec("Разделы условий", "terms-links", "Выберите нужную тему.", true) %}
+    <ul class="ip__tiles ip__tiles--2">
+      <li><a class="ip__tile" href="/delivery.html"><span class="ip__tile-meta">Оплата</span><span class="ip__tile-title">Доставка и оплата</span><span class="ip__tile-text">Как оплатить технику и как она доезжает до вас. Транспортные компании, сроки и стоимость.</span></a></li>
+      <li><a class="ip__tile" href="/leasing.html"><span class="ip__tile-meta">Финансирование</span><span class="ip__tile-title">Лизинг</span><span class="ip__tile-text">Калькулятор платежа, партнёры и порядок оформления.</span></a></li>
+      <li><a class="ip__tile" href="/subsidies.html"><span class="ip__tile-meta">Государственная поддержка</span><span class="ip__tile-title">Субсидии</span><span class="ip__tile-text">10% стоимости техники, до 500 000 ₽ на единицу, при покупке в лизинг.</span></a></li>
+      <li><a class="ip__tile" href="/options.html"><span class="ip__tile-meta">Комплектация</span><span class="ip__tile-title">Доработки и опции</span><span class="ip__tile-text">Оборудование для ДОПОГ, комплектующие и переоборудование под задачу.</span></a></li>
+      <li><a class="ip__tile" href="/dealers.html"><span class="ip__tile-meta">Партнёрам</span><span class="ip__tile-title">Дилерам</span><span class="ip__tile-text">Программа для компаний, которые продают технику завода в своём регионе.</span></a></li>
+      <li><a class="ip__tile" href="/tenders.html"><span class="ip__tile-meta">Закупки</span><span class="ip__tile-title">Тендеры</span><span class="ip__tile-text">Документы и поддержка для участия в закупках и тендерах.</span></a></li>
+      <li><a class="ip__tile" href="/services.html"><span class="ip__tile-meta">После покупки</span><span class="ip__tile-title">Гарантия и сервис</span><span class="ip__tile-text">Гарантийные обязательства, обслуживание и запчасти.</span></a></li>
+      <li><a class="ip__tile" href="/docs.html"><span class="ip__tile-meta">Документы</span><span class="ip__tile-title">Сертификаты</span><span class="ip__tile-text">ОТТС, ТР ТС, ДОПОГ, ГРСИ: что передаём вместе с техникой.</span></a></li>
+    </ul>
+  {% endcall %}
+
+  {% call sec("Путь покупки", "terms-process", "Пять шагов от звонка до передачи техники.") %}
+    <ol class="ip__tiles ip__tiles--3">
+      {% for step in home.process %}
+        <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">{{ loop.index }}</span><h3 class="ip__tile-title">{{ step.title }}</h3><p class="ip__tile-text">{{ step.text }}</p></li>
+      {% endfor %}
+    </ol>
+    <div class="prose"><p>Подробно о каждом шаге читайте в статье <a href="/blog-put-zakaza.html">«Путь заказа: от заявки до отгрузки»</a>.</p></div>
+  {% endcall %}
+
+  {{ cta() }}
+</article>
+{% endblock %}

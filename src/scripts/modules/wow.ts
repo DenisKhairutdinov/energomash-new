@@ -12,67 +12,56 @@ const initStatement = (): void => {
   }
 
   const accent = new Set((text.dataset['accent'] ?? '').split('|'))
-  const words = text.textContent.trim().split(/\s+/)
+  // Неразрывные пробелы (после предлогов и союзов, ставит vite-plugins/nbsp.ts) остаются между словами:
+  // слова режутся по обычным пробелам, а внутри «и автоцистерны» разделитель снова неразрывный
+  const tokens = text.textContent.trim().split(/ +/)
 
   text.textContent = ''
 
-  const spans = words.map((word) => {
-    const span = document.createElement('span')
+  const spans = tokens.flatMap((token) => {
+    const parts = token.split('\u00A0')
 
-    span.className = accent.has(word) ? 'word word--accent' : 'word'
-    span.textContent = word
-    text.append(span, ' ')
+    return parts.map((word, index) => {
+      const span = document.createElement('span')
 
-    return span
+      span.className = accent.has(word) ? 'word word--accent' : 'word'
+      span.textContent = word
+      text.append(span, index < parts.length - 1 ? '\u00A0' : ' ')
+
+      return span
+    })
   })
+
+  const foot = document.querySelector<HTMLElement>('[data-statement-foot]')
 
   gsap.matchMedia().add(NO_PREFERENCE, () => {
     gsap.fromTo(
       spans,
-      { opacity: 0.16, filter: 'blur(6px)' },
+      { opacity: 0.2, filter: 'blur(6px)' },
       {
         opacity: 1,
         filter: 'blur(0px)',
         ease: 'none',
         stagger: 0.12,
-        scrollTrigger: { trigger: text, start: 'top 85%', end: 'bottom 72%', scrub: 0.3 },
+        scrollTrigger: { trigger: text, start: 'top 85%', end: 'bottom 70%', scrub: 0.3 },
       },
     )
-  })
-}
 
-/** «Цистерна наполняется»: чертёж заливается акцентом слева направо, число единиц считается вместе с ним. */
-const initFill = (): void => {
-  const root = document.querySelector<HTMLElement>('[data-fill]')
-  const level = root?.querySelector<HTMLElement>('[data-fill-level]')
-  const counter = root?.querySelector<HTMLElement>('[data-fill-count]')
-
-  if (!root || !level || !counter) {
-    return
-  }
-
-  const total = Number(counter.dataset['fillCount'] ?? 0)
-
-  gsap.matchMedia().add(NO_PREFERENCE, () => {
-    const state = { progress: 0 }
-
-    gsap.set(level, { clipPath: 'inset(0 100% 0 0)' })
-    counter.textContent = '0'
-
-    gsap.to(state, {
-      progress: 1,
-      ease: 'none',
-      onUpdate: () => {
-        level.style.clipPath = `inset(0 ${String(100 - state.progress * 100)}% 0 0)`
-        counter.textContent = String(Math.round(total * state.progress))
-      },
-      scrollTrigger: { trigger: root, start: 'top 82%', end: 'top 30%', scrub: 0.4 },
-    })
+    // Кнопка и пояснение поднимаются один раз, когда низ секции входит в экран
+    if (foot) {
+      gsap.from(foot.children, {
+        y: 28,
+        autoAlpha: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+        stagger: 0.12,
+        scrollTrigger: { trigger: foot, start: 'top 92%', once: true },
+      })
+    }
   })
 }
 
 export const initWow = (): void => {
   gsap.registerPlugin(ScrollTrigger)
   initStatement()
-  initFill()
 }

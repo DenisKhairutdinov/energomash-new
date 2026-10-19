@@ -1,0 +1,1391 @@
+@use 'mixins' as *;
+
+// Внутренние страницы (редизайн 2026-10-18): условия, блог, «О заводе», контакты, документы, юридические тексты, статьи, посадочные.
+// Язык главной: светлая тема (белый и светло-серый фон секций, чередуются сами), для особо важного тёмные секции (`soft`),
+// фото на всю ширину со стеклянной плашкой в шапке и в призыве, крупный Oswald, акцент в кнопках, цифрах и ссылках,
+// сетка в 12 колонок с --edge по краям. Один вариант, переключателей нет. Цвета только из палитры.
+@layer sections {
+  .ip {
+    @include light-surface;
+  }
+
+  // ---------- Шапка страницы: светло-серое поле
+  .ip__head {
+    position: relative;
+    padding-block: calc(var(--header-h) + 1.5rem) clamp(1.75rem, 5svh, 3.5rem);
+    color: var(--paper);
+    background: var(--ink-soft);
+    isolation: isolate;
+  }
+
+  .ip__head-in {
+    display: grid;
+    gap: 1.25rem var(--col-gap);
+    align-items: end;
+    padding-inline: var(--edge);
+  }
+
+  // Шапка с фото: снимок на всю ширину, текст на стеклянной плашке
+  .ip__head--photo {
+    display: grid;
+    align-items: end;
+    min-block-size: clamp(26rem, 66svh, 44rem);
+    padding-block-end: clamp(1.5rem, 5svh, 3rem);
+    overflow: clip;
+    color: var(--c-white);
+    background: var(--c-black);
+  }
+
+  .ip__head-bg {
+    position: absolute;
+    inset: -6% 0;
+    z-index: -1;
+    inline-size: 100%;
+    block-size: 112%;
+    object-fit: cover;
+  }
+
+  .ip__head--photo .ip__head-in {
+    @include glass;
+
+    --paper: var(--c-white);
+
+    justify-self: start;
+    inline-size: min(100% - 2 * var(--edge), 68rem);
+    padding: clamp(1.25rem, 2.6vw, 2.25rem);
+    margin-inline-start: var(--edge);
+  }
+
+  // Тёмная шапка: чёрное поле, гигантский заголовок слева, справа пояснение и навигация по разделам страницы
+  .ip__head--dark {
+    @include dark-surface;
+
+    display: grid;
+    align-items: end;
+    min-block-size: clamp(24rem, 62svh, 40rem);
+    padding-block-end: clamp(2rem, 6svh, 4rem);
+    background: var(--c-black);
+  }
+
+  .ip__head--dark .ip__title {
+    font-size: clamp(3.25rem, 1rem + 8.4vw, 11rem);
+    line-height: 0.86;
+  }
+
+  .ip__head--dark .ip__title--long {
+    font-size: clamp(2.5rem, 1rem + 5vw, 7.5rem);
+  }
+
+  .ip__jump {
+    display: grid;
+    gap: 0.15rem;
+    justify-items: start;
+    margin-block-start: 0.5rem;
+  }
+
+  .ip__jump a {
+    display: inline-flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1rem + 0.6vw, 1.75rem);
+    font-weight: 250;
+    color: var(--c-white);
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+      color 0.25s,
+      transform 0.5s var(--ease-out);
+  }
+
+  .ip__jump a::after {
+    font-family: var(--font-text);
+    font-size: 0.8em;
+    color: var(--accent);
+    content: '\2193';
+  }
+
+  .ip__jump a:hover,
+  .ip__jump a:focus-visible {
+    color: var(--accent);
+    transform: translateX(0.35rem);
+  }
+
+  // Шапка с фото сбоку: слева текст на светло-сером, справа (или слева у split-r) снимок до края экрана на всю высоту шапки
+  .ip__head--split,
+  .ip__head--split-r {
+    display: grid;
+    align-items: end;
+    min-block-size: clamp(30rem, 78svh, 52rem);
+    overflow: clip;
+  }
+
+  .ip__head-photo {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    margin-block-start: 1.5rem;
+    overflow: clip;
+    background: var(--c-light);
+  }
+
+  .ip__head-photo img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  // Блог: крупное слово «Блог» на светлом поле (размер как у шапок остальных страниц)
+  .ip__head--mega .ip__title {
+    font-size: clamp(3.5rem, 1rem + 7vw, 9rem);
+    line-height: 0.9;
+  }
+
+  // Статья: крупный заголовок на светлом поле, обложка во всю ширину ниже, заголовок статьи не уходит в гигантский размер
+  .ip__head--article {
+    padding-block-end: clamp(1.5rem, 4svh, 3rem);
+  }
+
+  .ap__cover {
+    position: relative;
+    block-size: clamp(16rem, 52svh, 36rem);
+    margin: 0;
+    overflow: clip;
+    background: var(--c-light);
+  }
+
+  .ap__cover img {
+    position: absolute;
+    inset: -6% 0;
+    inline-size: 100%;
+    block-size: 112%;
+    object-fit: cover;
+  }
+
+  // Фото-вставка между секциями на всю ширину; вариант с цифрами на стекле
+  .ip__band {
+    position: relative;
+    display: grid;
+    align-items: end;
+    block-size: clamp(18rem, 56svh, 38rem);
+    margin: 0;
+    overflow: clip;
+    background: var(--c-black);
+    isolation: isolate;
+  }
+
+  // Фото-вставки между секциями чёрно-белые, при наведении возвращается цвет; фото вверху страницы (шапки, обложки статей) всегда цветные
+  .ip__band-img {
+    filter: grayscale(1);
+    transition: filter 0.8s var(--ease-out);
+  }
+
+  .ip__band:hover .ip__band-img {
+    filter: none;
+  }
+
+  .ip__band-img {
+    position: absolute;
+    inset: -8% 0;
+    z-index: -1;
+    inline-size: 100%;
+    block-size: 116%;
+    object-fit: cover;
+  }
+
+  .ip__band-cap {
+    @include glass;
+
+    justify-self: start;
+    max-inline-size: 36rem;
+    padding: 1rem 1.25rem;
+    margin: 0 0 clamp(1.5rem, 4svh, 3rem) var(--edge);
+    font-size: var(--fs-m);
+  }
+
+  // Цифры завода: чёрная секция, гигантские числа Oswald, единицы акцентом, подписи серым
+  .ip__nums {
+    @include dark-surface;
+
+    display: grid;
+    gap: clamp(2rem, 6svh, 4rem);
+    padding-block: calc(var(--sec-pad-y) * 2);
+    background: var(--c-black);
+  }
+
+  .ip__nums-head {
+    display: grid;
+    gap: 1rem;
+    padding-inline: var(--edge);
+  }
+
+  .ip__nums-list {
+    display: grid;
+    gap: clamp(2rem, 5svh, 3.5rem) var(--col-gap);
+    padding: 0 var(--edge);
+    margin: 0;
+    list-style: none;
+  }
+
+  .ip__num {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+  }
+
+  .ip__num-value {
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+    font-family: var(--font-display);
+    font-size: clamp(4.5rem, 1rem + 9vw, 11.5rem);
+    font-weight: 200;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.85;
+    color: var(--c-white);
+    transition: color 0.4s var(--ease-out);
+  }
+
+  .ip__num:hover .ip__num-value {
+    color: var(--accent);
+  }
+
+  .ip__num-unit {
+    font-size: 0.32em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .ip__num-label {
+    max-inline-size: 18rem;
+    font-size: var(--fs-m);
+    line-height: 1.4;
+    color: var(--c-gray);
+  }
+
+  .ip__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .ip__kicker a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ip__kicker a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .ip__title {
+    font-size: clamp(2.75rem, 1rem + 6vw, 8rem);
+    font-weight: 200;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    overflow-wrap: anywhere;
+  }
+
+  .ip__head--photo .ip__title {
+    font-size: clamp(2.5rem, 1rem + 4.4vw, 6rem);
+  }
+
+  .ip__title--long,
+  .ip__head--photo .ip__title--long {
+    font-size: clamp(2.25rem, 1rem + 3.2vw, 5rem);
+    line-height: 0.95;
+  }
+
+  .ip__lead {
+    max-inline-size: 36rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .ip__head-main {
+    display: grid;
+    gap: 1rem;
+    min-inline-size: 0;
+  }
+
+  .ip__head-side {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  // ---------- Секции: колонка заголовка и содержимое. Фон: белый, светло-серый (чередуются), тёмный у `soft`
+  .ip__sec {
+    --tile: var(--c-light);
+
+    display: grid;
+    gap: 1.5rem 0;
+    padding-block: calc(var(--sec-pad-y) * 2);
+    background: var(--ink);
+  }
+
+  .ip__sec:nth-of-type(even) {
+    --tile: var(--c-white);
+
+    background: var(--ink-soft);
+  }
+
+  .ip__sec--soft,
+  .ip__sec--soft:nth-of-type(even) {
+    @include dark-surface;
+
+    --tile: var(--c-white);
+
+    background: var(--c-black);
+  }
+
+  .ip__side {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    padding-inline: var(--edge) var(--col-gap);
+  }
+
+  .ip__h2 {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .ip__note {
+    max-inline-size: 26rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .ip__body {
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+    min-inline-size: 0;
+    padding-inline: var(--edge);
+  }
+
+  // ---------- Текст для чтения
+  .prose {
+    display: grid;
+    gap: 1.1rem;
+    max-inline-size: 46rem;
+    font-size: clamp(1.05rem, 1rem + 0.2vw, 1.25rem);
+    line-height: 1.7;
+  }
+
+  .prose h2,
+  .prose h3 {
+    margin-block-start: 1.25rem;
+    font-family: var(--font-display);
+    font-weight: 250;
+    line-height: 1.02;
+    text-transform: uppercase;
+  }
+
+  .prose h2 {
+    font-size: clamp(1.9rem, 1rem + 1.8vw, 3rem);
+  }
+
+  .prose h3 {
+    font-size: clamp(1.5rem, 1rem + 1vw, 2.2rem);
+  }
+
+  .prose ul,
+  .prose ol {
+    display: grid;
+    gap: 0.6rem;
+    padding-inline-start: 1.4rem;
+  }
+
+  .prose li::marker {
+    color: var(--accent);
+  }
+
+  .prose a {
+    color: var(--accent);
+    text-underline-offset: 3px;
+  }
+
+  .prose a:hover {
+    color: var(--paper);
+  }
+
+  .prose strong {
+    font-weight: 600;
+  }
+
+  .prose blockquote {
+    padding: 1.25rem 1.5rem;
+    margin: 0.5rem 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 1rem + 0.9vw, 2rem);
+    font-weight: 250;
+    line-height: 1.2;
+    background: var(--c-light);
+  }
+
+  // Таблица сравнения: плитки в стык, шапка чёрная
+  .prose table {
+    inline-size: 100%;
+    font-size: var(--fs-s);
+    line-height: 1.45;
+    border-spacing: 0.25rem;
+    border-collapse: separate;
+  }
+
+  .prose th,
+  .prose td {
+    padding: 0.8rem 1rem;
+    vertical-align: top;
+    text-align: start;
+    background: var(--c-light);
+  }
+
+  .prose th {
+    font-weight: 600;
+    color: var(--c-white);
+    background: var(--c-black);
+  }
+
+  .prose .tablewrap {
+    overflow-x: auto;
+  }
+
+  // Выноска «Коротко»: светло-серая плитка, заголовок акцентом
+  .callout {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.25rem 1.5rem;
+    color: var(--c-black);
+    background: var(--c-light);
+  }
+
+  .callout__title {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .callout p,
+  .callout ul {
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .callout ul {
+    display: grid;
+    gap: 0.4rem;
+    padding-inline-start: 1.2rem;
+  }
+
+  // Вопросы и ответы (строки .faq__item лежат в _sections.scss); в тёмной секции строки белые
+  .ip__faq {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .ip__sec--soft .faq__item {
+    @include light-surface;
+
+    background: var(--c-white);
+  }
+
+  // ---------- Плитки: цвет задаёт секция (--tile), при наведении акцент с белым текстом
+  .ip__tiles {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  // Плитка-ссылка внутри li растягивается на всю ячейку: в ряду все плитки одной высоты
+  .ip__tiles > li:not(.ip__tile) {
+    display: grid;
+  }
+
+  .ip__tile {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    min-inline-size: 0;
+    padding: clamp(1.1rem, 2.4svh, 1.75rem) clamp(1.1rem, 1.8vw, 1.75rem);
+    color: var(--c-black);
+    text-decoration: none;
+    background: var(--tile);
+    transition:
+      background-color 0.3s var(--ease-out),
+      color 0.3s var(--ease-out);
+  }
+
+  a.ip__tile:hover,
+  a.ip__tile:focus-visible {
+    color: var(--c-white);
+    background: var(--accent);
+  }
+
+  a.ip__tile:hover .ip__tile-meta,
+  a.ip__tile:focus-visible .ip__tile-meta {
+    color: var(--c-white);
+  }
+
+  .ip__tile-num {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1rem + 3vw, 4.5rem);
+    font-weight: 230;
+    line-height: 0.85;
+    color: transparent;
+
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-text-stroke: 1.5px var(--c-black);
+  }
+
+  a.ip__tile:hover .ip__tile-num,
+  a.ip__tile:focus-visible .ip__tile-num {
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-text-stroke-color: var(--c-white);
+  }
+
+  .ip__tile-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 1rem + 0.9vw, 2rem);
+    font-weight: 250;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .ip__tile-text {
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .ip__tile-meta {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  // Цифры: крупное акцентное значение и подпись; в тёмной секции без плитки
+  .ip__facts {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .ip__fact {
+    display: grid;
+    gap: 0.4rem;
+    padding: clamp(1.1rem, 2.4svh, 1.75rem);
+    color: var(--c-black);
+    background: var(--tile);
+  }
+
+  .ip__sec--soft .ip__fact {
+    color: var(--c-white);
+    background: transparent;
+  }
+
+  .ip__fact-value {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1rem + 3.2vw, 5rem);
+    font-weight: 230;
+    line-height: 0.9;
+    color: var(--accent);
+  }
+
+  .ip__fact-label {
+    font-size: var(--fs-m);
+    line-height: 1.4;
+  }
+
+  // Список «название, значение»
+  .ip__dl {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+  }
+
+  .ip__dl > div {
+    display: grid;
+    gap: 0.3rem;
+    padding: clamp(1rem, 2.2svh, 1.4rem) clamp(1rem, 1.6vw, 1.5rem);
+    color: var(--c-black);
+    background: var(--tile);
+  }
+
+  .ip__sec--soft .ip__dl > div {
+    background: var(--c-white);
+  }
+
+  .ip__dl dt {
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .ip__dl dd {
+    margin: 0;
+    font-size: var(--fs-m);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .ip__dl dd a {
+    color: var(--accent);
+  }
+
+  .ip__dl--big dd {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 1rem + 1vw, 2.2rem);
+    font-weight: 250;
+    line-height: 1.1;
+  }
+
+  // Фото-плитка в тексте
+  .ip__photo {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    margin: 0;
+    overflow: clip;
+    background: var(--c-light);
+  }
+
+  .ip__photo img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .ip__photo figcaption {
+    position: absolute;
+    inset-block-end: 0.75rem;
+    inset-inline-start: 0.75rem;
+    padding: 0.5rem 0.8rem;
+    font-size: var(--fs-xs);
+
+    @include glass;
+  }
+
+  // Одно главное действие на экран: если страница заканчивается своим призывом, кнопку звонка в подвале не дублируем
+  body:has(.ip__cta, .pdp__cta) .footer__call {
+    display: none;
+  }
+
+  // ---------- Призыв внизу страницы: фото на всю ширину и стеклянная плашка с кнопкой
+  .ip__cta {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-block-size: clamp(22rem, 56svh, 34rem);
+    padding-block: calc(var(--sec-pad-y) * 2);
+    overflow: clip;
+    color: var(--c-white);
+    background: var(--c-black);
+    isolation: isolate;
+  }
+
+  .ip__cta-bg {
+    position: absolute;
+    inset: -6% 0;
+    z-index: -1;
+    inline-size: 100%;
+    block-size: 112%;
+    object-fit: cover;
+  }
+
+  .ip__cta-in {
+    @include glass;
+
+    --paper: var(--c-white);
+
+    display: grid;
+    gap: 1.5rem var(--col-gap);
+    align-items: end;
+    justify-self: start;
+    inline-size: min(100% - 2 * var(--edge), 72rem);
+    padding: clamp(1.25rem, 2.6vw, 2.25rem);
+    margin-inline-start: var(--edge);
+  }
+
+  .ip__cta .ip__h2 {
+    font-size: var(--fs-sec);
+  }
+
+  .ip__cta-side {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .ip__button {
+    align-self: start;
+  }
+
+  // ---------- Статья: шапка с фото, текст, боковая выноска
+  .ap__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .ap__sec {
+    display: grid;
+    gap: 2rem 0;
+    padding-block: calc(var(--sec-pad-y) * 2);
+    background: var(--ink);
+  }
+
+  .ap__aside {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+    padding-inline: var(--edge) var(--col-gap);
+  }
+
+  .ap__aside-title {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .ap__share {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .ap__share a {
+    padding: 0.55rem 0.9rem;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    color: var(--c-black);
+    text-decoration: none;
+    background: var(--c-light);
+  }
+
+  .ap__share a:hover {
+    color: var(--c-white);
+    background: var(--c-black);
+  }
+
+  .ap__main {
+    display: grid;
+    gap: 2rem;
+    min-inline-size: 0;
+    padding-inline: var(--edge);
+  }
+
+  // Похожие статьи: светло-серое поле, плитки с фото
+  .ap__related {
+    display: grid;
+    gap: 1.5rem;
+    padding-block: calc(var(--sec-pad-y) * 2) 0;
+    background: var(--ink-soft);
+  }
+
+  .ap__related-title {
+    padding-inline: var(--edge);
+    font-size: var(--fs-sec);
+  }
+
+  .ap__related-list {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  // ---------- Блог: фильтр по рубрикам и сетка статей
+  .bl__filter {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 1rem var(--edge);
+    background: var(--c-white);
+  }
+
+  .bl__chip {
+    padding: 0.6rem 1rem;
+    font-size: var(--fs-s);
+    font-weight: 500;
+    color: var(--c-black);
+    cursor: pointer;
+    background: var(--c-light);
+    border: 0;
+    transition:
+      color 0.25s,
+      background-color 0.25s;
+  }
+
+  .bl__chip:hover {
+    background: var(--c-gray);
+  }
+
+  .bl__chip.is-active {
+    color: var(--c-white);
+    background: var(--c-black);
+  }
+
+  .bl__chip-n {
+    margin-inline-start: 0.4rem;
+    font-size: var(--fs-xs);
+  }
+
+  .bl__list {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .bl__list > li[hidden] {
+    display: none;
+  }
+
+  // Карточка статьи: цветное фото без затемнения, текст на стеклянной плашке, кадр следует за курсором (как на главной), текст на фото
+  .bl__card {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    align-content: end;
+    aspect-ratio: 3 / 2;
+    padding: clamp(1rem, 1.8vw, 1.75rem);
+    overflow: clip;
+    color: var(--c-white);
+    text-decoration: none;
+    background: var(--c-black);
+    isolation: isolate;
+  }
+
+  .bl__text {
+    @include glass;
+
+    display: grid;
+    gap: 0.5rem;
+    justify-self: start;
+    max-inline-size: min(100%, 44rem);
+    padding: clamp(0.8rem, 1.4vw, 1.2rem);
+  }
+
+  .bl__image {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transform: translate(calc(var(--px, 0) * -1.5%), calc(var(--py, 0) * -1.5%)) scale(1.06);
+    transition:
+      transform 0.5s var(--ease-out),
+      filter 0.6s var(--ease-out);
+  }
+
+  // Фото карточек блога и «Читайте также» чёрно-белые, при наведении возвращается цвет
+  .bl .bl__image,
+  .ap__related .bl__image {
+    filter: grayscale(1);
+  }
+
+  .bl .bl__card:hover .bl__image,
+  .bl .bl__card:focus-visible .bl__image,
+  .ap__related .bl__card:hover .bl__image,
+  .ap__related .bl__card:focus-visible .bl__image {
+    filter: none;
+  }
+
+  .bl__meta {
+    position: absolute;
+    inset-block-start: clamp(0.75rem, 1.4vw, 1.25rem);
+    inset-inline-start: clamp(0.75rem, 1.4vw, 1.25rem);
+    padding: 0.5rem 0.8rem;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+
+    @include glass;
+  }
+
+  .bl__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1rem + 1.4vw, 2.6rem);
+    font-weight: 240;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .bl__excerpt {
+    max-inline-size: 36rem;
+    font-size: var(--fs-s);
+    line-height: 1.5;
+  }
+
+  // ---------- Контакты: крупный телефон, ссылки, карта с переключателем офисов
+  .ct__phone {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1rem + 3.2vw, 5rem);
+    font-weight: 220;
+    line-height: 1;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .ct__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .ct__links a {
+    font-size: var(--fs-m);
+    color: var(--paper);
+    text-underline-offset: 4px;
+  }
+
+  .ct {
+    display: grid;
+    background: var(--c-black);
+  }
+
+  .ct__list {
+    @include dark-surface;
+
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+    padding: clamp(1.5rem, 4svh, 3rem) clamp(1rem, 2vw, 2rem);
+  }
+
+  .ct__place {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem 1.25rem;
+    font: inherit;
+    color: var(--c-white);
+    text-align: start;
+    cursor: pointer;
+    background: var(--c-black);
+    border: 0;
+    transition:
+      background-color 0.3s var(--ease-out),
+      color 0.3s var(--ease-out);
+  }
+
+  .ct__place:hover,
+  .ct__place:focus-visible,
+  .ct__place.is-active {
+    color: var(--c-black);
+    background: var(--c-white);
+  }
+
+  .ct__place.is-active {
+    background: var(--c-light);
+  }
+
+  .ct__place-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 1vw, 2.25rem);
+    font-weight: 250;
+    text-transform: uppercase;
+  }
+
+  .ct__place-text {
+    font-size: var(--fs-s);
+    line-height: 1.45;
+  }
+
+  .ct__note {
+    max-inline-size: 30rem;
+    margin-block-start: 1rem;
+    font-size: var(--fs-s);
+    line-height: 1.55;
+    color: var(--c-gray);
+  }
+
+  .ct__note a {
+    color: var(--c-white);
+  }
+
+  .ct__map {
+    position: relative;
+    min-block-size: clamp(22rem, 62svh, 44rem);
+    background: var(--c-light);
+  }
+
+  // Карту Яндекса стилизуем фильтром: цвета приглушены на треть, при наведении на карту полный цвет
+  .ct__frame {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    border: 0;
+    filter: grayscale(0.35) contrast(1.05);
+    transition: filter 0.6s var(--ease-out);
+  }
+
+  .ct__map:hover .ct__frame {
+    filter: none;
+  }
+
+  // ---------- Контакты и формы
+  .ip__map {
+    display: grid;
+    place-items: center;
+    min-block-size: 18rem;
+    padding: 2rem;
+    text-align: center;
+    background: var(--tile);
+  }
+
+  // ---------- Широкие экраны
+  @media (width >= 900px) {
+    .ip__nums {
+      grid-template-columns: var(--side-x) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .ip__nums-head {
+      position: sticky;
+      inset-block-start: calc(var(--header-h) + 1.5rem);
+      padding-inline: var(--edge) var(--col-gap);
+    }
+
+    .ip__nums-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-inline: var(--col-gap) var(--edge);
+    }
+
+    .ct {
+      grid-template-columns: minmax(22rem, 30%) minmax(0, 1fr);
+    }
+
+    .ip__head--dark .ip__head-in {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .ip__head--dark .ip__head-main {
+      grid-column: 1 / 9;
+    }
+
+    .ip__head--dark .ip__head-side {
+      grid-column: 9 / -1;
+    }
+
+    .ip__head--split,
+    .ip__head--split-r {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      padding-block-end: clamp(2rem, 7svh, 4.5rem);
+    }
+
+    .ip__head--split .ip__head-in,
+    .ip__head--split-r .ip__head-in {
+      grid-template-columns: minmax(0, 1fr);
+      grid-row: 1;
+      padding-inline: var(--edge);
+    }
+
+    .ip__head--split .ip__head-in {
+      grid-column: 1 / 8;
+    }
+
+    .ip__head--split-r .ip__head-in {
+      grid-column: 6 / -1;
+    }
+
+    .ip__head--split .ip__head-in > .ip__head-main,
+    .ip__head--split-r .ip__head-in > .ip__head-main,
+    .ip__head--split .ip__head-in > .ip__head-side,
+    .ip__head--split-r .ip__head-in > .ip__head-side {
+      grid-column: auto;
+    }
+
+    .ip__head--split .ip__title,
+    .ip__head--split-r .ip__title {
+      font-size: clamp(2.75rem, 1rem + 5vw, 7.25rem);
+    }
+
+    .ip__head-photo {
+      position: absolute;
+      inset-block: 0;
+      z-index: -1;
+      aspect-ratio: auto;
+      margin: 0;
+    }
+
+    .ip__head--split .ip__head-photo {
+      inset-inline-end: 0;
+      inline-size: 41.666%;
+    }
+
+    .ip__head--split-r .ip__head-photo {
+      inset-inline-start: 0;
+      inline-size: 41.666%;
+    }
+
+    .ip__head-in {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .ip__head-in > .ip__head-main {
+      grid-column: 1 / 9;
+    }
+
+    .ip__head-in > .ip__head-side {
+      grid-column: 9 / -1;
+    }
+
+    .ip__head-in--single {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ip__head--photo .ip__head-in {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ip__head--photo .ip__head-in > .ip__head-main,
+    .ip__head--photo .ip__head-in > .ip__head-side {
+      grid-column: auto;
+    }
+
+    .ip__sec,
+    .ap__sec {
+      grid-template-columns: var(--side-x) minmax(0, 1fr);
+    }
+
+    // Заголовок секции остаётся на месте, пока читается длинное содержимое справа
+    .ip__sec > .ip__side {
+      position: sticky;
+      inset-block-start: calc(var(--header-h) + 1.5rem);
+      align-self: start;
+    }
+
+    .ip__body,
+    .ap__main {
+      padding-inline: var(--col-gap) var(--edge);
+    }
+
+    .ip__tiles--2,
+    .ip__tiles--3,
+    .ip__tiles--4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ip__facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ip__dl--2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ip__cta-in {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+
+    .bl__list,
+    .ap__related-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bl__list:not(.bl__list--plain) > li:first-child {
+      grid-column: span 2;
+    }
+
+    .bl__list:not(.bl__list--plain) > li:first-child .bl__card {
+      aspect-ratio: 3 / 1;
+    }
+  }
+
+  @media (width >= 1300px) {
+    .bl__list.bl__list--plain {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ip__tiles--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .ip__tiles--4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .ip__facts {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .bl__list,
+    .ap__related-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bl__image,
+    a.ip__tile {
+      transition: none;
+    }
+  }
+
+  // Виньетка на всех фото внутренних страниц
+  .ip__head--photo {
+    @include vignette(-1);
+  }
+
+  .ip__head-photo,
+  .ap__cover {
+    @include vignette(1);
+  }
+
+  .ip__band {
+    @include vignette(-1);
+  }
+
+  .bl__card {
+    @include vignette(-1);
+  }
+
+  // ---------- Производство: триптих фото под шапкой, этапы строками с крупными номерами
+  .mf__strip {
+    display: grid;
+    gap: 0.25rem;
+    align-items: end;
+    padding: 0;
+    background: var(--ink-soft);
+  }
+
+  .mf__shot {
+    @include vignette(1);
+
+    position: relative;
+    aspect-ratio: 4 / 3;
+    margin: 0;
+    overflow: clip;
+    background: var(--c-light);
+  }
+
+  .mf__shot img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+
+  .mf__shot:hover img {
+    transform: scale(1.04);
+  }
+
+  .mf__process {
+    @include dark-surface;
+
+    display: grid;
+    gap: clamp(2rem, 6svh, 4rem);
+    padding-block: calc(var(--sec-pad-y) * 2);
+    background: var(--c-black);
+  }
+
+  .mf__process-head {
+    display: grid;
+    gap: 1rem;
+    padding-inline: var(--edge);
+  }
+
+  .mf__steps {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .mf__step {
+    display: grid;
+    gap: 0.5rem 2rem;
+    align-items: baseline;
+    padding: clamp(1rem, 2.4svh, 1.75rem) var(--edge);
+    color: var(--c-white);
+    background: var(--c-black);
+    transition:
+      color 0.35s var(--ease-out),
+      background-color 0.35s var(--ease-out);
+  }
+
+  .mf__step:hover {
+    color: var(--c-black);
+    background: var(--c-white);
+  }
+
+  .mf__num {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 1rem + 7vw, 9rem);
+    font-weight: 200;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.85;
+    color: var(--accent);
+  }
+
+  .mf__step-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1rem + 1.8vw, 3rem);
+    font-weight: 250;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .mf__step-text {
+    max-inline-size: 34rem;
+    font-size: var(--fs-m);
+    line-height: 1.5;
+    color: var(--c-gray);
+    transition: color 0.35s var(--ease-out);
+  }
+
+  .mf__step:hover .mf__step-text {
+    color: var(--c-black);
+  }
+
+  @media (width >= 900px) {
+    .mf__strip {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .mf__step {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 4fr) minmax(0, 5fr);
+    }
+
+    .mf__process {
+      grid-template-columns: 1fr;
+    }
+  }
+}

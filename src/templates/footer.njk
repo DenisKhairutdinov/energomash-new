@@ -1,20 +1,35 @@
-{# Подвал: огромное слово завода и чертёж цистерны; под ним реквизиты и ссылки. #}
+{# Подвал на 12 колонках: утверждение и звонок (1–8, 10–12), блоки: связь, разделы и «Покупателю» рядом, адреса, реквизиты; правовая строка. Слово завода убрано. #}
+{% from "icons.njk" import icon %}
+{% from "plural.njk" import plural %}
 <footer class="footer theme-dark" data-footer>
-  <div class="footer__mega" aria-hidden="true">
-    <span class="footer__word" data-footer-word>Энергомаш</span>
-    <span class="drawing drawing--chassis footer__drawing"></span>
-  </div>
-  <div class="footer__grid container">
-    <div class="footer__brand">
-      <a class="footer__logo" href="/" aria-label="Энергомаш, на главную">
-        <img src="/src/assets/images/logo.svg" width="176" height="27" alt="Энергомаш" loading="lazy" />
-      </a>
-      <p class="footer__lead">Завод-производитель полуприцепов-цистерн и автоцистерн</p>
-      <a class="footer__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
-      <a class="footer__mail link-arrow" href="mailto:{{ home.contacts.email }}">{{ home.contacts.email }}</a>
+  <div class="footer__top container grid">
+    <a class="footer__logo" href="/" aria-label="Энергомаш, на главную">
+      <span class="footer__logo-mark" aria-hidden="true"></span>
+    </a>
+    <p class="footer__statement">
+      Завод-производитель полуприцепов-цистерн и автоцистерн.
+      <span>{{ home.catalogTotals.total }} {{ plural(home.catalogTotals.total, "модель", "модели", "моделей") }} в каталоге, {{ home.catalogTotals.inStock }} {{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} в наличии.</span>
+    </p>
+    <div class="footer__call">
+      <button class="button" type="button" data-modal-open="call">
+        Заказать звонок
+      </button>
     </div>
-    <nav class="footer__col" aria-label="Навигация в подвале">
-      <h2 class="footer__title mono">Разделы</h2>
+  </div>
+
+  <div class="footer__grid container grid">
+    <div class="footer__col footer__col--contact">
+      <h2 class="footer__title">Связь</h2>
+      <a class="footer__phone" href="{{ home.contacts.phoneHref }}">{{ home.contacts.phone }}</a>
+      <ul class="footer__list">
+        <li><a class="link-arrow" href="mailto:{{ home.contacts.email }}">{{ home.contacts.email }}</a></li>
+        <li><a class="link-arrow" href="{{ home.contacts.max }}" target="_blank" rel="noopener noreferrer">Max</a></li>
+        <li><a class="link-arrow" href="{{ home.contacts.vk }}" target="_blank" rel="noopener noreferrer">ВКонтакте</a></li>
+      </ul>
+    </div>
+    <nav class="footer__nav" aria-label="Навигация в подвале">
+      <div class="footer__col">
+      <h2 class="footer__title">Разделы</h2>
       <ul class="footer__list">
         <li><a class="link-arrow" href="/catalog.html">Каталог</a></li>
         <li><a class="link-arrow" href="/catalog.html?in-stock=1">В наличии</a></li>
@@ -23,32 +38,46 @@
         <li><a class="link-arrow" href="/blog.html">Блог</a></li>
         <li><a class="link-arrow" href="/contacts.html">Контакты</a></li>
       </ul>
+      </div>
+      <div class="footer__col">
+      <h2 class="footer__title">Покупателю</h2>
+      <ul class="footer__list">
+        <li><a class="link-arrow" href="/guide.html">Как выбрать цистерну</a></li>
+        <li><a class="link-arrow" href="/delivery.html">Доставка и оплата</a></li>
+        <li><a class="link-arrow" href="/leasing.html">Лизинг</a></li>
+        <li><a class="link-arrow" href="/subsidies.html">Субсидии</a></li>
+        <li><a class="link-arrow" href="/services.html">Сервис и запчасти</a></li>
+        <li><a class="link-arrow" href="/docs.html">Документы</a></li>
+        <li><a class="link-arrow" href="/faq.html">Вопросы и ответы</a></li>
+      </ul>
+      </div>
     </nav>
     <div class="footer__col">
-      <h2 class="footer__title mono">Адреса</h2>
+      <h2 class="footer__title">Адреса</h2>
       <dl class="footer__details">
         {% for office in home.offices %}
           <div>
-            <dt class="mono">{{ office.title }}</dt>
+            <dt>{{ office.title }}</dt>
             <dd>{{ office.text }}</dd>
           </div>
         {% endfor %}
       </dl>
     </div>
     <div class="footer__col">
-      <h2 class="footer__title mono">Реквизиты</h2>
+      <h2 class="footer__title">Реквизиты</h2>
       <dl class="footer__details">
         {% for item in home.requisites %}
           <div>
-            <dt class="mono">{{ item.title }}</dt>
-            <dd>{{ item.text }}</dd>
+            <dt>{{ item.title }}</dt>
+            <dd class="footer__data">{{ item.text }}</dd>
           </div>
         {% endfor %}
       </dl>
       <a class="footer__more link-arrow" href="/company-details.html">Все реквизиты</a>
     </div>
   </div>
-  <div class="footer__legal container">
+
+  <div class="footer__legal container grid">
     <p>© 2026 ООО «Энергомаш». Все права защищены</p>
     <ul>
       {% for link in nav.legal %}

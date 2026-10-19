@@ -3,9 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ pageTitleFull or (pageTitle + " — Энергомаш") }}</title>
+    <title>{{ pageTitleFull or (pageTitle if ("Энергомаш" in pageTitle) else (pageTitle + " — Энергомаш")) }}</title>
     {% if pageDescription %}<meta name="description" content="{{ pageDescription }}" />{% endif %}
-    <meta name="theme-color" content="#110f0d" />
+    {% set seoTitle = pageTitleFull or (pageTitle if ("Энергомаш" in pageTitle) else (pageTitle + " — Энергомаш")) %}
+    {% if pagePath %}
+      <link rel="canonical" href="{{ site.url }}{{ pagePath }}" />
+      <meta property="og:url" content="{{ site.url }}{{ pagePath }}" />
+    {% endif %}
+    <meta property="og:site_name" content="{{ site.name }}" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:type" content="{{ 'article' if pageClass == 'article' else 'website' }}" />
+    <meta property="og:title" content="{{ seoTitle }}" />
+    {% if pageDescription %}<meta property="og:description" content="{{ pageDescription }}" />{% endif %}
+    <meta property="og:image" content="{{ site.url }}{{ pageImage or site.ogImage }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#181b21" />
     <link rel="icon" href="/src/assets/favicon.svg" type="image/svg+xml" />
     {# Прелоадер показываем на главной один раз за сессию #}
     <script>
@@ -18,37 +30,35 @@
         } catch (error) {
           /* без localStorage остаётся тёмная тема */
         }
-        try {
-          if (root.dataset.page === 'home' && !sessionStorage.getItem('loaded')) root.classList.add('has-loader')
-        } catch (error) {
-          /* без sessionStorage прелоадер не показываем */
-        }
       })()
     </script>
     <link rel="stylesheet" href="/src/styles/main.scss" />
     <script type="module" src="/src/scripts/main.ts"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "{{ site.name }}",
+        "legalName": "{{ site.legalName }}",
+        "url": "{{ site.url }}",
+        "logo": "{{ site.url }}{{ site.logo }}",
+        "email": "{{ site.email }}",
+        "telephone": "{{ site.phone }}",
+        "contactPoint": [{ "@type": "ContactPoint", "telephone": "{{ site.phone }}", "contactType": "sales", "areaServed": "RU", "availableLanguage": "Russian" }],
+        "address": [
+          {% for office in site.offices %}{ "@type": "PostalAddress", "addressLocality": "{{ office.city }}", "streetAddress": "{{ office.street }}", "addressRegion": "{{ office.region }}", "addressCountry": "RU" }{% if not loop.last %},{% endif %}{% endfor %}
+        ]
+      }
+    </script>
   </head>
   <body class="page{% if pageClass %} page--{{ pageClass }}{% endif %}">
     <a class="skip-link" href="#main">Перейти к содержимому</a>
-    {% if pageClass == "home" %}
-      <div class="loader" data-loader aria-hidden="true">
-        <div class="loader__stage">
-          <div class="loader__drawing">
-            <span class="drawing drawing--ppc" data-loader-drawing></span>
-          </div>
-        </div>
-        <div class="loader__foot">
-          <img class="loader__logo" src="/src/assets/images/logo.svg" width="176" height="27" alt="" />
-          <span class="loader__count" data-loader-count>000</span>
-        </div>
-      </div>
-    {% endif %}
     {% include "header.njk" %}
     <main id="main">
       {% block content %}{% endblock %}
     </main>
+    {% if pageClass != "home" %}{% include "request.njk" %}{% endif %}
     {% include "footer.njk" %}
     {% include "modal-request.njk" %}
-    <div class="grain" aria-hidden="true"></div>
   </body>
 </html>

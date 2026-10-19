@@ -49,6 +49,16 @@ export const createProductCard = (
   drawing?.setAttribute('aria-label', label)
 
   const photoSource = item.photos.map((name) => photoUrl(name)).find((url) => url !== undefined)
+  const root = card.firstElementChild
+
+  // Метки для оформления: без фото карточка компактнее, цена по запросу показывается у позиций в наличии
+  if (item.stock.status === STOCK_IN) {
+    root?.classList.add('ccard--stock')
+  }
+
+  if (!photoSource) {
+    root?.classList.add('ccard--nophoto')
+  }
 
   if (photoSource && drawing) {
     const photo = document.createElement('img')
@@ -69,6 +79,7 @@ export const createProductCard = (
       'error',
       () => {
         photo.replaceWith(drawing)
+        root?.classList.add('ccard--nophoto')
 
         if (soon) {
           soon.hidden = false

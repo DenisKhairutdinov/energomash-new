@@ -1,17 +1,20 @@
 // Темы. Цвета задаются переменными, поэтому компоненты внутри (кнопки, поля, стекло) подстраиваются сами.
-// theme-dark: всегда тёмная (секции с фото, подвал, шапка, окно). theme-site: следует теме сайта (тёмная или светлая).
+// theme-dark: всегда тёмная (секции с фото, подвал, шапка, окно). theme-site: следует теме сайта (тёмной или светлой).
 @mixin theme-dark-vars {
   --bg: var(--ink);
   --bg-2: var(--ink-soft);
+  --bg-3: var(--ink-3);
   --fg: var(--paper);
-  --fg-2: rgb(247 246 243 / 68%);
+  --fg-2: var(--c-gray);
   --line: var(--line-dark);
   --btn-ink: var(--paper);
   --btn-ink-fg: var(--ink);
-  --field: #f7f6f314;
-  --field-hover: #f7f6f324;
-  --accent-text: #e4744b;
-  --btn-line: #f7f6f38c;
+  --field: var(--c-black);
+  --field-hover: var(--c-black);
+  --hover-fill: var(--accent);
+  --focus-fill: var(--c-black);
+  --accent-text: var(--accent);
+  --btn-line: var(--c-gray);
   --btn-hover-bg: var(--paper);
   --btn-hover-fg: var(--ink);
 }
@@ -26,6 +29,7 @@
 @mixin theme-site-vars {
   --bg: var(--site-bg);
   --bg-2: var(--site-bg-2);
+  --bg-3: var(--site-bg-3);
   --fg: var(--site-fg);
   --fg-2: var(--site-fg-2);
   --line: var(--site-line);
@@ -37,6 +41,8 @@
   --btn-line: var(--site-btn-line);
   --btn-hover-bg: var(--site-fg);
   --btn-hover-fg: var(--site-bg);
+  --hover-fill: var(--site-hover-fill);
+  --focus-fill: var(--site-focus-fill);
 }
 
 @mixin theme-site {
@@ -46,23 +52,27 @@
   background: var(--bg);
 }
 
-// Стекло: полупрозрачная подложка с размытием. Размытие не анимируем (только прозрачность и transform).
+// Тёмное стекло: ровная полупрозрачная заливка и лёгкое размытие. Без градиентов, рамок и теней:
+// форму даёт размер блока, а фото под ним остаётся читаемым. Размытие не анимируем (только прозрачность и transform).
 // Родитель стеклянного элемента не должен иметь opacity, filter, mask или clip-path: иначе размытие не видит фон.
-// «Морозное» стекло: ровная полупрозрачная подложка и размытие с насыщением. Без рамок и градиентов: объём даёт мягкая тень.
+// Текст на стекле всегда белый (владелец, 2026-10-18), в том числе внутри светлых секций: внутри стекла белые тона (glass-tones).
 @mixin glass($strength: 'dark') {
+  @include glass-tones;
+
+  --paper: var(--c-white);
+  --ink: var(--c-black);
+
+  color: var(--c-white);
   background: var(--glass-dark);
-  box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 28%);
-  backdrop-filter: var(--glass-blur) saturate(1.35);
+  backdrop-filter: var(--glass-blur);
 
   @if $strength == 'strong' {
     background: var(--glass-dark-strong);
-    backdrop-filter: blur(14px) saturate(1.5);
+    backdrop-filter: var(--glass-blur-strong);
   }
 
   @if $strength == 'clear' {
     background: var(--glass-clear);
-    box-shadow: none;
-    backdrop-filter: var(--glass-blur-strong);
   }
 
   @supports not (backdrop-filter: blur(1px)) {
@@ -72,5 +82,175 @@
   @media (prefers-reduced-transparency: reduce) {
     background: var(--ink);
     backdrop-filter: none;
+  }
+}
+
+// Фаска: срезанный правый верхний угол. Единственная «форменная» деталь, остальные блоки прямоугольные.
+@mixin cut($size: var(--cut)) {
+  clip-path: polygon(0 0, calc(100% - #{$size}) 0, 100% $size, 100% 100%, 0 100%);
+}
+
+// Шапка секции на 12 колонках: заголовок в колонках 1–7, остальное (описание, кнопка) в 9–12 стопкой.
+// На узких экранах всё в одну колонку. Использовать для .xxx__head / .xxx__top.
+@mixin sec-head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1.25rem var(--col-gap);
+  align-items: end;
+  margin-block-end: clamp(2rem, 4vw, 4rem);
+
+  > * {
+    grid-column: 1 / -1;
+    min-inline-size: 0;
+  }
+
+  @media (width >= 900px) {
+    > :first-child {
+      grid-row: 1 / span 3;
+      grid-column: 1 / span 7;
+    }
+
+    > :not(:first-child) {
+      grid-column: 9 / span 4;
+    }
+
+    // Кнопка не растягивается на всю колонку
+    > .button {
+      justify-self: start;
+    }
+  }
+}
+
+// Тона внутри стекла: стекло лежит поверх фото и остаётся как было (владелец: «стекла не трогай»), поэтому внутри него
+// остаются прежние белые прозрачности для заливок, линий и второстепенного текста (шапка, hero, колонка наличия).
+@mixin glass-tones {
+  --paper-5: oklch(96.8% 0.004 255deg / 5%);
+  --paper-8: oklch(96.8% 0.004 255deg / 8%);
+  --paper-9: oklch(96.8% 0.004 255deg / 9%);
+  --paper-13: oklch(96.8% 0.004 255deg / 13%);
+  --paper-15: oklch(96.8% 0.004 255deg / 15%);
+  --paper-16: oklch(96.8% 0.004 255deg / 16%);
+  --paper-20: oklch(96.8% 0.004 255deg / 20%);
+  --paper-22: oklch(96.8% 0.004 255deg / 22%);
+  --paper-35: oklch(96.8% 0.004 255deg / 35%);
+  --paper-55: oklch(96.8% 0.004 255deg / 55%);
+  --paper-60: oklch(96.8% 0.004 255deg / 60%);
+  --paper-65: oklch(96.8% 0.004 255deg / 65%);
+  --paper-70: oklch(96.8% 0.004 255deg / 70%);
+  --paper-75: oklch(96.8% 0.004 255deg / 75%);
+  --paper-80: oklch(96.8% 0.004 255deg / 80%);
+  --paper-85: oklch(96.8% 0.004 255deg / 85%);
+  --paper-88: oklch(96.8% 0.004 255deg / 88%);
+  --paper-90: oklch(96.8% 0.004 255deg / 90%);
+  --fg-2: oklch(96.8% 0.004 255deg / 68%);
+  --line: oklch(96.8% 0.004 255deg / 14%);
+  --line-dark: oklch(96.8% 0.004 255deg / 14%);
+  --field: oklch(96.8% 0.004 255deg / 7%);
+  --field-hover: oklch(96.8% 0.004 255deg / 12%);
+  --btn-line: oklch(96.8% 0.004 255deg / 45%);
+}
+
+// Подмена токенов для вариантов дизайна секций (partials/_variants.scss): светлая секция, тёмная секция, акцентное поле.
+// Каждая роль это один из пяти цветов палитры, без прозрачностей.
+// Светлая секция: белый фон, светло-серые плитки, серый для вложенных и активных состояний, текст чёрный.
+@mixin light-surface {
+  --ink: var(--c-white);
+  --ink-soft: var(--c-light);
+  --ink-3: var(--c-gray);
+  --paper: var(--c-black);
+  --paper-5: var(--c-light);
+  --paper-8: var(--c-light);
+  --paper-9: var(--c-light);
+  --paper-13: var(--c-light);
+  --paper-15: var(--c-light);
+  --paper-16: var(--c-light);
+  --paper-20: var(--c-light);
+  --paper-22: var(--c-light);
+  --paper-35: var(--c-gray);
+  --paper-55: var(--c-black);
+  --paper-60: var(--c-black);
+  --paper-65: var(--c-black);
+  --paper-70: var(--c-black);
+  --paper-75: var(--c-black);
+  --paper-80: var(--c-black);
+  --paper-85: var(--c-black);
+  --paper-88: var(--c-black);
+  --paper-90: var(--c-black);
+  --fg-2: var(--c-black);
+  --field: var(--c-white);
+  --field-hover: var(--c-light);
+  --line: var(--c-gray);
+  --btn-line: var(--c-black);
+  --hover-fill: var(--c-white);
+  --focus-fill: var(--c-white);
+  --accent-text: var(--accent);
+
+  color: var(--paper);
+  background: var(--ink);
+}
+
+@mixin dark-surface {
+  --ink: var(--c-black);
+  --ink-soft: var(--c-black);
+  --ink-3: var(--c-black);
+  --paper: var(--c-white);
+  --paper-5: var(--c-black);
+  --paper-8: var(--c-black);
+  --paper-9: var(--c-black);
+  --paper-13: var(--c-black);
+  --paper-15: var(--c-black);
+  --paper-16: var(--c-black);
+  --paper-20: var(--c-black);
+  --paper-22: var(--c-black);
+  --paper-35: var(--c-black);
+  --paper-55: var(--c-gray);
+  --paper-60: var(--c-gray);
+  --paper-65: var(--c-gray);
+  --paper-70: var(--c-gray);
+  --paper-75: var(--c-gray);
+  --paper-80: var(--c-white);
+  --paper-85: var(--c-white);
+  --paper-88: var(--c-white);
+  --paper-90: var(--c-white);
+  --fg-2: var(--c-gray);
+  --field: var(--c-black);
+  --field-hover: var(--c-black);
+  --line: var(--c-gray);
+  --btn-line: var(--c-gray);
+  --hover-fill: var(--accent);
+  --focus-fill: var(--c-black);
+  --accent-text: var(--accent);
+
+  color: var(--paper);
+}
+
+// Секция на акцентном поле: текст и заголовки чёрные, плитки остаются тёмными
+@mixin accent-surface {
+  --paper: var(--c-black);
+  --paper-60: var(--c-black);
+  --paper-70: var(--c-black);
+  --paper-80: var(--c-black);
+  --paper-85: var(--c-black);
+  --paper-90: var(--c-black);
+  --fg-2: var(--c-black);
+  --accent-text: var(--c-black);
+
+  color: var(--c-black);
+  background: var(--accent);
+}
+
+// Виньетка как у «Техники в наличии» на главной: центр кадра чистый, края и верх уходят в тёмное. Накладывается слоем ::after поверх фото
+@mixin vignette($z: 1) {
+  &::after {
+    position: absolute;
+    inset: 0;
+    z-index: $z;
+    pointer-events: none;
+    content: '';
+    background: radial-gradient(
+      ellipse 68% 72% at 62% 58%,
+      color-mix(in oklch, var(--c-black) 0%, transparent) 40%,
+      color-mix(in oklch, var(--c-black) 45%, transparent) 100%
+    );
   }
 }

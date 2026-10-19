@@ -1,0 +1,11 @@
+{% extends "layout.njk" %}
+{% set pagePath = "/avtotoplivozapravschiki.html" %}
+{% set slug = "avtotoplivozapravschiki" %}
+{% set landing = landings.bySlug[slug] %}
+{% set pageTitle = landing.seoTitle %}
+{% set pageDescription = landing.description %}
+{% set currentPage = "catalog" %}
+{% set pageClass = "inner" %}
+{% block content %}
+  {% include "landing-page.njk" %}
+{% endblock %}

@@ -1,2 +1,11 @@
-{% extends "layout.njk" %} {% set pageTitle = "Опыт эксплуатации" %} {% set currentPage =
-"blog/experience" %} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-grsi-i-arshin.html" %}
+{% set slug = "grsi-i-arshin" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

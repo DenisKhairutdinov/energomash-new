@@ -20,6 +20,8 @@ export const initText = (): void => {
         type: 'lines',
         mask: 'lines',
         autoSplit: true,
+        // Не сворачивать пробелы: неразрывные после предлогов и союзов (vite-plugins/nbsp.ts) должны остаться
+        reduceWhiteSpace: false,
         linesClass: 'split-line',
         // GSAP-анимация «thenable», но SplitText ждёт именно её: по возвращённой анимации он синхронизирует повторную разбивку
         // eslint-disable-next-line @typescript-eslint/no-misused-promises

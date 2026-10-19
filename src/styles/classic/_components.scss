@@ -1,0 +1,572 @@
+@use 'mixins' as *;
+
+.glass {
+  @include glass;
+
+  color: var(--paper);
+}
+
+.glass--strong {
+  @include glass('strong');
+}
+
+.glass--clear {
+  @include glass('clear');
+}
+
+// Кнопки: прямые углы, при наведении заливка выезжает слева
+.button {
+  position: relative;
+  display: inline-flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 3.5rem;
+  padding-inline: 1.9rem;
+  overflow: hidden;
+  font: 500 var(--fs-s) / 1 var(--font-text);
+  color: var(--paper);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  background: var(--accent-deep);
+  border: 0;
+  isolation: isolate;
+  transition: color 0.4s var(--ease-out);
+}
+
+.button::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  background: var(--btn-hover-bg, var(--paper));
+  transform: translateX(-101%);
+  transition: transform 0.55s var(--ease-out);
+}
+
+.button:hover::before,
+.button:focus-visible::before {
+  transform: none;
+}
+
+// Сайт тёмный: при наведении кнопка заливается белым и текст темнеет, заливка видна на любом фоне
+.button:hover,
+.button:focus-visible {
+  color: var(--btn-hover-fg, var(--ink));
+}
+
+.button--ink {
+  color: var(--btn-ink-fg);
+  background: var(--btn-ink);
+}
+
+.button--ink::before {
+  background: var(--accent-deep);
+}
+
+.theme-dark .button--ink::before {
+  background: var(--accent-deep);
+}
+
+.button--ink:hover,
+.button--ink:focus-visible {
+  color: var(--paper);
+}
+
+.button--glass {
+  @include glass('clear');
+
+  color: var(--paper);
+  border: 1px solid var(--btn-line);
+}
+
+.button--glass::before {
+  background: var(--paper);
+}
+
+.button--glass:hover,
+.button--glass:focus-visible {
+  color: var(--ink);
+  border-color: var(--paper);
+}
+
+.button--line {
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--btn-line);
+}
+
+.button--compact {
+  min-block-size: 2.75rem;
+  padding-inline: 1.25rem;
+  font-size: var(--fs-xs);
+}
+
+.button__badge {
+  padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  background: color-mix(in oklch, var(--c-black) 22%, transparent);
+}
+
+.button__icon {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.button:hover .button__icon {
+  transform: translateX(0.3rem);
+}
+
+// Текстовая ссылка со стрелкой и подчёркиванием, которое рисуется при наведении
+.link-arrow {
+  position: relative;
+  display: inline-flex;
+  gap: 0.6rem;
+  align-items: center;
+  padding-block: 0.4rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.link-arrow {
+  transition: color 0.3s;
+}
+
+.link-arrow:hover,
+.link-arrow:focus-visible {
+  color: var(--accent-text);
+}
+
+// Поля формы
+.field {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+.field__label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--fg-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.field__control {
+  inline-size: 100%;
+  min-block-size: 3.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--fg);
+  background: var(--field);
+  border: 0;
+  transition: background-color 0.25s;
+}
+
+.field__control--area {
+  min-block-size: 7rem;
+  resize: vertical;
+}
+
+.field__control:hover,
+.field__control:focus {
+  outline: none;
+  background: var(--field-hover);
+}
+
+.field__control:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.field__error {
+  font-size: var(--fs-s);
+  color: var(--err);
+}
+
+// Чекбокс
+.check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: var(--fs-s);
+  cursor: pointer;
+}
+
+.check__input {
+  position: absolute;
+  opacity: 0;
+}
+
+.check__box {
+  display: grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  color: transparent;
+  background: var(--field-hover);
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.check__box svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.check__input:checked + .check__box {
+  color: var(--paper);
+  background: var(--accent-deep);
+}
+
+.check__input:focus-visible + .check__box {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.check__text a {
+  text-underline-offset: 3px;
+}
+
+// Переключатель: прямоугольный, ползунок квадратный
+.switch {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  background: var(--field);
+  transition: background-color 0.35s var(--ease-out);
+}
+
+// Включённый переключатель: плашка заливается акцентным цветом, но остаётся прозрачной (стекло)
+.switch:has(.switch__input:checked) {
+  background: var(--accent-glass);
+}
+
+.switch__input {
+  position: absolute;
+  opacity: 0;
+}
+
+.switch__track {
+  position: relative;
+  inline-size: 3rem;
+  block-size: 1.5rem;
+  margin-block-start: 0.15rem;
+  background: var(--field-hover);
+  transition: background-color 0.25s;
+}
+
+.switch__track::after {
+  position: absolute;
+  inset-block-start: 3px;
+  inset-inline-start: 3px;
+  inline-size: calc(1.5rem - 8px);
+  block-size: calc(1.5rem - 8px);
+  content: '';
+  background: var(--fg);
+  transition:
+    transform 0.35s var(--ease-out),
+    background-color 0.25s;
+}
+
+.switch__input:checked + .switch__track {
+  background: var(--paper);
+}
+
+.switch__input:checked + .switch__track::after {
+  background: var(--accent-deep);
+  transform: translateX(1.5rem);
+}
+
+.switch__input:checked ~ .switch__body .switch__text {
+  color: var(--c-white);
+}
+
+.switch__input:focus-visible + .switch__track {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.switch__body {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.switch__title {
+  font-weight: 500;
+}
+
+.switch__text {
+  font-size: var(--fs-s);
+  line-height: 1.5;
+  color: var(--fg-2);
+}
+
+.switch__text a {
+  color: var(--fg);
+  text-underline-offset: 3px;
+}
+
+// Плашки выбора
+.chip {
+  cursor: pointer;
+}
+
+.chip__input {
+  position: absolute;
+  opacity: 0;
+}
+
+.chip__label {
+  display: inline-block;
+  padding: 0.8rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--field);
+  transition:
+    background-color 0.25s,
+    color 0.25s;
+}
+
+.chip:hover .chip__label {
+  background: var(--field-hover);
+}
+
+.chip__input:checked + .chip__label {
+  color: var(--paper);
+  background: var(--accent-deep);
+}
+
+.chip__input:focus-visible + .chip__label {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+// Ползунок: тонкая линия и квадратный бегунок
+.range {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.range__label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--fg-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.range__value {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 200;
+}
+
+.range__value--input {
+  padding: 0.5rem 0.9rem;
+  background: rgb(255 255 255 / 6%);
+}
+
+.range__number {
+  inline-size: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+.range__unit {
+  font-size: var(--fs-m);
+  color: var(--fg-2);
+}
+
+/* stylelint-disable selector-no-vendor-prefix */
+.range__slider {
+  inline-size: 100%;
+  block-size: 2rem;
+  appearance: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.range__slider::-webkit-slider-runnable-track {
+  block-size: 1px;
+  background: var(--fg-2);
+}
+
+.range__slider::-moz-range-track {
+  block-size: 1px;
+  background: var(--fg-2);
+}
+
+.range__slider::-webkit-slider-thumb {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  margin-block-start: calc(-0.45rem + 0.5px);
+  appearance: none;
+  background: var(--accent);
+  border: 0;
+}
+
+.range__slider::-moz-range-thumb {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  background: var(--accent);
+  border: 0;
+}
+/* stylelint-enable selector-no-vendor-prefix */
+
+// Выпадающий список вместо системного (scripts/modules/select.ts). Настоящий <select> спрятан и хранит значение.
+.select {
+  position: relative;
+}
+
+.select__native {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.select__button {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  inline-size: 100%;
+  min-block-size: 3.5rem;
+  padding: 0.75rem 1rem;
+  font: 500 var(--fs-s) / 1.2 var(--font-text);
+  color: var(--paper);
+  text-align: start;
+  cursor: pointer;
+  background: var(--field);
+  border: 0;
+  transition: background-color 0.25s;
+}
+
+.select__button:hover,
+.select.is-open .select__button {
+  background: var(--field-hover);
+}
+
+.select__chevron {
+  flex: none;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  color: var(--accent-text);
+  transition: transform 0.35s var(--ease-out);
+}
+
+.select.is-open .select__chevron {
+  transform: rotate(180deg);
+}
+
+// Список открывается вверх: фильтр стоит у нижнего края экрана
+.select__list {
+  position: absolute;
+  inset-block-end: calc(100% + 0.5rem);
+  inset-inline: 0;
+  z-index: 20;
+  display: grid;
+  visibility: hidden;
+  min-inline-size: 16rem;
+  max-block-size: 20rem;
+  padding: 0.4rem;
+  overflow-y: auto;
+  color: var(--paper);
+  background: oklch(17% 0.008 60deg / 86%);
+  opacity: 0;
+  backdrop-filter: var(--glass-blur-strong);
+  transform: translateY(0.5rem);
+  transition:
+    opacity 0.25s var(--ease-out),
+    transform 0.3s var(--ease-out),
+    visibility 0s 0.3s;
+}
+
+.select.is-open .select__list {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.25s var(--ease-out),
+    transform 0.3s var(--ease-out),
+    visibility 0s;
+}
+
+.select__list:focus {
+  outline: none;
+}
+
+.select__option {
+  padding: 0.8rem 0.9rem;
+  font: 500 var(--fs-s) / 1.25 var(--font-text);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.select__option.is-active {
+  background: var(--field-hover);
+}
+
+.select__option[aria-selected='true'] {
+  color: var(--accent-text);
+}
+
+// Сегментированный выбор
+.segmented {
+  display: flex;
+  background: var(--field);
+}
+
+.segmented__item {
+  flex: 1;
+  cursor: pointer;
+}
+
+.segmented__input {
+  position: absolute;
+  opacity: 0;
+}
+
+.segmented__label {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  min-block-size: 3.5rem;
+  padding-inline: 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition:
+    background-color 0.25s,
+    color 0.25s;
+}
+
+.segmented__input:checked + .segmented__label {
+  color: var(--paper);
+  background: var(--accent-deep);
+}
+
+.segmented__input:focus-visible + .segmented__label {
+  outline: 1px solid var(--accent);
+  outline-offset: -3px;
+}

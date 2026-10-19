@@ -1,0 +1,11 @@
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-myka-i-degazaciya-cisterny.html" %}
+{% set slug = "myka-i-degazaciya-cisterny" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

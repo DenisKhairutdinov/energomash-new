@@ -1,22 +1,20 @@
-{# Калькулятор лизинга. Расчёт ориентировочный: условия партнёров и субсидия лежат в src/data/home.json, ключ leasing. #}
+{# Калькулятор лизинга (редизайн с нуля, 2026-10-17): сверху заголовок, пояснение и переключатель субсидии, ниже форма, внизу во всю ширину акцентная полоса с крупным платежом (без колонок, высота по содержимому). Расчёт ориентировочный: условия партнёров и субсидия лежат в src/data/home.json, ключ leasing. #}
 {# Партнёры: аванс, срок и удорожание условные, их нужно заменить данными самих лизинговых компаний. #}
-<section
+<section data-v="1"
   class="leasing"
   id="leasing"
   aria-labelledby="leasing-title"
   data-leasing
   data-chapter="Лизинг"
   data-subsidy-share="{{ home.leasing.subsidyShare }}"
-  data-subsidy-cap="{{ home.leasing.subsidyCap }}"
->
-  <img class="leasing__bg" src="/src/assets/models/IMG_2119.webp" width="2400" height="1600" alt="" loading="lazy" data-parallax="0.08" />
-  <div class="leasing__layout container">
-    <div class="leasing__intro">
-      <h2 class="section-title" id="leasing-title" data-split>Лизинг<br />и субсидия</h2>
+  data-subsidy-cap="{{ home.leasing.subsidyCap }}">
+  <div class="leasing__head">
+    <h2 class="section-title leasing__title" id="leasing-title" data-split>Лизинг<br />и субсидия</h2>
+    <div class="leasing__info">
       <p class="leasing__lead">
         Выберите лизинговую компанию и посчитайте платёж за минуту. Все партнёры аккредитованы по программе Минпромторга.
       </p>
-      <label class="switch glass">
+      <label class="switch">
         <input class="switch__input" type="checkbox" checked data-subsidy />
         <span class="switch__track" aria-hidden="true"></span>
         <span class="switch__body">
@@ -28,15 +26,17 @@
         </span>
       </label>
     </div>
+  </div>
 
-    <form class="leasing__form glass" action="#" novalidate data-leasing-form>
+  <div class="leasing__main">
+    <form class="leasing__form" action="#" novalidate data-leasing-form>
       <fieldset class="leasing__partners">
         <legend class="leasing__legend">Лизинговый партнёр</legend>
-        <div class="leasing__chips">
+        <div class="opts">
           {% for partner in home.leasing.partners %}
-            <label class="chip">
+            <label class="opt">
               <input
-                class="chip__input"
+                class="opt__input"
                 type="radio"
                 name="partner"
                 value="{{ partner.id }}"
@@ -46,37 +46,39 @@
                 data-name="{{ partner.name }}"
                 {% if loop.first %}checked{% endif %}
               />
-              <span class="chip__label">{{ partner.name }}</span>
+              <span class="opt__label">{{ partner.name }}</span>
             </label>
           {% endfor %}
         </div>
       </fieldset>
 
       <div class="leasing__fields">
-        <label class="range">
-          <span class="range__label">Стоимость техники</span>
-          <span class="range__value range__value--input">
-            <input class="range__number" type="text" inputmode="numeric" autocomplete="off" value="6 000 000" aria-label="Стоимость техники, рублей" data-price />
-            <span class="range__unit">₽</span>
+        <label class="slider">
+          <span class="slider__label">Стоимость техники</span>
+          <span class="slider__value">
+            <input class="slider__number" type="text" inputmode="numeric" autocomplete="off" value="6 000 000" aria-label="Стоимость техники, рублей" data-price />
+            <span class="slider__unit">₽</span>
           </span>
-          <input class="range__slider" type="range" min="500000" max="15000000" step="100000" value="6000000" aria-label="Стоимость техники, ползунок" data-price-range />
+          <input class="slider__range" type="range" min="500000" max="15000000" step="100000" value="6000000" aria-label="Стоимость техники, ползунок" data-price-range />
         </label>
-        <label class="range">
-          <span class="range__label">Первоначальный взнос</span>
-          <span class="range__value"><output data-advance-out>20</output><span class="range__unit">%</span></span>
-          <input class="range__slider" type="range" min="0" max="50" step="1" value="20" aria-label="Первоначальный взнос, процентов" data-advance-range />
+        <label class="slider">
+          <span class="slider__label">Первоначальный взнос</span>
+          <span class="slider__value"><output data-advance-out>20</output><span class="slider__unit">%</span></span>
+          <input class="slider__range" type="range" min="0" max="50" step="1" value="20" aria-label="Первоначальный взнос, процентов" data-advance-range />
         </label>
-        <label class="range">
-          <span class="range__label">Срок лизинга</span>
-          <span class="range__value"><output data-term-out>36</output><span class="range__unit">мес.</span></span>
-          <input class="range__slider" type="range" min="12" max="60" step="6" value="36" aria-label="Срок лизинга, месяцев" data-term-range />
+        <label class="slider">
+          <span class="slider__label">Срок лизинга</span>
+          <span class="slider__value"><output data-term-out>36</output><span class="slider__unit">мес.</span></span>
+          <input class="slider__range" type="range" min="12" max="60" step="6" value="36" aria-label="Срок лизинга, месяцев" data-term-range />
         </label>
       </div>
     </form>
 
-    <div class="leasing__result glass glass--strong" aria-live="polite">
-      <p class="leasing__payment-label">Платёж в месяц</p>
-      <p class="leasing__payment" data-payment>—</p>
+    <div class="leasing__result" aria-live="polite">
+      <div class="leasing__pay">
+        <p class="leasing__payment-label">Платёж в месяц</p>
+        <p class="leasing__payment" data-payment>—</p>
+      </div>
       <dl class="leasing__summary">
         <div><dt>Аванс</dt><dd data-advance-sum>—</dd></div>
         <div data-subsidy-row><dt>Субсидия</dt><dd data-subsidy-sum>—</dd></div>
@@ -84,7 +86,7 @@
         <div><dt>Переплата</dt><dd data-overpay>—</dd></div>
       </dl>
       <p class="leasing__note" data-note>Расчёт ориентировочный. Точные условия подтвердит лизинговая компания.</p>
-      <button class="button button--accent" type="button" data-modal-open="calc">Получить расчёт</button>
+      <button class="button leasing__button" type="button" data-modal-open="calc">Получить расчёт</button>
     </div>
   </div>
 </section>

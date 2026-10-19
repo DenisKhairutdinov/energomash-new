@@ -1,0 +1,43 @@
+@use 'sass:meta';
+@use 'classic/vars';
+
+// Старый hero (вариант «classic»). Все стили вложены под .classic-scope и несут свои токены, так что новый дизайн
+// остальной страницы их не меняет. Подключать после общих компонентов.
+@layer components {
+  // Общие компоненты нового дизайна не просачиваются в старый hero: откат к значениям нижних слоёв,
+  // затем действуют старые правила (у них специфичность выше).
+  .classic-scope
+    :where(
+      .button,
+      .button__badge,
+      .glass,
+      .select__button,
+      .select__list,
+      .select__option,
+      .segmented,
+      .segmented__label,
+      .check__box,
+      .picker__input,
+      .cat,
+      .hero__utp-link
+    ) {
+    all: revert-layer;
+  }
+
+  .classic-scope .button::before,
+  .classic-scope .button::after {
+    all: revert-layer;
+  }
+
+  .classic-scope {
+    @include vars.legacy-vars;
+
+    font: 400 var(--fs-m) / 1.55 var(--font-text);
+    color: var(--paper);
+    text-transform: none;
+    letter-spacing: normal;
+
+    @include meta.load-css('classic/components');
+    @include meta.load-css('classic/hero');
+  }
+}

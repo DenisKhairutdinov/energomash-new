@@ -1,0 +1,1510 @@
+@use 'mixins' as *;
+
+// Редизайн с нуля, 2026-10-17: отгрузки, лизинг, путь заказа, документы, вопросы, блог, заявка. Язык секций (docs/design-brief.md, редакция 4):
+// экран на секцию, сетка в стык от края до края, слева колонка до края четырёх колонок контейнера (--side-x), текст на краю контейнера (--edge),
+// в каждой секции сплошной акцентный блок, фото крупные и горизонтальные (ч/б под ровным затемнением, цвет при наведении), кнопки на акценте тёмные.
+// Чёрная кнопка на акцентной плите: чёрный фон и белый текст, при наведении белая заливка и чёрный текст (цвета палитры, не зависят от секции)
+@mixin accent-button {
+  --btn-hover-bg: var(--c-white);
+  --btn-hover-fg: var(--c-black);
+
+  color: var(--c-white);
+  background: var(--c-black);
+
+  &:hover,
+  &:focus-visible {
+    color: var(--btn-hover-fg);
+  }
+}
+
+@layer sections {
+  // ---------- Отгрузки: слева тёмная колонка, справа лента крупных горизонтальных фото, едет при прокрутке (cinema.ts)
+  .shipments {
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .shipments__pin {
+    display: grid;
+  }
+
+  .shipments__side {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: space-between;
+    padding: var(--sec-pad-y) var(--col-gap) var(--sec-pad-y) var(--edge);
+    color: var(--paper);
+    background: var(--ink-soft);
+  }
+
+  .shipments__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .shipments__foot {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  .shipments__lead {
+    max-inline-size: 26rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  // Вариант 1 (выбор владельца): колонка тёмная, кнопка акцентная с белым текстом, при наведении белая с чёрным
+  .shipments__button {
+    @include accent-button;
+
+    --btn-hover-bg: var(--paper);
+    --btn-hover-fg: var(--ink);
+
+    background: var(--accent);
+  }
+
+  .shipments__viewport {
+    display: grid;
+    align-items: center;
+    padding-inline-start: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .shipments__grid {
+    will-change: transform;
+  }
+
+  .shipments__grid {
+    display: flex;
+    gap: 0.25rem;
+    inline-size: max-content;
+  }
+
+  .shipments__item {
+    flex: none;
+    block-size: min(72svh, 56rem);
+    aspect-ratio: 3 / 2;
+  }
+
+  .shipments__item--all {
+    aspect-ratio: 3 / 4;
+  }
+
+  .shipments__link {
+    position: relative;
+    display: block;
+    block-size: 100%;
+    overflow: clip;
+    color: var(--paper);
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  .shipments__frame {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .shipments__image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    filter: grayscale(1);
+    transform: scale(1.04);
+    transition:
+      filter 0.7s var(--ease-out),
+      transform 1.2s var(--ease-out);
+  }
+
+  .shipments__link::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: color-mix(in oklch, var(--c-black) 44%, transparent);
+    transition: background-color 0.6s var(--ease-out);
+  }
+
+  .shipments__link:hover::after,
+  .shipments__link:focus-visible::after {
+    background: color-mix(in oklch, var(--c-black) 10%, transparent);
+  }
+
+  .shipments__link:hover .shipments__image,
+  .shipments__link:focus-visible .shipments__image {
+    filter: none;
+    transform: none;
+  }
+
+  .shipments__where {
+    position: absolute;
+    inset-block-start: 1.25rem;
+    inset-inline-start: 1.25rem;
+    padding: 0.55rem 0.85rem;
+    font-size: var(--fs-s);
+    font-weight: 500;
+
+    @include glass;
+  }
+
+  // Название, тип и характеристики на одной стеклянной плашке, стекло как в hero
+  .shipments__info {
+    position: absolute;
+    inset-block-end: clamp(0.75rem, 1.8svh, 1.25rem);
+    inset-inline-start: clamp(0.75rem, 1.2vw, 1.25rem);
+    display: grid;
+    gap: 0.35rem;
+    inline-size: fit-content;
+    max-inline-size: calc(100% - 2 * clamp(0.75rem, 1.2vw, 1.25rem));
+    padding: clamp(0.9rem, 2svh, 1.4rem) clamp(1rem, 1.5vw, 1.5rem);
+
+    @include glass;
+  }
+
+  .shipments__model {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1rem + 2.4vw, 3.8rem);
+    font-weight: 240;
+    line-height: 0.98;
+    text-transform: uppercase;
+  }
+
+  .shipments__type {
+    font-size: var(--fs-m);
+    color: var(--paper-88);
+  }
+
+  // Характеристики скрыты и выезжают снизу при наведении или фокусе (плашка вырастает вверх, нижний край на месте).
+  // На сенсорных экранах и при reduced motion видны сразу
+  .shipments__reveal {
+    display: grid;
+    grid-template-rows: 0fr;
+    padding-block-start: 0;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.5s var(--ease-out),
+      padding-block-start 0.5s var(--ease-out),
+      opacity 0.4s var(--ease-out);
+  }
+
+  .shipments__link:hover .shipments__reveal,
+  .shipments__link:focus-visible .shipments__reveal {
+    grid-template-rows: 1fr;
+    padding-block-start: 0.5rem;
+    opacity: 1;
+  }
+
+  @media (hover: none), (prefers-reduced-motion: reduce) {
+    .shipments__reveal {
+      grid-template-rows: 1fr;
+      padding-block-start: 0.5rem;
+      opacity: 1;
+      transition: none;
+    }
+  }
+
+  .shipments__specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    min-block-size: 0;
+    overflow: hidden;
+  }
+
+  .shipments__spec {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    font-size: var(--fs-s);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .shipments__spec-label {
+    font-size: var(--fs-xs);
+    color: var(--paper-70);
+  }
+
+  // Последний слайд: светло-серое поле, при наведении заливается акцентом слева направо, как у кнопок
+  .shipments__all {
+    position: relative;
+    display: grid;
+    align-content: space-between;
+    block-size: 100%;
+    padding: clamp(1.5rem, 2.4vw, 2.5rem);
+    overflow: clip;
+    color: var(--ink);
+    text-decoration: none;
+
+    // Серый палитры, как у регионов без поставок на карте «Географии»
+    background: var(--c-gray);
+    isolation: isolate;
+  }
+
+  .shipments__all::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .shipments__all:hover::before,
+  .shipments__all:focus-visible::before {
+    transform: scaleX(1);
+  }
+
+  .shipments__all-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1rem + 4.2vw, 6rem);
+    font-weight: 230;
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+
+  .shipments__all-icon {
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    color: var(--ink);
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .shipments__all:hover .shipments__all-icon,
+  .shipments__all:focus-visible .shipments__all-icon {
+    transform: translateX(0.5rem);
+  }
+
+  // ---------- Лизинг: слева узкая колонка (заголовок, подпись, внизу переключатель субсидии), справа четыре строки по одной сетке:
+  // партнёр, три параметра (подпись, ползунок, значение), итоги на акцентной полосе до правого края. Высота по содержимому.
+  .leasing {
+    display: grid;
+    gap: clamp(1.5rem, 4svh, 3rem) var(--col-gap);
+    padding-block-start: calc(var(--sec-pad-y) * 1.5);
+    padding-inline: var(--edge);
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .leasing__head {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.25rem, 3svh, 2rem);
+    padding-block-end: calc(var(--sec-pad-y) * 1.5);
+  }
+
+  .leasing__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .leasing__info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .leasing__lead {
+    max-inline-size: 26rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+    color: var(--paper-85);
+  }
+
+  .leasing__info .switch {
+    margin-block-start: auto;
+  }
+
+  .leasing__main {
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+    min-inline-size: 0;
+    padding-block-end: calc(var(--sec-pad-y) * 1.5);
+  }
+
+  // Партнёры растянуты на всю ширину правой колонки
+  .leasing .opt {
+    flex: 1 1 auto;
+  }
+
+  .leasing .opt__label {
+    text-align: center;
+  }
+
+  // Названия партнёров не переносятся по словам: кнопка шириной по названию, остаток строки делится поровну, а если не помещается, целая кнопка уходит на следующую строку
+  .leasing .opt__label {
+    padding-inline: clamp(0.6rem, 1vw, 1.1rem);
+    white-space: nowrap;
+  }
+
+  // Знак рубля мельче цифр только в платеже в месяц (его создаёт leasing.ts)
+  .leasing__payment .money__sign {
+    font-size: 0.6em;
+  }
+
+  // Переключатель субсидии без рамок
+  .leasing .switch,
+  .leasing .switch__track {
+    border: 0;
+  }
+
+  .leasing__form {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .leasing__partners {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0 0 clamp(1rem, 2.5svh, 1.5rem);
+    border: 0;
+  }
+
+  .leasing__legend {
+    padding: 0;
+    margin-block-end: 0.75rem;
+    font-size: var(--fs-s);
+    color: var(--paper-70);
+  }
+
+  .leasing__fields {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  // Параметр: плитка, подпись сверху, крупное значение, ползунок снизу
+  .leasing .slider {
+    grid-template-areas:
+      'label'
+      'value'
+      'range';
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: start;
+    padding: clamp(1.25rem, 3svh, 2rem) clamp(1.1rem, 1.8vw, 1.75rem);
+    background: var(--ink-3);
+  }
+
+  .leasing .slider__label {
+    grid-area: label;
+  }
+
+  .leasing .slider__value {
+    grid-area: value;
+    margin-block-end: clamp(0.75rem, 2svh, 1.5rem);
+  }
+
+  .leasing .slider__range {
+    grid-area: range;
+  }
+
+  // Результат: акцентная плитка, платёж слева, итоги в середине, кнопка справа
+  .leasing__result {
+    display: grid;
+    gap: 1.25rem var(--col-gap);
+    align-items: center;
+    padding: clamp(1.5rem, 4svh, 2.75rem) clamp(1.1rem, 1.8vw, 1.75rem);
+    color: var(--ink);
+    background: var(--accent);
+  }
+
+  .leasing__payment-label {
+    font-size: var(--fs-s);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .leasing__payment {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 1rem + 4.4vw, 6.5rem);
+    font-weight: 230;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.95;
+    color: var(--paper);
+  }
+
+  // Итоги в одну строку (аванс, субсидия, всего платежей, переплата); если не помещаются, переносятся целиком
+  .leasing__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: 0.75rem 1.5rem;
+  }
+
+  .leasing__summary dt {
+    font-size: var(--fs-s);
+  }
+
+  .leasing__summary dd {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 3svh, 1.9rem);
+    font-weight: 260;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .leasing__note {
+    max-inline-size: 30rem;
+    font-size: var(--fs-s);
+    line-height: 1.5;
+  }
+
+  .leasing__button {
+    justify-self: start;
+
+    @include accent-button;
+  }
+
+  // Выбор лизингового партнёра и заявки: плоские плитки-кнопки; выбранная светлая
+  .opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .opt {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .opt__input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .opt__label {
+    display: block;
+    padding: clamp(0.8rem, 2svh, 1.2rem) clamp(1rem, 1.4vw, 1.5rem);
+    font-size: var(--fs-m);
+    font-weight: 500;
+    background: var(--paper-9);
+    transition:
+      color 0.25s,
+      background-color 0.25s;
+  }
+
+  .opt:hover .opt__label {
+    background: var(--paper-16);
+  }
+
+  .opt__input:checked + .opt__label {
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  .opt__input:focus-visible + .opt__label {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  // Ползунки: подпись и крупное значение в строке, плоская дорожка и квадратный бегунок
+  .slider {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 1rem;
+    align-items: baseline;
+  }
+
+  .slider__label {
+    font-size: var(--fs-m);
+    color: var(--paper-70);
+  }
+
+  .slider__value {
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5svh, 3.6rem);
+    font-weight: 260;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .slider__number {
+    inline-size: 10ch;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: end;
+    background: transparent;
+    border: 0;
+  }
+
+  .slider__number:focus {
+    outline: none;
+  }
+
+  // Поле стоимости без своей рамки: фокус показывает вся плитка параметра
+  .leasing .slider:focus-within {
+    background: var(--focus-fill);
+  }
+
+  .slider__unit {
+    font-family: var(--font-text);
+    font-size: var(--fs-s);
+    color: var(--paper-70);
+  }
+
+  .slider__range {
+    grid-column: 1 / -1;
+    inline-size: 100%;
+    block-size: 2rem;
+    appearance: none;
+    cursor: pointer;
+    background: transparent;
+  }
+
+  /* stylelint-disable selector-no-vendor-prefix */
+  .slider__range::-webkit-slider-runnable-track {
+    block-size: 6px;
+    background: var(--paper-22);
+  }
+
+  .slider__range::-webkit-slider-thumb {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    margin-block-start: calc((6px - 1.5rem) / 2);
+    appearance: none;
+    background: var(--accent);
+    border: 0;
+  }
+
+  .slider__range::-moz-range-track {
+    block-size: 6px;
+    background: var(--paper-22);
+  }
+
+  .slider__range::-moz-range-thumb {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    background: var(--accent);
+    border: 0;
+    border-radius: 0;
+  }
+  /* stylelint-enable selector-no-vendor-prefix */
+
+  // ---------- Как купить: акцентная секция, сверху заголовок и кнопка, ниже ряд из пяти фото-карточек «гармошкой» по ширине
+  .process {
+    display: grid;
+    gap: clamp(1.25rem, 3svh, 2rem);
+    padding-block: calc(var(--sec-pad-y) * 1.5) 0;
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  // Заголовок, под ним пояснение, ниже кнопка (как в «Лизинге» и «Отгрузках»)
+  .process__head {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+    padding-inline: var(--edge);
+  }
+
+  .process__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .process__foot {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  .process__lead {
+    max-inline-size: 30rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .process__list {
+    display: grid;
+    gap: 0.25rem;
+    padding-inline: var(--edge);
+    margin-block-end: calc(var(--sec-pad-y) * 1.5);
+  }
+
+  .process__item {
+    display: grid;
+    align-content: space-between;
+    min-block-size: 11rem;
+    padding: clamp(1rem, 2svh, 1.5rem) clamp(1rem, 1.4vw, 1.5rem);
+    overflow: clip;
+    background: var(--ink-soft);
+    transition: background-color 0.4s var(--ease-out);
+  }
+
+  // Номер крупный и контурный, при наведении заливается белым
+  .process__number {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 1.5rem + 5vw, 9rem);
+    font-weight: 230;
+    line-height: 0.8;
+    color: transparent;
+    transition: color 0.5s var(--ease-out);
+
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-text-stroke: 1.5px var(--paper-55);
+  }
+
+  .process__body {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .process__step {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1rem + 1vw, 2.25rem);
+    font-weight: 240;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .process__text {
+    max-inline-size: 26rem;
+    font-size: var(--fs-m);
+    line-height: 1.5;
+    color: var(--paper-80);
+  }
+
+  // Описание шага скрыто и выплывает снизу при наведении и фокусе (только где есть наведение; на сенсорных и при reduced motion видно сразу)
+  @media (hover: hover) and (pointer: fine) {
+    .process__text {
+      max-block-size: 0;
+      overflow: clip;
+      opacity: 0;
+      transform: translateY(0.75rem);
+      transition:
+        max-block-size 0.5s var(--ease-out),
+        opacity 0.4s var(--ease-out),
+        transform 0.5s var(--ease-out);
+    }
+
+    .process__item:hover .process__text,
+    .process__item:focus-visible .process__text {
+      max-block-size: 9rem;
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .process__text {
+        max-block-size: none;
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+  }
+
+  .process__item:hover,
+  .process__item:focus-visible {
+    background: var(--ink-3);
+  }
+
+  .process__item:hover .process__number,
+  .process__item:focus-visible .process__number {
+    color: var(--paper);
+  }
+
+  // ---------- Документы: слева тёмная колонка, справа четыре плитки 2×2; высота по содержимому, без фото
+  .docs {
+    display: grid;
+    min-block-size: clamp(26rem, 64svh, 40rem);
+    color: var(--paper);
+    background: var(--ink-soft);
+  }
+
+  .docs__side {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: space-between;
+    padding: var(--sec-pad-y) var(--col-gap) var(--sec-pad-y) var(--edge);
+    background: var(--ink-soft);
+  }
+
+  .docs__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .docs__foot {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  .docs__lead {
+    max-inline-size: 26rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+    color: var(--paper-85);
+  }
+
+  .docs__main {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 0.25rem;
+    padding-inline-start: 0.25rem;
+  }
+
+  .docs__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 0.25rem;
+  }
+
+  .docs__item {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    align-content: space-between;
+    padding: clamp(1.1rem, 2.4svh, 1.75rem) clamp(1.1rem, 1.6vw, 1.75rem);
+    overflow: clip;
+    background: var(--ink-soft);
+    isolation: isolate;
+    transition: color 0.4s var(--ease-out);
+  }
+
+  .docs__item::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: var(--accent);
+    transform: translateX(-101%);
+    transition: transform 0.55s var(--ease-out);
+  }
+
+  .docs__item:hover,
+  .docs__item:focus-within {
+    color: var(--ink);
+  }
+
+  .docs__item:hover::before,
+  .docs__item:focus-within::before {
+    transform: none;
+  }
+
+  .docs__mark {
+    display: grid;
+    place-items: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    color: var(--ink);
+    background: var(--accent);
+    transition:
+      color 0.4s,
+      background-color 0.4s;
+  }
+
+  .docs__item:hover .docs__mark {
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .docs__mark svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+
+  .docs__name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.4svh, 2.4rem);
+    font-weight: 250;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .docs__text {
+    max-inline-size: 30rem;
+    font-size: var(--fs-m);
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+
+  // Плашка сервиса без фото: акцентная полоса, заголовок, текст и кнопка в ряд (на узком экране в колонку)
+  .service {
+    display: grid;
+    gap: 1rem 2rem;
+    place-items: center start;
+    padding: clamp(1.1rem, 2.4svh, 1.75rem) var(--edge) clamp(1.1rem, 2.4svh, 1.75rem)
+      clamp(1.1rem, 1.6vw, 1.75rem);
+    color: var(--ink);
+    background: var(--accent);
+  }
+
+  .service__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1rem + 1.4vw, 2.6rem);
+    font-weight: 240;
+    line-height: 0.98;
+    text-transform: uppercase;
+  }
+
+  .service__text {
+    max-inline-size: 32rem;
+    font-size: var(--fs-m);
+    line-height: 1.5;
+  }
+
+  .service__button {
+    @include accent-button;
+  }
+
+  @media (width >= 1200px) {
+    .service {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto;
+    }
+  }
+
+  // ---------- Вопросы и ответы: слева акцентная колонка, справа ответы плитками; высота секции по плашкам
+  // Вопросы: вариант 2 (выбор владельца): светлая секция, колонка светло-серая, кнопка чёрная
+  .faq {
+    @include light-surface;
+
+    display: grid;
+    interpolate-size: allow-keywords;
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .faq__side {
+    color: var(--paper);
+    background: var(--ink-soft);
+  }
+
+  // Высота секции задаётся плашками справа; колонка слева растягивается на неё (заголовок сверху, кнопка снизу)
+  .faq__sticky {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: space-between;
+    block-size: 100%;
+    padding: var(--sec-pad-y) var(--col-gap) var(--sec-pad-y) var(--edge);
+  }
+
+  .faq__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .faq__foot {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  .faq__lead {
+    max-inline-size: 26rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .faq__button {
+    @include accent-button;
+
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  .faq__list {
+    display: grid;
+    gap: 0.25rem;
+    align-content: center;
+    padding: var(--sec-pad-y) var(--edge) var(--sec-pad-y) var(--col-gap);
+  }
+
+  .faq__item {
+    background: var(--ink-soft);
+    transition: background-color 0.3s;
+  }
+
+  .faq__item:hover,
+  .faq__item[open] {
+    background: var(--ink-3);
+  }
+
+  .faq__question {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(1.1rem, 4.4svh, 2.6rem) clamp(1.1rem, 1.8vw, 1.75rem);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__text {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3.2svh, 2.4rem);
+    font-weight: 250;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  .faq__mark {
+    position: relative;
+    flex: none;
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .faq__mark::before,
+  .faq__mark::after {
+    position: absolute;
+    inset: 50% 0 auto;
+    block-size: 2px;
+    content: '';
+    background: var(--accent);
+    translate: 0 -50%;
+  }
+
+  .faq__mark::after {
+    rotate: 90deg;
+    transition: rotate 0.4s var(--ease-out);
+  }
+
+  .faq__item[open] .faq__mark::after {
+    rotate: 0deg;
+  }
+
+  .faq__item::details-content {
+    block-size: 0;
+    overflow: clip;
+    opacity: 0;
+    transition:
+      block-size 0.45s var(--ease-out),
+      opacity 0.3s,
+      content-visibility 0.45s allow-discrete;
+  }
+
+  .faq__item[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+
+  .faq__answer {
+    max-inline-size: 52rem;
+    padding: 0 clamp(1.1rem, 1.8vw, 1.75rem) clamp(1rem, 2.4svh, 1.6rem);
+    font-size: var(--fs-m);
+    line-height: 1.6;
+    color: var(--paper-85);
+  }
+
+  // ---------- Блог: как «Каталог по назначению»: сетка в стык, акцентный блок и свежая статья крупно, ниже три статьи
+  .blog {
+    display: grid;
+    min-block-size: min(100svh, 52rem);
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .blog__grid {
+    display: grid;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+
+  .blog__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: space-between;
+    padding: var(--sec-pad-y) var(--col-gap) var(--sec-pad-y) var(--edge);
+    color: var(--ink);
+    background: var(--accent);
+  }
+
+  .blog__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .blog__foot {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+
+  .blog__lead {
+    max-inline-size: 26rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .blog__button {
+    @include accent-button;
+  }
+
+  .blog__row {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .news {
+    position: relative;
+    display: grid;
+    align-content: space-between;
+    min-block-size: 16rem;
+    padding: clamp(1rem, 2.4svh, 1.5rem) clamp(1.1rem, 1.6vw, 1.75rem);
+    overflow: clip;
+    color: var(--paper);
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  .news__photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  // Кадр слегка следует за курсором (--px, --py задаёт scripts/modules/purposes.ts, как в «Каталоге по назначению»), фото остаётся ч/б
+  .news__image {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    filter: grayscale(1);
+    transform: translate(calc(var(--px, 0) * -1.5%), calc(var(--py, 0) * -1.5%)) scale(1.06);
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .news::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: color-mix(in oklch, var(--c-black) 40%, transparent);
+    transition: background-color 0.6s var(--ease-out);
+  }
+
+  .news:hover::after,
+  .news:focus-visible::after {
+    background: color-mix(in oklch, var(--c-black) 18%, transparent);
+  }
+
+  // Соседние карточки темнеют, пока курсор над одной (как в «Каталоге по назначению»)
+  .blog__grid:has(.news:is(:hover, :focus-visible)) .news:not(:hover, :focus-visible)::after {
+    background: color-mix(in oklch, var(--c-black) 62%, transparent);
+  }
+
+  // Композиция: сверху слева дата (число крупно акцентом, месяц белым), справа стрелка; внизу рубрика маленькой подписью и заголовок
+  .news__date {
+    display: inline-flex;
+    gap: 0.5rem;
+    place-self: start start;
+    align-items: baseline;
+    font-family: var(--font-display);
+    line-height: 0.9;
+    color: var(--accent);
+    text-transform: uppercase;
+    text-shadow: 0 1px 14px color-mix(in oklch, var(--c-black) 55%, transparent);
+  }
+
+  .news__day {
+    font-size: clamp(3rem, 1rem + 3vw, 5rem);
+    font-weight: 260;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .news__month {
+    font-size: var(--fs-m);
+    font-weight: 500;
+    color: var(--paper);
+    letter-spacing: 0.06em;
+  }
+
+  .news__bottom {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: start;
+  }
+
+  // Рубрика: маленькая подпись, без плашки и черты
+  .news__rubric {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--paper);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 12px color-mix(in oklch, var(--c-black) 60%, transparent);
+  }
+
+  .news__arrow {
+    position: absolute;
+    inset-block-start: clamp(1rem, 2.4svh, 1.5rem);
+    inset-inline-end: clamp(1.1rem, 1.6vw, 1.75rem);
+    inline-size: 2rem;
+    block-size: 2rem;
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .news:hover .news__arrow,
+  .news:focus-visible .news__arrow {
+    transform: translateX(0.4rem);
+  }
+
+  // Акцент при наведении: только стрелка; заголовок остаётся белым ради читаемости
+  .news__arrow {
+    transition:
+      transform 0.5s var(--ease-out),
+      color 0.3s;
+  }
+
+  .news:hover .news__arrow,
+  .news:focus-visible .news__arrow {
+    color: var(--accent);
+  }
+
+  .news__title {
+    max-inline-size: 90%;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1rem + 1.4vw, 3rem);
+    font-weight: 240;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .news__excerpt {
+    max-inline-size: 38rem;
+    margin-block-start: 0.75rem;
+    font-size: var(--fs-m);
+    line-height: 1.5;
+    color: var(--paper-88);
+  }
+
+  .news--lead .news__title {
+    font-size: clamp(2rem, 1rem + 2.4vw, 4.2rem);
+  }
+
+  // ---------- Заявка: белая тема без фото, слева заголовок и контакты, справа компактная светлая панель с формой.
+  // Высота по содержимому, без экрана на секцию
+  .request {
+    @include light-surface;
+
+    display: grid;
+    padding-block: calc(var(--sec-pad-y) * 1.5);
+    overflow: clip;
+    background: var(--ink);
+  }
+
+  // Серая тема (на внутренних страницах, если секция над формой белая, ставит request-tone.ts): серое поле, белая панель, светло-серые поля
+  .request--gray {
+    background: var(--c-light);
+  }
+
+  .request.request--gray .request__panel {
+    background: var(--c-white);
+  }
+
+  .request.request--gray .opt__label,
+  .request.request--gray .field__control,
+  .request.request--gray .check__box {
+    background: var(--c-light);
+  }
+
+  .request.request--gray .opt:hover .opt__label {
+    background: var(--c-gray);
+  }
+
+  .request.request--gray .opt__input:checked + .opt__label {
+    background: var(--accent);
+  }
+
+  .request__photo {
+    display: grid;
+  }
+
+  .request__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    justify-content: space-between;
+    padding: 0 var(--col-gap) 0 var(--edge);
+  }
+
+  .request__title {
+    font-size: var(--fs-sec);
+    text-box: trim-start cap alphabetic;
+  }
+
+  .request__contact {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .request__lead {
+    max-inline-size: 28rem;
+    font-size: var(--fs-m);
+    line-height: 1.55;
+  }
+
+  .request__contacts {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .request__phone {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1rem + 2.2vw, 3.6rem);
+    font-weight: 240;
+    line-height: 1;
+    color: var(--paper);
+    text-decoration: none;
+  }
+
+  .request__mail {
+    font-size: var(--fs-m);
+    color: var(--paper);
+    text-underline-offset: 4px;
+  }
+
+  // Панель с формой: светло-серая плитка на белом поле секции
+  .request__panel {
+    display: grid;
+    align-content: center;
+    padding: clamp(1rem, 2.4svh, 1.75rem) clamp(1.1rem, 1.8vw, 1.75rem);
+    margin-inline: var(--edge);
+    background: var(--ink-soft);
+  }
+
+  .request__form {
+    display: grid;
+    gap: clamp(0.75rem, 1.8svh, 1.25rem);
+  }
+
+  .request__group {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0;
+    border: 0;
+  }
+
+  .request__legend {
+    padding: 0;
+    margin-block-end: 0.5rem;
+    font-size: var(--fs-s);
+    font-weight: 500;
+  }
+
+  // Без рамок: у кнопок выбора, полей и чекбокса только заливка стекла (рамка при ошибке остаётся)
+  .request .opt__label,
+  .request .field__control,
+  .request .check__box {
+    border-color: transparent;
+  }
+
+  .request .field__control[aria-invalid='true'] {
+    border-color: var(--err);
+  }
+
+  // Панель светло-серая, поля и кнопки выбора белые (цвета палитры), при наведении серые
+  .request .opt__label {
+    color: var(--c-black);
+    background: var(--c-white);
+  }
+
+  .request .opt:hover .opt__label {
+    background: var(--c-gray);
+  }
+
+  .request .opt__input:checked + .opt__label {
+    color: var(--c-white);
+    background: var(--accent);
+  }
+
+  .request__fields {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .request .field__label {
+    color: var(--c-black);
+  }
+
+  .request .field__control {
+    color: var(--c-black);
+    background: var(--c-white);
+  }
+
+  .request .field__control::placeholder {
+    color: var(--c-gray);
+  }
+
+  // Контуры фокуса в заявке тонкие, 1 px
+  .request .field__control:focus,
+  .request .field__control:focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: -1px;
+  }
+
+  .request .opt__input:focus-visible + .opt__label,
+  .request .check__input:focus-visible + .check__box {
+    outline-width: 1px;
+  }
+
+  .request .field__error {
+    font-weight: 600;
+    color: var(--accent-text);
+  }
+
+  .request__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .request .check__box {
+    background: var(--c-white);
+  }
+
+  .request .check__input:checked + .check__box {
+    color: var(--c-white);
+    background: var(--accent);
+  }
+
+  // Кнопка отправки: акцент со светлым текстом, при наведении заливка тёмным
+  .request .button {
+    --btn-hover-bg: var(--paper);
+    --btn-hover-fg: var(--c-white);
+
+    color: var(--c-white);
+  }
+
+  .request__done {
+    font-weight: 600;
+  }
+
+  // ---------- Раскладка на широких экранах
+  @media (width >= 900px) {
+    .shipments__pin,
+    .docs,
+    .faq {
+      grid-template-columns: var(--side-x) minmax(0, 1fr);
+    }
+
+    .shipments__pin {
+      align-items: center;
+    }
+
+    // Акцентный блок той же высоты, что и фото в ленте
+    .shipments__side {
+      block-size: min(72svh, 56rem);
+    }
+
+    .shipments__viewport {
+      overflow: clip;
+    }
+
+    // Сетка как у остальных секций: левая колонка до --side-x, справа содержимое с тем же отступом, что у документов и вопросов
+    .leasing {
+      grid-template-columns: var(--side-x) minmax(0, 1fr);
+      gap: 0;
+      padding-inline: 0;
+    }
+
+    .leasing__head {
+      padding-inline: var(--edge) var(--col-gap);
+    }
+
+    .leasing__main {
+      padding-inline: var(--col-gap) var(--edge);
+    }
+
+    .leasing__fields {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    // Мозаика: первый шаг крупной плиткой на две строки, остальные четыре вокруг
+    .process__list {
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      block-size: clamp(24rem, 50svh, 34rem);
+    }
+
+    .process__item {
+      min-block-size: 0;
+    }
+
+    .process__item:first-child {
+      grid-row: 1 / span 2;
+      grid-column: 1 / span 2;
+    }
+
+    .process__item:first-child .process__number {
+      font-size: clamp(8rem, 2rem + 12vw, 20rem);
+    }
+
+    .process__item:first-child .process__step {
+      font-size: clamp(2rem, 1rem + 2vw, 3.5rem);
+    }
+
+    .blog__grid {
+      grid-template-columns: var(--side-x) minmax(0, 1fr);
+    }
+
+    .blog__row {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-column: 1 / -1;
+    }
+
+    .request {
+      grid-template-columns: var(--side-x) minmax(0, 1fr);
+      align-items: center;
+    }
+
+    .request__panel {
+      margin-inline: var(--col-gap) var(--edge);
+    }
+
+    .request__fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .request__fields .field--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (width < 900px) {
+    .faq__text {
+      font-size: clamp(1.25rem, 5.5vw, 1.6rem);
+    }
+
+    .shipments__item {
+      block-size: 60svh;
+    }
+
+    .docs__list,
+    .blog__row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shipments__image,
+    .docs__item::before,
+    .news__image,
+    .faq__item::details-content {
+      transition: none;
+    }
+  }
+}

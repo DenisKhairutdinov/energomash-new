@@ -3,6 +3,7 @@ import vituum from 'vituum'
 import nunjucks from '@vituum/vite-plugin-nunjucks'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
+import { nbspPlugin } from './vite-plugins/nbsp'
 
 const targets = browserslistToTargets(browserslist())
 
@@ -23,6 +24,7 @@ export default defineConfig({
         lstripBlocks: true,
       },
     }),
+    nbspPlugin(),
   ],
   css: {
     transformer: 'lightningcss',

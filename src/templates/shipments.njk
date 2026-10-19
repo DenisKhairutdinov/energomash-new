@@ -1,14 +1,16 @@
-{# Отгрузки: данные-заглушки (модели, города, даты), позже придут из БД. Ключ shipments в src/data/home.json #}
-{# Горизонтальная «киноплёнка» с пином на широких экранах (scripts/modules/cinema.ts). #}
+{# Отгрузки (редизайн с нуля, 2026-10-17): данные-заглушки (модели, города, даты), позже придут из БД. Ключ shipments в src/data/home.json #}
+{# Слева акцентная колонка до края четырёх колонок контейнера, справа горизонтальная лента крупных горизонтальных фото, которая едет при прокрутке (pin на широких экранах, scripts/modules/cinema.ts); последняя карточка акцентная «Все отгрузки». #}
 {% from "icons.njk" import icon %}
 <section class="shipments" aria-labelledby="shipments-title" data-shipments data-chapter="Отгрузки">
   <div class="shipments__pin" data-shipments-pin>
-    <div class="shipments__head container">
-      <h2 class="section-title" id="shipments-title" data-split>Недавно<br />отгружено</h2>
-      <p class="section-head__text">Свежие поставки заказчикам: модели, города и даты отгрузки.</p>
-      <a class="button button--ink" href="/shipments.html">Все отгрузки</a>
+    <div class="shipments__side">
+      <h2 class="section-title shipments__title" id="shipments-title" data-split>Недавно<br />отгружено</h2>
+      <div class="shipments__foot">
+        <p class="shipments__lead">Свежие поставки заказчикам: модели, города и даты отгрузки.</p>
+        <a class="button shipments__button" href="/shipments.html">Все отгрузки</a>
+      </div>
     </div>
-    <div class="shipments__viewport">
+    <div class="shipments__viewport" data-shipments-viewport>
       <ul class="shipments__grid" data-shipments-track>
         {% for item in home.shipments %}
           <li class="shipments__item">
@@ -22,19 +24,18 @@
                   alt="{{ item.type }} {{ item.model }}"
                   loading="lazy"
                   decoding="async"
-                  data-parallax-img
                 />
               </span>
-              <span class="shipments__where glass glass--clear mono">
+              <span class="shipments__where">
                 <time datetime="{{ item.datetime }}">{{ item.date }}</time>, {{ item.city }}
               </span>
-              <span class="shipments__info glass glass--strong">
-                <span class="shipments__type mono">{{ item.type }}</span>
+              <span class="shipments__info">
                 <span class="shipments__model">{{ item.model }}</span>
-                <span class="shipments__details">
+                <span class="shipments__type">{{ item.type }}</span>
+                <span class="shipments__reveal">
                   <span class="shipments__specs">
                     {% for spec in item.specs %}
-                      <span class="shipments__spec"><span class="mono">{{ spec[0] }}</span><span>{{ spec[1] }}</span></span>
+                      <span class="shipments__spec"><span class="shipments__spec-label">{{ spec[0] }}</span><span>{{ spec[1] }}</span></span>
                     {% endfor %}
                   </span>
                 </span>
@@ -42,6 +43,12 @@
             </a>
           </li>
         {% endfor %}
+        <li class="shipments__item shipments__item--all">
+          <a class="shipments__all" href="/shipments.html">
+            <span class="shipments__all-title">Все<br />отгрузки</span>
+            {{ icon("arrow", "shipments__all-icon") }}
+          </a>
+        </li>
       </ul>
     </div>
   </div>

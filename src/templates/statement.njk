@@ -1,8 +1,12 @@
-{# Заявление: слова проявляются по мере прокрутки (scripts/modules/wow.ts). Акцентные слова помечены в home.json (statement.accent) #}
+{# О заводе (редизайн с нуля, 2026-10-17): тёмная секция после hero (вариант 1 выбран владельцем, остальные варианты убраны). Крупная фраза проявляется по словам при прокрутке (scripts/modules/wow.ts), под ней слева кнопка, справа пояснение; на дальнем плане чертёж ППЦ. Текст: home.json, ключ statement (text, note, accent). #}
 <section class="statement" aria-labelledby="statement-title" data-chapter="О заводе" data-statement>
   <div class="statement__inner container">
     <h2 class="visually-hidden" id="statement-title">О заводе</h2>
     <p class="statement__text" data-words data-accent="{{ home.statement.accent | join('|') }}">{{ home.statement.text }}</p>
-    <a class="button button--ink" href="/about.html">О заводе</a>
+    <div class="statement__foot" data-statement-foot>
+      <a class="button statement__button" href="/about.html">О заводе</a>
+      <p class="statement__note">{{ home.statement.note | safe }}</p>
+    </div>
   </div>
+  <span class="statement__drawing drawing drawing--ppc" aria-hidden="true" data-parallax="0.06"></span>
 </section>

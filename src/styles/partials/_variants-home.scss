@@ -1,0 +1,161 @@
+@use 'mixins' as *;
+
+// Варианты дизайна секций, часть 2: секции главной (наличие, назначение, география, отгрузки, лизинг, как купить, документы,
+// вопросы, блог, заявка). Включаются так же, как в _variants.scss: data-v="1…4" на секции, 0 — текущий дизайн. Подмена токенов
+// (light-surface, dark-surface, accent-surface) лежит в _variants.scss. Раскладки меняются только от 900 px, на узких экранах все варианты
+// отличаются цветом и размерами.
+@layer sections {
+  // =====================================================================
+
+  // 1. Светлая секция
+  .docs[data-v='1'] {
+    @include light-surface;
+  }
+
+  .docs[data-v='1'] .docs__side {
+    background: var(--ink-soft);
+  }
+
+  // 2. Акцентная колонка слева
+  .docs[data-v='2'] .docs__side {
+    @include accent-surface;
+  }
+
+  .docs[data-v='2'] .docs__foot .button {
+    --btn-hover-bg: var(--paper);
+    --btn-hover-fg: var(--ink);
+
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  // 3. Вертикально: заголовок сверху на всю ширину, плитки в четыре колонки, сервис ниже
+  @media (width >= 900px) {
+    .docs[data-v='3'] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .docs[data-v='3'] .docs__side {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
+      gap: 2rem;
+      align-items: end;
+      padding: calc(var(--sec-pad-y) * 1.5) var(--edge) var(--sec-pad-y);
+    }
+
+    .docs[data-v='3'] .docs__title {
+      font-size: clamp(3rem, 1rem + 7vw, 9rem);
+    }
+
+    .docs[data-v='3'] .docs__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    // 4. Зеркало: плитки слева, заголовок справа
+    .docs[data-v='4'] {
+      grid-template-columns: minmax(0, 1fr) var(--side-x);
+    }
+
+    .docs[data-v='4'] .docs__side {
+      grid-row: 1;
+      grid-column: 2;
+      padding-inline: var(--col-gap) var(--edge);
+      text-align: end;
+    }
+
+    .docs[data-v='4'] .docs__foot {
+      justify-items: end;
+    }
+
+    .docs[data-v='4'] .docs__main {
+      grid-row: 1;
+      grid-column: 1;
+    }
+  }
+
+  .docs[data-v='4'] .docs__item {
+    background: var(--ink-3);
+  }
+
+  // =====================================================================
+  // БЛОГ (.blog, главная)
+  // =====================================================================
+
+  // Выбранный вариант (data-v="2" в разметке, переключатель секцию не трогает): тёмно-серый блок с заголовком и акцентной кнопкой, на статьях ч/б фото
+  .blog[data-v='2'] .blog__intro {
+    color: var(--paper);
+    background: var(--ink-3);
+  }
+
+  .blog[data-v='2'] .blog__button {
+    color: var(--c-white);
+    background: var(--accent);
+  }
+
+  // =====================================================================
+  // КАК КУПИТЬ (.process)
+  // =====================================================================
+
+  // Выбранный вариант: светлая сетка из пяти колонок, тема светло-серая (data-v="3" стоит в разметке, переключатель секцию не трогает).
+  // Фон секции и плитки на ступень темнее белого, при наведении плитка темнее
+  .process[data-v='3'] {
+    @include light-surface;
+
+    background: var(--c-light);
+  }
+
+  .process[data-v='3'] .process__item {
+    background: var(--c-white);
+  }
+
+  .process[data-v='3'] .process__item:hover,
+  .process[data-v='3'] .process__item:focus-visible {
+    background: var(--c-gray);
+  }
+
+  @media (width >= 900px) {
+    .process[data-v='3'] .process__list {
+      grid-template-rows: auto;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      block-size: auto;
+    }
+
+    .process[data-v='3'] .process__item,
+    .process[data-v='3'] .process__item:first-child {
+      grid-row: auto;
+      grid-column: auto;
+
+      // Высота фиксирована и рассчитана на раскрытое описание, поэтому плитки не меняют размер при наведении
+      block-size: clamp(24rem, 46svh, 30rem);
+      min-block-size: 0;
+    }
+  }
+
+  // =====================================================================
+  // ЛИЗИНГ (.leasing)
+  // =====================================================================
+
+  // Выбранный вариант: светлая секция (data-v="1" стоит в разметке, переключатель секцию не трогает)
+  .leasing[data-v='1'] {
+    @include light-surface;
+
+    // Поля, линии и текст форм заданы под тёмный фон; на светлом без этого неактивный переключатель субсидии не виден
+    --fg: var(--paper);
+    --fg-2: var(--paper-70);
+    --line: var(--paper-20);
+    --field: var(--paper-5);
+    --field-hover: var(--paper-13);
+    --btn-line: var(--paper-35);
+  }
+
+  .leasing[data-v='1'] .leasing__result {
+    @include dark-surface;
+
+    color: var(--ink);
+    background: var(--accent);
+  }
+
+  .leasing[data-v='1'] .leasing__result .leasing__payment {
+    color: var(--paper);
+  }
+}

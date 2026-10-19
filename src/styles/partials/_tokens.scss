@@ -1,66 +1,100 @@
-// Токены. Палитра со старого сайта (src/styles/base/vars.scss старого проекта). Исключение по просьбе владельца (2026-10-16):
-// основной чёрный нейтральный #110f0d вместо синеватого #0d0e13; второй тёмный --ink-soft считается из палитры (чёрный и тёмно-серый).
+// Токены редизайна 2026-10-17: плоский минимализм без градиентов. Палитра: пять цветов (см. блок «Палитра сайта» ниже). Тёмная тема по умолчанию, светлая включается data-theme="light".
+// Старый hero живёт со своими токенами внутри .classic-scope (styles/classic).
 @layer tokens {
   :root {
-    // Палитра
-    --paper: #f7f6f3;
-    --ink: #110f0d;
-    --ink-soft: #25221f;
+    // Палитра сайта: пять цветов, других нет (владелец, 2026-10-18). Каждый элемент заливается ровно одним из них, без ступеней
+    // и полупрозрачных оттенков. Исключение только затемнение и стекло поверх фото: это тот же чёрный с прозрачностью, иначе фото не затемнить.
+    // Чёрный как фон секции «Недавно отгружено», белый как фон «Географии поставок», серый как регионы без поставок на карте,
+    // светло-серый как плитки «Лизинга и субсидии», один акцент.
+    --c-black: #181b21;
+    --c-white: #fcfdfe;
+    --c-gray: #b9bbbe;
+    --c-light: #eceef1;
     --accent: #c8603d;
-    --accent-deep: #b84f30;
-    --accent-text: #e4744b;
-    --grey: #dfdedb;
-    --grey-dark: #94928e;
-    --muted-dark: #b3b1ad;
+    --accent-deep: var(--accent);
+    --accent-text: var(--accent);
 
-    // Вспомогательные цвета: категории и статусы, на тёмном контраст 6 и выше. Использовать точечно, не как фон
-    --steel: #84a4b7;
-    --amber: #eebc4a;
-    --ok: #5bbd74;
-    --err: #f75e54;
+    // Тёмный контекст (по умолчанию): все поверхности чёрные, текст белый, второстепенный текст и линии серые.
+    // Имена --paper-N сохранены, значения сплошные: от 80 и выше белый, 55–75 серый, до 35 чёрный (то есть «ничего»).
+    --ink: var(--c-black);
+    --ink-soft: var(--c-black);
+    --ink-3: var(--c-black);
+    --paper: var(--c-white);
+    --err: var(--accent);
+    --line-light: var(--c-gray);
+    --line-dark: var(--c-gray);
+    --btn-line: var(--c-gray);
+    --paper-5: var(--c-black);
+    --paper-8: var(--c-black);
+    --paper-9: var(--c-black);
+    --paper-13: var(--c-black);
+    --paper-15: var(--c-black);
+    --paper-16: var(--c-black);
+    --paper-20: var(--c-black);
+    --paper-22: var(--c-black);
+    --paper-35: var(--c-black);
+    --paper-55: var(--c-gray);
+    --paper-60: var(--c-gray);
+    --paper-65: var(--c-gray);
+    --paper-70: var(--c-gray);
+    --paper-75: var(--c-gray);
+    --paper-80: var(--c-white);
+    --paper-85: var(--c-white);
+    --paper-88: var(--c-white);
+    --paper-90: var(--c-white);
+    --field: var(--c-black);
+    --field-hover: var(--c-black);
 
-    // Совместимость со старыми именами
-    --accent-bright: var(--accent);
+    // Наведение и фокус плиток: на тёмном акцент, на светлом белый (в светлых секциях задаётся миксином light-surface)
+    --hover-fill: var(--accent);
+    --focus-fill: var(--c-black);
 
-    // Рамок у элементов нет: поля и плашки выделяются заливкой и тенью
-    --line-light: #110f0d1f;
-    --line-dark: #f7f6f326;
-    --btn-line: #f7f6f38c;
-    --field: #f7f6f314;
-    --field-hover: #f7f6f324;
+    // Стекло поверх фото: как было, не меняется (владелец: «стекла не трогай»). Плоская заливка, без градиента.
+    --glass-dark: oklch(17% 0.008 60deg / 44%);
+    --glass-dark-strong: oklch(15.5% 0.008 255deg / 52%);
+    --glass-clear: oklch(15.5% 0.008 255deg / 20%);
+    --glass-accent: #c8603dcc;
+    --accent-glass: #c8603db8;
+    --glass-blur: blur(5px) saturate(1.5);
+    --glass-blur-strong: blur(6px);
 
-    // Стекло: тёмная подложка и размытие
-    // Стекло: прозрачнее и с умеренным размытием, чтобы фото под плашкой читалось
-    --glass-dark: #110f0d59;
-    --glass-dark-strong: #110f0d73;
-    --glass-clear: #110f0d40;
-    --glass-accent: #c8603dbf;
-    --accent-glass: #b84f30b3;
-    --glass-blur: blur(9px);
-    --glass-blur-strong: blur(12px) saturate(1.5);
-
-    // Шрифты: заголовки Oswald, текст Manrope (--font-text в _site.scss)
-    --font-display: 'Oswald Variable', 'Arial Narrow', sans-serif;
+    // Шрифты как в hero: заголовки Oswald, текст Manrope, моноширинный только для данных
+    --font-display: 'Oswald Fit', 'Oswald Variable', 'Arial Narrow', sans-serif;
+    --font-text: 'Manrope Variable', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-    // Размеры текста: меньше и аккуратнее, чем раньше
+    // Размеры текста. Заголовки узкие, поэтому крупнее прежних
     --fs-xs: 0.75rem;
     --fs-s: 0.875rem;
     --fs-m: 1rem;
-    --fs-l: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
-    --fs-xl: clamp(1.5rem, 1.15rem + 1.1vw, 2.125rem);
-    --fs-title: clamp(2.5rem, 1rem + 4.4vw, 6rem);
-    --fs-title-s: clamp(2.25rem, 1rem + 3vw, 4.25rem);
-    --fs-hero: clamp(2.75rem, 0.8rem + 6vw, 8.25rem);
-    --fs-number: clamp(3rem, 1.4rem + 5vw, 8rem);
+    --fs-l: clamp(1.0625rem, 1rem + 0.3vw, 1.3125rem);
+    --fs-xl: clamp(1.75rem, 1.2rem + 1.6vw, 2.75rem);
+    --fs-title: clamp(3rem, 1rem + 6vw, 8rem);
+
+    // Общие размеры секций на весь экран (о заводе, наличие, назначение): заголовок и вертикальный отступ от края секции
+    --fs-sec: clamp(2.5rem, min(1rem + 3.4vw, 9svh), 5rem);
+    --sec-pad-y: clamp(1.5rem, 5svh, 3.5rem);
+
+    // Левый край контейнера и правый край левой колонки секций (четыре колонки контейнера): left = (100vw - w) / 2, колонка = w / 3 - 2/3 зазора
+    --cont-w: min(100vw - 2 * var(--gutter), var(--max));
+    --edge: max(var(--gutter), (100vw - var(--max)) / 2);
+    --side-x: calc((100vw - var(--cont-w)) / 2 + var(--cont-w) / 3 - var(--col-gap) * 2 / 3);
+    --fs-title-s: clamp(2.5rem, 1rem + 3.6vw, 5.25rem);
+    --fs-hero: clamp(3.5rem, 0.5rem + 9.5vw, 12rem);
+    --fs-number: clamp(3.5rem, 1.4rem + 7vw, 11rem);
     --fs-mega: clamp(4rem, 0.5rem + 15vw, 22rem);
 
-    // Сетка и ритм: единая шкала отступов, чтобы всё стояло ровно
+    // Сетка и ритм
     --gutter: clamp(1rem, 3.5vw, 3.5rem);
+    --col-gap: clamp(0.75rem, 1.4vw, 1.5rem);
     --section-y: clamp(5rem, 3rem + 7vw, 9.5rem);
     --gap: clamp(0.75rem, 1.4vw, 1.25rem);
-    --header-h: 3.5rem;
+    --header-h: 4rem;
     --max: 1680px;
+
+    // Углы: плоские блоки с прямыми углами. Единственная «фаска» (срез угла) задаётся --cut там, где она нужна
+    --r: 0;
+    --cut: 0.75rem;
 
     // Угол окна справа внизу оставляем свободным: на старом сайте там стоял виджет чата
     --corner-clearance: 6.5rem;
@@ -70,34 +104,40 @@
     --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
-  // Тема сайта: тёмная по умолчанию, светлая включается атрибутом data-theme="light" на <html> (переключатель в шапке).
-  // Плоские секции берут цвета из --site-* (миксин theme-site); секции с фото остаются тёмными в любой теме (миксин theme-dark).
+  // Тема сайта: тёмная по умолчанию, светлая включается атрибутом data-theme="light" на <html>.
+  // Секции с фото остаются тёмными в любой теме (миксин theme-dark).
   :root {
-    --site-bg: var(--ink);
-    --site-bg-2: var(--ink-soft);
-    --site-fg: var(--paper);
-    --site-fg-2: #f7f6f3ad;
-    --site-line: #f7f6f326;
-    --site-field: #f7f6f314;
-    --site-field-hover: #f7f6f324;
-    --site-accent-text: #e4744b;
-    --site-btn-line: #f7f6f38c;
-    --site-halo: #110f0dbf;
+    --site-bg: var(--c-black);
+    --site-bg-2: var(--c-black);
+    --site-bg-3: var(--c-black);
+    --site-fg: var(--c-white);
+    --site-fg-2: var(--c-gray);
+    --site-line: var(--c-gray);
+    --site-field: var(--c-black);
+    --site-field-hover: var(--c-black);
+    --site-accent-text: var(--accent);
+    --site-btn-line: var(--c-gray);
+    --site-halo: var(--c-black);
+    --site-hover-fill: var(--accent);
+    --site-focus-fill: var(--c-black);
 
     color-scheme: dark;
   }
 
   :root[data-theme='light'] {
-    --site-bg: var(--paper);
-    --site-bg-2: #ecebe7;
-    --site-fg: var(--ink);
-    --site-fg-2: #110f0dad;
-    --site-line: #110f0d1f;
-    --site-field: #110f0d0f;
-    --site-field-hover: #110f0d1a;
-    --site-accent-text: #a8452a;
-    --site-btn-line: #110f0d73;
-    --site-halo: #f7f6f3d9;
+    --site-bg: var(--c-white);
+    --site-bg-2: var(--c-light);
+    --site-bg-3: var(--c-gray);
+    --site-fg: var(--c-black);
+    --site-fg-2: var(--c-black);
+    --site-line: var(--c-gray);
+    --site-field: var(--c-white);
+    --site-field-hover: var(--c-light);
+    --site-accent-text: var(--accent);
+    --site-btn-line: var(--c-black);
+    --site-halo: var(--c-white);
+    --site-hover-fill: var(--c-white);
+    --site-focus-fill: var(--c-white);
 
     color-scheme: light;
   }
@@ -107,14 +147,16 @@
     --bg: var(--ink);
     --bg-2: var(--ink-soft);
     --fg: var(--paper);
-    --fg-2: #f7f6f3b3;
+    --fg-2: var(--c-gray);
     --line: var(--line-dark);
     --btn-ink: var(--paper);
     --btn-ink-fg: var(--ink);
-    --field: #f7f6f314;
-    --field-hover: #f7f6f324;
-    --accent-text: #e4744b;
-    --btn-line: #f7f6f38c;
+    --field: var(--c-black);
+    --field-hover: var(--c-black);
+    --hover-fill: var(--accent);
+    --focus-fill: var(--c-black);
+    --accent-text: var(--accent);
+    --btn-line: var(--c-gray);
     --btn-hover-bg: var(--paper);
     --btn-hover-fg: var(--ink);
   }

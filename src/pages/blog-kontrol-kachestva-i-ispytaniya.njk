@@ -1,0 +1,11 @@
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-kontrol-kachestva-i-ispytaniya.html" %}
+{% set slug = "kontrol-kachestva-i-ispytaniya" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

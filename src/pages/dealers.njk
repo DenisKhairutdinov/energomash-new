@@ -1,2 +1,52 @@
-{% extends "layout.njk" %} {% set pageTitle = "Дилерам" %} {% set currentPage = "terms/dealers" %}
-{% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/dealers.html" %}
+{% set pageTitle = "Дилерам: стать партнёром Энергомаш" %}
+{% set pageDescription = "Дилерская программа завода «Энергомаш»: как стать дилером, какие материалы и поддержку получает партнёр, как оставить заявку на сотрудничество." %}
+{% set currentPage = "terms/dealers" %}
+{% set pageClass = "inner" %}
+{% block content %}
+{% from "ip.njk" import head, sec, cta, crumbs, faq, band %}
+<article class="ip">
+  {{ crumbs([["Условия", "/terms.html"], ["Дилерам", "/dealers.html"]]) }}
+  {{ head("Дилерам", "Завод принимает заявки от компаний, которые хотят продавать технику «Энергомаш» в своём регионе. Условия обсуждаем индивидуально.", '<a href="/terms.html">Условия</a>', false, "IMG_2494.webp", "split-r") }}
+
+  {% call sec("Кому подходит программа", "dealers-who", "У кого есть выход на покупателей спецтехники.") %}
+    <ul class="ip__tiles ip__tiles--3">
+      <li class="ip__tile"><h3 class="ip__tile-title">Продавцы техники</h3><p class="ip__tile-text">Компании по продаже и обслуживанию грузовой и специальной техники.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Лизинг и сервис</h3><p class="ip__tile-text">Лизинговые и сервисные компании с собственной клиентской базой.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Поставщики оборудования</h3><p class="ip__tile-text">Региональные поставщики для нефтяной, коммунальной и сельскохозяйственной сфер.</p></li>
+    </ul>
+  {% endcall %}
+
+  {{ band("IMG_0619.webp") }}
+
+  {% call sec("Что получает дилер", "dealers-get", "Поддержка завода на всех этапах.", true) %}
+    <ul class="ip__tiles ip__tiles--2">
+      <li class="ip__tile"><h3 class="ip__tile-title">Каталог и наличие</h3><p class="ip__tile-text">Доступ к каталогу, складу и срокам изготовления.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Консультации инженеров</h3><p class="ip__tile-text">Помощь с комплектацией и подбором техники под задачу клиента.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Коммерческие предложения</h3><p class="ip__tile-text">Расчёты, спецификации и документы для ваших покупателей.</p></li>
+      <li class="ip__tile"><h3 class="ip__tile-title">Гарантия и сервис</h3><p class="ip__tile-text">Информация об обязательствах завода и запчасти для клиентов.</p></li>
+    </ul>
+  {% endcall %}
+
+  {% call sec("Как стать дилером", "dealers-steps", "Четыре шага до партнёрства.") %}
+    <ol class="ip__tiles ip__tiles--4">
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">1</span><h3 class="ip__tile-title">Заявка</h3><p class="ip__tile-text">Расскажите о компании: регион, направление, клиенты.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">2</span><h3 class="ip__tile-title">Обсуждение</h3><p class="ip__tile-text">Менеджер уточнит задачи и предложит формат сотрудничества.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">3</span><h3 class="ip__tile-title">Договор</h3><p class="ip__tile-text">Согласуем условия поставки и работы в регионе.</p></li>
+      <li class="ip__tile"><span class="ip__tile-num" aria-hidden="true">4</span><h3 class="ip__tile-title">Запуск</h3><p class="ip__tile-text">Передаём материалы и цены, помогаем с первыми сделками.</p></li>
+    </ol>
+    <div class="prose"><p>Подробнее: <a href="/blog-kak-stat-dilerom.html">«Как стать дилером завода»</a>.</p></div>
+  {% endcall %}
+
+  {% call sec("Вопросы", "dealers-faq", "Частые вопросы партнёров.", true) %}
+    {{ faq([
+      ["Есть ли ограничения по регионам?", "Условия зависят от региона и объёмов, поэтому их обсуждают лично. Укажите регион в заявке."],
+      ["Нужно ли закупать технику на склад?", "Формат работы согласуем индивидуально: возможна работа под заказ клиента и с наличием."],
+      ["Помогает ли завод с документами для клиентов?", "Да, передаём коммерческие предложения, спецификации и документы на технику."]
+    ], "dealers-faq") }}
+  {% endcall %}
+
+  {{ cta("Станьте<br />партнёром", "Оставьте заявку на сотрудничество, и менеджер свяжется с вами.", "Отправить заявку") }}
+</article>
+{% endblock %}

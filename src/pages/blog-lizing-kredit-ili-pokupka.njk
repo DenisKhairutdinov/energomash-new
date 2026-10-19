@@ -1,2 +1,11 @@
-{% extends "layout.njk" %} {% set pageTitle = "Гид по подбору" %} {% set currentPage =
-"blog/selection-guide" %} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-lizing-kredit-ili-pokupka.html" %}
+{% set slug = "lizing-kredit-ili-pokupka" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

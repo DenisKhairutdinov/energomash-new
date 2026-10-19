@@ -1,76 +1,149 @@
 @use 'mixins' as *;
 
-// Шапка: плавающая стеклянная «таблетка» (приём Terminal Industries). В ней: логотип, меню с мега-панелями как на старом сайте,
-// поиск, почта, Max, VK, телефон и звонок. Цвета берутся из переменных варианта: --hdr-bg, --hdr-fg, --hdr-fg-2, --hdr-cell, --hdr-hover.
+// Шапка (редизайн с нуля, 2026-10-17). Плавающая стеклянная лента с отступом от краёв окна, прямые углы, без срезов и рамок.
+// Лента: блок логотипа слева (плотнее фона), меню, справа телефон, значки и акцентная кнопка «Заказать звонок» заподлицо с краем.
+// Панели меню и поиск: тот же стеклянный фон, висят под лентой с зазором и вырастают сверху вниз (clip-path); пункты внутри появляются по очереди.
+// Ховер пунктов меню прежний: светлая пластина скользит за курсором, на текущем разделе залита акцентом (scripts/modules/header.ts).
+// Стекло: backdrop-filter стоит только на самих панелях (ленты, панели меню, поиск), родителей с фильтром нет, иначе блюр у вложенных пропадает.
 @layer sections {
+  :root {
+    --bar-h: 3.5rem;
+    --hdr-gap: 0.75rem;
+    --header-h: calc(var(--bar-h) + var(--hdr-gap) * 2);
+    --hdr-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+    // Задержка закрытия панели меню: курсор может пройти по диагонали мимо пункта (например, над логотипом) и успеть попасть в панель
+    --hdr-linger: 0.3s;
+  }
+
   .header {
-    --hdr-bg: #110f0db3;
-    --hdr-bg-solid: #110f0de6;
-    --hdr-fg: var(--paper);
-    --hdr-fg-2: #f7f6f3b3;
-    --hdr-cell: #ffffff0f;
-    --hdr-hover: var(--accent-deep);
+    @include glass-tones;
+
+    // Палитра шапки: тёплый графит, акцент владельца без изменений
+    --hdr-fg: var(--c-white);
+    --hdr-fg-2: var(--paper-70);
+    --hdr-glass: oklch(17% 0.008 60deg / 38%);
+    --hdr-glass-solid: oklch(17% 0.008 60deg / 44%);
+    --hdr-plate: var(--paper-15);
+    --hdr-cell: var(--paper-9);
+    --hdr-blur: blur(5px) saturate(1.5);
 
     position: fixed;
-    inset-block-start: 0.875rem;
-    inset-inline: var(--gutter);
+    inset-block-start: 0;
+    inset-inline: 0;
     z-index: 600;
+    padding-block-start: var(--hdr-gap);
     color: var(--hdr-fg);
+    pointer-events: none;
+    isolation: isolate;
+    transform: translateY(0);
+    transition: transform 0.5s var(--hdr-ease);
 
     @include theme-dark-vars;
+  }
 
-    transition: transform 0.7s var(--ease-out);
+  .header > * {
+    pointer-events: auto;
+  }
+
+  // После прокрутки стекло подстраивается под фон (data-tone ставит scripts/modules/header.ts):
+  // на тёмном фоне светлеет, на светлом темнеет. Текст везде светлый
+  .header.is-solid[data-tone='dark'] {
+    --hdr-glass: var(--paper-16);
+    --hdr-glass-solid: var(--paper-20);
+    --hdr-plate: var(--paper-22);
+    --hdr-cell: var(--paper-13);
+  }
+
+  .header.is-solid[data-tone='light'] {
+    --hdr-glass: oklch(14% 0.008 60deg / 68%);
+    --hdr-glass-solid: oklch(14% 0.008 60deg / 74%);
+  }
+
+  // Скрим под открытыми панелями: плоская затемняющая заливка, без размытия
+  .header::after {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: -3;
+    block-size: 100svh;
+    pointer-events: none;
+    content: '';
+    background: oklch(0% 0 0deg / 50%);
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-out);
+  }
+
+  .header.is-open::after,
+  .header.is-searching::after {
+    opacity: 1;
   }
 
   .header.is-hidden:not(.is-open, .is-searching) {
-    transform: translateY(calc(-100% - 1.5rem));
+    transform: translateY(calc(-100% - 1rem));
+  }
+
+  // Секция на весь экран (витрина наличия): пока она на экране, шапка скрыта всегда, в том числе при прокрутке вверх (scripts/modules/slider.ts)
+  .header.is-away {
+    pointer-events: none;
+    transform: translateY(calc(-100% - 1rem));
   }
 
   .page:not(.page--home) main {
     padding-block-start: calc(var(--header-h) + 1.5rem);
   }
 
+  // У каталога и внутренних страниц шапка страницы сама уходит под шапку сайта, отступ main не нужен (иначе сверху полоса чёрного фона)
+  .page.page--catalog main,
+  .page:not(.page--home) main:has(.ip__head, .pdp__hero) {
+    padding-block-start: 0;
+  }
+
+  // Лента: стекло на псевдоэлементе, сама лента без фильтра
   .header__bar {
     position: relative;
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    justify-content: space-between;
-    inline-size: min(100%, 96rem);
-    min-block-size: var(--header-h);
-    padding: 0.3rem 0.5rem 0.3rem 1.25rem;
-    margin-inline: auto;
-    background: var(--hdr-bg);
-    box-shadow: 0 14px 44px rgb(17 15 13 / 16%);
-    backdrop-filter: blur(14px) saturate(1.5);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: stretch;
+    min-block-size: var(--bar-h);
+  }
+
+  .header__bar::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: var(--hdr-glass);
+    backdrop-filter: var(--hdr-blur);
     transition: background-color 0.4s;
   }
 
-  .header.is-solid .header__bar,
-  .header.is-open .header__bar {
-    background: var(--hdr-bg-solid);
+  .header.is-solid .header__bar::before,
+  .header.is-open .header__bar::before {
+    background: var(--hdr-glass-solid);
   }
 
   .header__logo {
-    display: block;
-    flex: none;
+    display: flex;
+    align-items: center;
+    padding-inline: 1.25rem;
   }
 
+  // Буквы логотипа (высота 3.7–18.2 из 27) стоят выше геометрического центра файла на 2.55/176 ширины:
+  // сдвигаем знак вниз на эту долю, чтобы по центру ленты были именно буквы
   .header__logo img {
-    inline-size: 8.75rem;
-  }
+    --logo-w: clamp(10rem, 5vw + 6rem, 11rem);
 
-  // В хедере рамок нет, в том числе у кнопки звонка
-  .header .button {
-    border: 0;
+    inline-size: var(--logo-w);
+    translate: 0 calc(var(--logo-w) * 0.0145);
   }
 
   .header__burger {
     display: grid;
     place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
+    inline-size: var(--bar-h);
     color: inherit;
+    cursor: pointer;
     background: transparent;
     border: 0;
   }
@@ -80,18 +153,18 @@
     block-size: 1.6rem;
   }
 
-  // Мобильная панель (мобильную версию пока не дорабатываем, оставлена рабочая)
+  // Мобильная панель: стеклянный лист под лентой
   .header__panel {
     position: absolute;
     inset-block-start: calc(100% + 0.5rem);
     inset-inline: 0;
     display: none;
     gap: 1.25rem;
-    max-block-size: calc(100svh - var(--header-h) - 2rem);
-    padding: 1rem 1.25rem 1.5rem;
+    max-block-size: calc(100svh - var(--header-h) - 1rem);
+    padding: 1.25rem;
     overflow: auto;
-    background: var(--hdr-bg-solid);
-    backdrop-filter: blur(22px);
+    background: var(--hdr-glass-solid);
+    backdrop-filter: var(--hdr-blur);
   }
 
   .header.is-open .header__panel {
@@ -109,25 +182,31 @@
     gap: 0.25rem;
   }
 
+  // Значки: ховер как у пунктов меню, плоская светлая полупрозрачная пластина
   .header__tool {
     display: grid;
     place-items: center;
     inline-size: 2.5rem;
     block-size: 2.5rem;
-    color: inherit;
+    color: var(--hdr-fg-2);
     cursor: pointer;
     background: transparent;
     border: 0;
     transition:
-      background-color 0.3s,
-      color 0.3s;
+      color 0.25s,
+      background-color 0.25s,
+      transform 0.15s var(--ease-out);
   }
 
   .header__tool:hover,
   .header__tool:focus-visible,
   .header__tool[aria-expanded='true'] {
-    color: var(--paper);
-    background: var(--hdr-hover);
+    color: var(--hdr-fg);
+    background: var(--hdr-plate);
+  }
+
+  .header__tool:active {
+    transform: scale(0.94);
   }
 
   .header__tool-icon {
@@ -159,37 +238,78 @@
     --icon: url('/src/assets/icons/vk.svg');
   }
 
+  // Телефон: данные, поэтому моноширинный с табличными цифрами
   .header__phone {
-    font-family: var(--font-display);
-    font-size: var(--fs-l);
-    font-weight: 300;
-    color: inherit;
+    padding: 0.7rem 0.75rem;
+    margin-inline-start: -0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-s);
+    font-variant-numeric: tabular-nums;
+    color: var(--hdr-fg-2);
     white-space: nowrap;
     text-decoration: none;
+    transition:
+      color 0.25s,
+      background-color 0.25s;
   }
 
-  // Строка поиска выезжает под таблеткой
+  .header__phone:hover,
+  .header__phone:focus-visible {
+    color: var(--hdr-fg);
+    background: var(--hdr-plate);
+  }
+
+  // «Заказать звонок»: как кнопки в hero, при наведении заливка идёт слева направо, текст темнеет
+  .header__cta {
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border: 0;
+    isolation: isolate;
+    transition: color 0.4s var(--ease-out);
+  }
+
+  .header__cta::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    background: var(--btn-hover-bg);
+    transform: translateX(-101%);
+    transition: transform 0.55s var(--ease-out);
+  }
+
+  .header__cta:hover,
+  .header__cta:focus-visible {
+    color: var(--btn-hover-fg);
+    background: var(--accent-deep);
+  }
+
+  .header__cta:hover::before,
+  .header__cta:focus-visible::before {
+    transform: none;
+  }
+
+  // Поиск: стеклянный лист под лентой на ширину ленты, содержимое поднимается следом. Подсказки идут в потоке и растягивают лист
   .header__search {
     position: absolute;
-    inset-block-start: calc(100% + 0.5rem);
+    inset-block-start: calc(var(--hdr-gap) + var(--bar-h) + 0.5rem);
     inset-inline: 0;
     visibility: hidden;
-    inline-size: min(100%, 96rem);
     margin-inline: auto;
-    background: var(--hdr-bg-solid);
-    backdrop-filter: blur(22px) saturate(1.4);
+    background: var(--hdr-glass-solid);
+    backdrop-filter: var(--hdr-blur);
     clip-path: inset(0 0 100%);
     transition:
-      clip-path 0.6s var(--ease-out),
-      visibility 0s 0.6s;
+      clip-path 0.3s var(--hdr-ease),
+      visibility 0s 0.3s;
   }
 
-  // Открытая панель не обрезает подсказки, которые выпадают ниже неё
   .header.is-searching .header__search {
     visibility: visible;
-    clip-path: inset(0 0 -32rem);
+    clip-path: inset(0);
     transition:
-      clip-path 0.6s var(--ease-out),
+      clip-path 0.45s var(--hdr-ease),
       visibility 0s;
   }
 
@@ -197,49 +317,93 @@
     display: flex;
     gap: 1rem;
     align-items: center;
-    padding: 0.5rem 0.75rem 0.5rem 1.25rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .header__search-icon,
+  .header__search-input,
+  .header__search-inner .button {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition:
+      opacity 0.12s,
+      transform 0s 0.12s;
+  }
+
+  .header.is-searching .header__search-icon,
+  .header.is-searching .header__search-input,
+  .header.is-searching .header__search-inner .button {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.3s var(--ease-out) 0.1s,
+      transform 0.5s var(--ease-out) 0.1s;
+  }
+
+  .header.is-searching .header__search-input {
+    transition-delay: 0.16s;
+  }
+
+  .header.is-searching .header__search-inner .button {
+    transition-delay: 0.22s;
+  }
+
+  // «Найти» капсом, как «Заказать звонок»
+  .header__search-inner .button {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
 
   .header__search-icon {
     flex: none;
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
     color: var(--accent-text);
   }
 
   .header__search-input {
     flex: 1;
     min-inline-size: 0;
-    padding: 0.45rem 0.9rem;
+    padding: 0.4rem 0;
     font-family: var(--font-display);
-    font-size: var(--fs-l);
-    font-weight: 200;
+    font-size: clamp(1.75rem, 1.2rem + 1.4vw, 2.5rem);
+    font-weight: 260;
     color: var(--hdr-fg);
-    background: var(--hdr-cell);
+    background: transparent;
     border: 0;
-    transition: background-color 0.3s;
   }
 
   .header__search-input:focus {
     outline: none;
-    background: rgb(128 128 128 / 22%);
   }
 
   .header__search-input::placeholder {
     color: var(--hdr-fg-2);
   }
 
-  // Подсказки поиска: список моделей под строкой, выбранная строка подсвечена
+  // Крестик очистки в поле поиска: своя тонкая линия вместо системной, крупнее и с курсором-рукой
+  /* stylelint-disable selector-no-vendor-prefix */
+  .header__search-input::-webkit-search-cancel-button {
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    margin: 0;
+    appearance: none;
+    cursor: pointer;
+    background: var(--hdr-fg-2);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1' stroke-linecap='square'%3E%3Cpath d='M4 4l16 16M20 4L4 20'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    transition: background-color 0.2s;
+  }
+
+  .header__search-input::-webkit-search-cancel-button:hover {
+    background: var(--accent-text);
+  }
+  /* stylelint-enable selector-no-vendor-prefix */
+
   .search__results {
-    position: absolute;
-    inset-block-start: calc(100% + 0.5rem);
-    inset-inline: 0;
-    max-block-size: min(26rem, 70svh);
-    padding: 0.4rem;
+    max-block-size: min(26rem, 60svh);
+    padding: 0 0.75rem 0.75rem;
     overflow-y: auto;
-    background: #110f0df2;
-    box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 35%);
-    backdrop-filter: blur(14px) saturate(1.4);
   }
 
   .search__item,
@@ -248,10 +412,10 @@
     gap: 1rem;
     align-items: center;
     justify-content: space-between;
-    padding: 0.8rem 1rem;
+    padding: 0.8rem 0.5rem;
     color: var(--hdr-fg);
     text-decoration: none;
-    transition: background-color 0.25s;
+    transition: background-color 0.15s;
   }
 
   .search__item:hover,
@@ -290,25 +454,30 @@
     color: var(--hdr-fg-2);
   }
 
-  // Меню
+  // Меню (мобильный вид: крупный вертикальный список)
   .menu__list {
     display: grid;
   }
 
   .menu__link {
     display: block;
-    padding-block: 0.8rem;
+    padding-block: 0.7rem;
     font-family: var(--font-display);
     font-size: var(--fs-xl);
-    font-weight: 200;
+    font-weight: 260;
     color: inherit;
     text-transform: uppercase;
     text-decoration: none;
   }
 
-  .menu__link--accent,
   .menu__link--active {
     color: var(--accent-text);
+  }
+
+  .menu__marker,
+  .menu__lead,
+  .menu__sketch {
+    display: none;
   }
 
   .menu__dropdown {
@@ -318,10 +487,6 @@
   .menu__groups,
   .menu__tiles {
     display: grid;
-  }
-
-  .menu__feature {
-    display: none;
   }
 
   .menu__group-head,
@@ -348,37 +513,46 @@
     color: var(--hdr-fg-2);
   }
 
+  // «Все модели» набрано так же, как «Открыть раздел»: текстовый шрифт, обычный регистр
   .menu__group-all {
     display: inline-flex;
     gap: 0.5rem;
     align-items: center;
-    font-size: var(--fs-xs);
+    font-family: var(--font-text);
+    font-size: var(--fs-s);
     font-weight: 500;
+    line-height: 1.4;
     color: var(--accent-text);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    text-transform: none;
+    letter-spacing: normal;
   }
 
   .menu__arrow {
     flex: none;
     inline-size: 1.1rem;
     block-size: 1.1rem;
-    transition: transform 0.4s var(--ease-out);
+    transition:
+      transform 0.3s var(--ease-out),
+      color 0.2s;
   }
 
-  @media (width >= 1180px) {
+  // Рабочий вид от 1280 px
+  @media (width >= 1280px) {
     .header__burger {
       display: none;
     }
 
+    .header__bar {
+      display: flex;
+      gap: 0;
+    }
+
+    // Панель и контакты распадаются на части ленты: меню слева за логотипом, контакты прижаты вправо
     .header__panel {
       position: static;
       display: flex;
       flex: 1;
-      gap: 1rem;
-      align-items: center;
-      justify-content: space-between;
-      max-block-size: none;
+      align-items: stretch;
       padding: 0;
       overflow: visible;
       background: transparent;
@@ -386,222 +560,463 @@
     }
 
     .header__contacts {
-      grid-auto-flow: column;
-      gap: 0.75rem;
-      align-items: center;
+      display: flex;
+      gap: 0.5rem;
+      align-items: stretch;
+      margin-inline-start: auto;
     }
 
     .header__phone {
+      display: flex;
+      align-items: center;
+      padding-block: 0;
+      margin-inline-start: 0;
+    }
+
+    .header__tools {
+      align-items: center;
+      padding-inline-end: 0.5rem;
+    }
+
+    .header__tool {
+      inline-size: 2.25rem;
+      block-size: 2.25rem;
+    }
+
+    // Подсказка у значков: берётся из aria-label, появляется под значком через 0.35 s после наведения мыши (и при фокусе с клавиатуры), прячется, пока поиск открыт
+    .header__tool {
+      position: relative;
+    }
+
+    .header__tool::after {
+      position: absolute;
+      inset-block-start: calc(100% + 0.5rem);
+      inset-inline-start: 50%;
+      z-index: 5;
+      padding: 0.45rem 0.7rem;
+      font: 500 var(--fs-xs) / 1.2 var(--font-text);
+      color: var(--hdr-fg);
+      white-space: nowrap;
+      pointer-events: none;
+      content: attr(aria-label);
+      background: var(--hdr-glass-solid);
+      opacity: 0;
+      backdrop-filter: var(--hdr-blur);
+      transform: translate(-50%, -0.25rem);
+      transition:
+        opacity 0.12s,
+        transform 0.2s var(--ease-out);
+    }
+
+    .header__tool:focus-visible::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .header__tool:hover::after {
+        opacity: 1;
+        transform: translate(-50%, 0);
+        transition-delay: 0.35s;
+      }
+    }
+
+    .header__tool[aria-expanded='true']::after {
       display: none;
+    }
+
+    // Пластина за курсором (marker) уже даёт фон, у самих значков и телефона фона при наведении нет
+    .header__tool:hover,
+    .header__tool:focus-visible,
+    .header__phone:hover,
+    .header__phone:focus-visible {
+      background: transparent;
+    }
+
+    // «Заказать звонок»: акцентный блок во всю высоту ленты, заподлицо с краем
+    .header__cta {
+      min-block-size: 0;
+      padding-inline: 1.6rem;
+      font-size: var(--fs-s);
+    }
+
+    .menu {
+      align-self: stretch;
+      margin-inline-start: 0.5rem;
     }
 
     .menu__list {
       display: flex;
-      gap: 0.15rem;
+      align-items: stretch;
+      block-size: 100%;
     }
 
+    // Пункты меню: тонкие высокие капсом, приглушённые, при наведении светлеют; фон даёт скользящая пластина
     .menu__link {
-      padding: 0.75rem 0.9rem;
-      font-family: var(--font-text);
-      font-size: var(--fs-s);
-      font-weight: 500;
-      text-transform: none;
-      transition: color 0.3s;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(0.6rem, 0.25rem + 0.5vw, 1rem);
+      font-size: 1.1rem;
+      font-weight: 360;
+      color: var(--hdr-fg-2);
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      transition: color 0.25s;
     }
 
+    .menu__link--active,
     .menu__item:hover > .menu__link,
     .menu__item:focus-within > .menu__link {
-      color: var(--accent-text);
+      color: var(--hdr-fg);
     }
 
-    // Панель мега-меню плавает под таблеткой и появляется мягко: прозрачность и сдвиг на несколько пикселей
+    // Пластина: плоский светлый фон едет за курсором, ширина догоняет позицию (растяжение).
+    // На текущем разделе она залита акцентом. Лежит в ленте, поля сверху и снизу по 0.45rem
+    .menu__marker {
+      position: absolute;
+      inset-block: 0.45rem;
+      inset-inline-start: 0;
+      z-index: -1;
+      display: block;
+      inline-size: var(--w, 0);
+      pointer-events: none;
+      background: var(--hdr-plate);
+      opacity: 0;
+      transform: translateX(var(--x, 0));
+      transition:
+        transform 0.5s var(--ease-out),
+        inline-size 0.8s var(--ease-out),
+        background-color 0.3s,
+        opacity 0.25s;
+    }
+
+    .menu__marker.is-rest {
+      background: var(--accent-deep);
+    }
+
+    // Панель привязана к ленте и занимает всю её ширину. Обёртка прозрачная, её верхний отступ «мостом» держит наведение над зазором
+    .menu__item {
+      position: static;
+      display: flex;
+    }
+
     .menu__dropdown {
       position: absolute;
-      inset-block-start: calc(100% + 0.5rem);
+      inset-block-start: 100%;
       inset-inline: 0;
-      visibility: hidden;
-      padding: 0;
-      background: #110f0df2;
-      box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 35%);
-      opacity: 0;
-      backdrop-filter: blur(14px) saturate(1.4);
-      transform: translateY(-0.5rem);
-      transition:
-        opacity 0.3s var(--ease-out),
-        transform 0.4s var(--ease-out),
-        visibility 0s 0.4s;
-    }
-
-    // Мост через зазор между таблеткой и панелью: меню не закрывается по пути курсора
-    .menu__dropdown::before {
-      position: absolute;
-      inset-block-end: 100%;
-      inset-inline: 0;
-      block-size: 1.5rem;
-      content: '';
+      z-index: 2;
+      padding: 0.5rem 0 0;
+      pointer-events: none;
     }
 
     .menu__item:hover > .menu__dropdown,
     .menu__item:focus-within > .menu__dropdown {
-      visibility: visible;
+      pointer-events: auto;
+    }
+
+    // Пока курсор на одном пункте, остальные панели закрываются мгновенно: две стеклянные панели не накладываются, мерцания при переборе пунктов нет
+    .menu__list:has(.menu__item:hover) .menu__item:not(:hover) .menu__inner {
+      clip-path: inset(0 0 100%);
+      transition: none;
+    }
+
+    .menu__list:has(.menu__item:hover) .menu__item:not(:hover) > .menu__dropdown {
+      pointer-events: none;
+    }
+
+    .menu__list:has(.menu__item:hover) .menu__item:not(:hover) :is(.menu__cell, .menu__lead) {
+      visibility: hidden;
+      opacity: 0;
+      transform: translateY(0.75rem);
+      transition: none;
+    }
+
+    .header:has(.menu__item:is(:hover, :focus-within) > .menu__dropdown)::after {
       opacity: 1;
-      transform: none;
-      transition:
-        opacity 0.3s var(--ease-out),
-        transform 0.4s var(--ease-out),
-        visibility 0s;
     }
 
-    .menu__item {
-      position: static;
-    }
-
+    // Стеклянный лист: шторка сверху вниз. Фильтр и clip-path на одном элементе
     .menu__inner {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 21rem);
-      gap: 2.5rem;
-      inline-size: 100%;
-      padding: 2rem;
-      margin: 0;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      padding: 2rem 1.25rem 2.25rem;
+      pointer-events: auto;
+      background: var(--hdr-glass-solid);
+      backdrop-filter: var(--hdr-blur);
+      clip-path: inset(0 0 100%);
+      transition: clip-path 0.2s var(--ease-out) var(--hdr-linger);
+      will-change: clip-path;
     }
 
-    .menu__inner--plain {
-      grid-template-columns: minmax(0, 1fr);
+    .menu__item:hover .menu__inner,
+    .menu__item:focus-within .menu__inner {
+      clip-path: inset(0);
+      transition: clip-path 0.45s var(--hdr-ease);
     }
 
+    // Пока курсор уже побыл в меню (is-menu-warm), лист при переходе на соседний пункт не выезжает заново, меняется только содержимое
+    .header.is-menu-warm .menu__item:is(:hover, :focus-within) .menu__inner {
+      clip-path: inset(0);
+      transition: none;
+    }
+
+    // Вся связка «название и Открыть раздел» одна ссылка; зона нажатия ровно по содержимому
+    .menu__lead {
+      display: grid;
+      grid-column: 1 / span 3;
+      gap: 1rem;
+      place-self: start start;
+      align-content: start;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .menu__lead-title,
+    .menu__group-head > span:first-child {
+      text-box: trim-start cap alphabetic;
+    }
+
+    .menu__lead-title {
+      display: block;
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 1.8rem + 2vw, 4.25rem);
+      font-weight: 220;
+      line-height: 0.95;
+      text-transform: uppercase;
+    }
+
+    .menu__lead-link {
+      display: inline-flex;
+      gap: 0.5rem;
+      align-items: center;
+      justify-self: start;
+      font-size: var(--fs-s);
+      font-weight: 500;
+      color: var(--accent-text);
+      text-decoration: none;
+    }
+
+    .menu__lead:hover .menu__arrow,
+    .menu__lead:focus-visible .menu__arrow {
+      transform: translateX(0.3rem);
+    }
+
+    // Обычные панели: пункты справа по три в ряд
+    .menu__inner--plain .menu__tiles {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-column: 4 / -1;
+      gap: 0.25rem var(--col-gap);
+      align-content: start;
+    }
+
+    .menu__inner--plain .menu__tile {
+      padding: 1rem 0.75rem;
+      margin-inline: -0.75rem;
+      font-family: var(--font-display);
+      font-size: clamp(1.3rem, 1.05rem + 0.5vw, 1.65rem);
+      font-weight: 260;
+      line-height: 1.05;
+      color: var(--hdr-fg);
+      text-transform: uppercase;
+    }
+
+    // Каталог: два списка (колонки 4–7 и 8–12), над каждым свой чертёж
     .menu__groups {
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-column: 4 / -1;
+    }
+
+    .menu__group {
+      display: grid;
+      align-content: start;
+    }
+
+    .menu__group:nth-child(1) {
+      grid-column: 1 / span 3;
+    }
+
+    .menu__group:nth-child(2) {
+      grid-column: 4 / -1;
+    }
+
+    .menu__group:nth-child(2) .menu__tiles {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 2.5rem;
-    }
-
-    .menu__tiles {
-      grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-      gap: 0.15rem;
-    }
-
-    .menu__groups .menu__tiles {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    // Ячейки проявляются по очереди, без сдвига
-    .menu__cell {
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .menu__item:hover .menu__cell,
-    .menu__item:focus-within .menu__cell {
-      opacity: 1;
-      transition: opacity 0.45s var(--ease-out);
-      transition-delay: calc(var(--i, 0) * 24ms + 80ms);
+      column-gap: var(--col-gap);
     }
 
     .menu__group-head {
-      align-items: baseline;
-      padding: 0 0 1rem;
-      margin-block-end: 0.5rem;
+      flex-direction: column;
+      gap: 0.35rem;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding-block: 0;
+      font-size: clamp(1.6rem, 1.2rem + 0.8vw, 2.1rem);
+      font-weight: 260;
+      line-height: 1;
     }
 
-    .menu__group-head > span:first-child {
-      font-size: var(--fs-xl);
-      font-weight: 200;
+    // Чертежи в рамке одной высоты и прижаты влево: списки под ними начинаются на одной линии
+    .menu__sketch {
+      position: relative;
+      display: grid;
+      block-size: 6.5rem;
+      margin-block: 1.5rem 1.25rem;
     }
 
+    .menu__sketch .drawing {
+      grid-area: 1 / 1;
+      inline-size: 100%;
+      block-size: 100%;
+      aspect-ratio: auto;
+      mask-position: left center;
+    }
+
+    .menu__sketch-base {
+      color: var(--hdr-fg);
+      opacity: 0.18;
+    }
+
+    .menu__sketch-line {
+      color: var(--accent-text);
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path 0.2s ease-in;
+    }
+
+    // Чертёж вычерчивается слева направо при каждом открытии панели
+    .menu__item:is(:hover, :focus-within) .menu__sketch-line {
+      clip-path: inset(0);
+      transition: clip-path 1.2s var(--ease-out) 0.3s;
+    }
+
+    .menu__inner--catalog .menu__tile {
+      padding: 0.75rem 0.6rem;
+      margin-inline: -0.6rem;
+      font-size: var(--fs-m);
+    }
+
+    // Пункт панели: при наведении светлая пластина, стрелка едет вправо и краснеет
     .menu__tile {
-      padding: 0.8rem 1rem;
       transition:
-        background-color 0.3s,
-        color 0.3s;
-    }
-
-    .menu__tile .menu__arrow {
-      opacity: 0;
-      transform: translateX(-0.5rem);
-      transition:
-        opacity 0.3s,
-        transform 0.4s var(--ease-out);
+        color 0.2s,
+        background-color 0.2s;
     }
 
     .menu__tile:hover,
     .menu__tile:focus-visible {
-      color: var(--paper);
+      color: var(--hdr-fg);
       background: var(--hdr-cell);
     }
 
     .menu__tile:hover .menu__arrow,
-    .menu__tile:focus-visible .menu__arrow {
-      opacity: 1;
-      transform: none;
+    .menu__tile:focus-visible .menu__arrow,
+    .menu__group-head:hover .menu__arrow,
+    .menu__group-head:focus-visible .menu__arrow {
+      color: var(--accent-text);
+      transform: translateX(0.3rem);
     }
 
     .menu__tile.is-current {
       color: var(--accent-text);
     }
 
-    .menu__group-head:hover .menu__arrow {
-      transform: translateX(0.35rem);
-    }
-
-    .menu__feature {
-      position: relative;
-      display: block;
-      min-block-size: 22rem;
-      overflow: hidden;
-      color: var(--paper);
-      text-decoration: none;
-      background: var(--ink);
-    }
-
-    // Фото-превью: по умолчанию «На складе», при наведении на группу проявляется её фото
-    .menu__preview {
-      position: absolute;
-      inset: 0;
-      inline-size: 100%;
-      block-size: 100%;
-      object-fit: cover;
+    // Появление содержимого панели: части по очереди, снизу вверх на 0.75rem. Закрытая панель сбрасывает состояние мгновенно
+    // Стеклянный лист остаётся в дереве всегда (его прячет только clip-path), скрываются лишь ссылки внутри: слой фильтра не пересоздаётся
+    .menu__cell,
+    .menu__lead {
+      visibility: hidden;
       opacity: 0;
-      transform: scale(1.05);
+      transform: translateY(0.75rem);
       transition:
-        opacity 0.6s var(--ease-io),
-        transform 1.4s var(--ease-out);
+        opacity 0.12s var(--hdr-linger),
+        transform 0s calc(0.12s + var(--hdr-linger)),
+        visibility 0s calc(0.12s + var(--hdr-linger));
     }
 
-    .menu__preview--0 {
+    .menu__item:is(:hover, :focus-within) .menu__cell,
+    .menu__item:is(:hover, :focus-within) .menu__lead {
+      visibility: visible;
       opacity: 1;
       transform: none;
+      transition:
+        opacity 0.3s var(--ease-out) calc(0.1s + var(--i, 0) * 0.04s),
+        transform 0.5s var(--ease-out) calc(0.1s + var(--i, 0) * 0.04s),
+        visibility 0s;
     }
 
-    .menu__inner:has(.menu__group:nth-child(1):hover) .menu__preview--1,
-    .menu__inner:has(.menu__group:nth-child(1):focus-within) .menu__preview--1,
-    .menu__inner:has(.menu__group:nth-child(2):hover) .menu__preview--2,
-    .menu__inner:has(.menu__group:nth-child(2):focus-within) .menu__preview--2 {
-      opacity: 1;
-      transform: none;
+    // Первое появление шапки на странице : части выезжают сверху по очереди
+    :root {
+      .header__logo,
+      .menu__link,
+      .header__phone,
+      .header__tools,
+      .header__cta {
+        animation: header-in 0.6s var(--ease-out) backwards;
+      }
+
+      .header__logo {
+        animation-delay: 0.05s;
+      }
+
+      .header__phone {
+        animation-delay: 0.4s;
+      }
+
+      .header__tools {
+        animation-delay: 0.45s;
+      }
+
+      .header__cta {
+        animation-delay: 0.5s;
+      }
     }
 
-    // Подпись на стекле, без градиента по фото
-    .menu__feature-caption {
-      position: absolute;
-      inset-block-end: 0.75rem;
-      inset-inline: 0.75rem;
-      display: grid;
-      gap: 0.2rem;
-      padding: 1rem 1.1rem;
-      background: var(--glass-dark-strong);
-      backdrop-filter: blur(16px) saturate(1.4);
-    }
-
-    .menu__feature-title {
-      font-family: var(--font-display);
-      font-size: var(--fs-xl);
-      font-weight: 200;
-      text-transform: uppercase;
+    @for $i from 1 through 8 {
+      :root .menu__item:nth-child(#{$i}) .menu__link {
+        animation-delay: #{0.12 + ($i - 1) * 0.05}s;
+      }
     }
   }
+}
 
-  @media (width >= 1500px) {
-    .header__phone {
-      display: block;
-    }
+@keyframes header-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.6rem);
+  }
+}
+
+// Без движения: шторка заменяется проявлением, смещения и вычерчивание убираются, прозрачность остаётся
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition: none;
+  }
+
+  .menu__marker,
+  .menu__sketch-line {
+    transition: none;
+  }
+
+  .menu__inner,
+  .header__search {
+    clip-path: none;
+  }
+
+  .menu__cell,
+  .menu__lead,
+  .header__search-icon,
+  .header__search-input,
+  .header__search-inner .button {
+    transform: none;
+  }
+
+  :root .header__logo,
+  :root .menu__link,
+  :root .header__phone,
+  :root .header__tools,
+  :root .header__cta {
+    animation: none;
   }
 }

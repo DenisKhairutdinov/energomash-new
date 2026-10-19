@@ -1,6 +1,7 @@
 {# Hero: фото с рябью, огромный тонкий h1, кнопки, категории и мини-фильтр с быстрыми подборками. #}
 {# Слои фото: .hero__media двигается и приближается при прокрутке, .hero__zoom отвечает за появление (два разных слоя, чтобы анимации не конфликтовали). #}
 {% from "icons.njk" import icon %}
+{% from "plural.njk" import plural %}
 <section class="hero" id="top" aria-labelledby="hero-title" data-hero data-chapter="Главная">
   <div class="hero__media" data-hero-media>
     <div class="hero__zoom" data-hero-zoom>
@@ -25,48 +26,48 @@
         <span class="hero__line"><span class="hero__line-in" data-hero-line>{{ line | safe }}</span></span>
       {% endfor %}
     </h1>
-    <div class="hero__side" data-hero-side>
+    <div class="hero__side">
       <div class="hero__actions">
-        <a class="button" href="/catalog.html?in-stock=1">
+        <a class="button" href="/catalog.html?in-stock=1" data-hero-side>
           Техника в наличии
           <span class="button__badge">{{ home.catalogTotals.inStock }}</span>
         </a>
-        <button class="button button--glass" type="button" data-modal-open="call">Заказать звонок</button>
+        <button class="button button--glass" type="button" data-modal-open="call" data-hero-side>Заказать звонок</button>
       </div>
-      <p class="hero__lead">{{ home.hero.lead }}</p>
+      <p class="hero__lead" data-hero-side>{{ home.hero.lead }}</p>
     </div>
   </div>
 
-  <ul class="hero__utp container" data-hero-side>
+  <ul class="hero__utp container">
     {% for item in home.hero.utp %}
-      <li><a class="hero__utp-link glass" href="{{ item.url }}"><span>{{ item.title }}</span>{{ icon("arrow", "hero__utp-icon") }}</a></li>
+      <li><a class="hero__utp-link glass" href="{{ item.url }}" data-hero-glass><span>{{ item.title }}</span>{{ icon("arrow", "hero__utp-icon") }}</a></li>
     {% endfor %}
   </ul>
 
-  <div class="hero__bottom container" data-hero-side>
+  <div class="hero__bottom container">
     <div class="hero__cats">
-      <a class="cat glass" href="/catalog.html?type=semitrailer">
+      <a class="cat glass" href="/catalog.html?type=semitrailer" data-hero-glass>
         <span class="cat__head">
           <span class="cat__title">Полуприцепы-<wbr />цистерны</span>
-          <span class="cat__count mono">{{ home.picker.types[0].count }} моделей</span>
+          <span class="cat__count mono">{{ home.picker.types[0].count }} {{ plural(home.picker.types[0].count, "модель", "модели", "моделей") }}</span>
         </span>
         <span class="drawing drawing--ppc cat__drawing" aria-hidden="true"></span>
         {{ icon("arrow", "cat__arrow") }}
       </a>
-      <a class="cat glass" href="/catalog.html?type=chassis">
+      <a class="cat glass" href="/catalog.html?type=chassis" data-hero-glass>
         <span class="cat__head">
           <span class="cat__title">Автоцистерны</span>
-          <span class="cat__count mono">{{ home.picker.types[1].count }} моделей</span>
+          <span class="cat__count mono">{{ home.picker.types[1].count }} {{ plural(home.picker.types[1].count, "модель", "модели", "моделей") }}</span>
         </span>
         <span class="drawing drawing--chassis cat__drawing" aria-hidden="true"></span>
         {{ icon("arrow", "cat__arrow") }}
       </a>
     </div>
 
-    <form class="picker glass glass--strong" action="/catalog.html" method="get" data-picker aria-labelledby="picker-title">
-      <h2 class="picker__title mono" id="picker-title">Подбор по параметрам</h2>
+    <form class="picker glass glass--strong" action="/catalog.html" method="get" data-picker aria-labelledby="picker-title" data-hero-glass>
+      <h2 class="picker__title" id="picker-title">Подбор по параметрам</h2>
       <fieldset class="picker__field picker__field--type">
-        <legend class="visually-hidden">Тип техники</legend>
+        <legend class="picker__legend mono">Тип техники</legend>
         <div class="segmented">
           {% for type in home.picker.types %}
             <label class="segmented__item">
@@ -84,7 +85,7 @@
           {% endfor %}
         </div>
       </fieldset>
-      <div class="picker__field">
+      <div class="picker__field picker__field--purpose">
         <span class="picker__legend mono" id="picker-purpose-label">Назначение</span>
         <select class="picker__select" name="purpose" data-picker-purpose>
           <option value="">Любое</option>
@@ -111,11 +112,6 @@
         <span class="check__text">В наличии</span>
       </label>
       <button class="button picker__submit" type="submit">Подобрать</button>
-      <ul class="picker__presets" aria-label="Быстрые подборки">
-        {% for preset in home.picker.presets %}
-          <li><a class="picker__preset mono" href="{{ preset.url }}">{{ preset.title }}</a></li>
-        {% endfor %}
-      </ul>
     </form>
   </div>
 

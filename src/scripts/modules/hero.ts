@@ -22,6 +22,10 @@ export const initHero = (ready: Promise<void>): void => {
   const title = hero.querySelector<HTMLElement>('[data-hero-title]')
   const lines = gsap.utils.toArray<HTMLElement>('[data-hero-line]', hero)
   const sides = gsap.utils.toArray<HTMLElement>('[data-hero-side]', hero)
+  // Стеклянные плашки анимируются сами, а не через общий контейнер: прозрачность контейнера делает его «корнем фона»,
+  // и размытие у плашек внутри пропадает до конца анимации
+  const links = gsap.utils.toArray<HTMLElement>('.hero__utp [data-hero-glass]', hero)
+  const panels = gsap.utils.toArray<HTMLElement>('.hero__bottom [data-hero-glass]', hero)
   const bottom = hero.querySelector<HTMLElement>('.hero__bottom')
 
   gsap.matchMedia().add(NO_PREFERENCE, () => {
@@ -40,6 +44,18 @@ export const initHero = (ready: Promise<void>): void => {
         { y: 36, autoAlpha: 0 },
         { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.14 },
         0.8,
+      )
+      .fromTo(
+        links,
+        { y: 36, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.08 },
+        0.94,
+      )
+      .fromTo(
+        panels,
+        { y: 36, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.12 },
+        1.08,
       )
 
     void ready.then(() => {
@@ -62,10 +78,8 @@ export const initHero = (ready: Promise<void>): void => {
     gsap.fromTo(lines[0] ?? [], { xPercent: 0 }, { xPercent: -12, ease: 'none', scrollTrigger })
     gsap.fromTo(lines[2] ?? [], { xPercent: 0 }, { xPercent: 12, ease: 'none', scrollTrigger })
     gsap.fromTo(title, { opacity: 1 }, { opacity: 0.1, ease: 'none', scrollTrigger })
-    gsap.fromTo(
-      bottom ?? [],
-      { yPercent: 0, opacity: 1 },
-      { yPercent: 18, opacity: 0.15, ease: 'none', scrollTrigger },
-    )
+    // Сдвиг на контейнере (transform размытию не мешает), затухание на самих плашках
+    gsap.fromTo(bottom ?? [], { yPercent: 0 }, { yPercent: 18, ease: 'none', scrollTrigger })
+    gsap.fromTo(panels, { opacity: 1 }, { opacity: 0.15, ease: 'none', scrollTrigger })
   })
 }

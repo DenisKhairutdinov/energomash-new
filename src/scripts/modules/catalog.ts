@@ -1,4 +1,4 @@
-import { loadCatalog } from './catalog-data'
+import { loadCatalog, photoUrl } from './catalog-data'
 import { createProductCard, type CardItem } from './product-card'
 import { isSearchMatch, parseQuery } from './search-match'
 import { getLenis } from './smooth'
@@ -84,6 +84,48 @@ const getValues = (item: CatalogItem, name: string): string[] => {
 
 const getVolume = (item: CatalogItem): number => Number(item.params[VOLUME_FIELD] ?? Number.NaN)
 
+// Сортировка выдачи. По умолчанию сначала модели с фото, затем в наличии: карточки с чертежом-заглушкой уходят в конец
+const SORT_FIELD = 'sort'
+const SORT_DEFAULT = 'rec'
+const SORT_VALUES = new Set([SORT_DEFAULT, 'stock', 'volume-asc', 'volume-desc', 'name'])
+
+const hasPhoto = (item: CatalogItem): boolean =>
+  item.photos.some((name) => photoUrl(name) !== undefined)
+
+const isInStock = (item: CatalogItem): boolean => item.stock.status === 'in'
+
+const byVolume = (first: CatalogItem, second: CatalogItem, direction: 1 | -1): number => {
+  const a = getVolume(first)
+  const b = getVolume(second)
+
+  // Без объёма (навесное оборудование) всегда в конце
+  if (Number.isNaN(a) || Number.isNaN(b)) {
+    return Number.isNaN(a) ? (Number.isNaN(b) ? 0 : 1) : -1
+  }
+
+  return (a - b) * direction
+}
+
+const sortItems = (list: CatalogItem[], mode: string): CatalogItem[] => {
+  const sorted = [...list]
+
+  switch (mode) {
+    case 'stock':
+      return sorted.sort((a, b) => Number(isInStock(b)) - Number(isInStock(a)))
+    case 'volume-asc':
+      return sorted.sort((a, b) => byVolume(a, b, 1))
+    case 'volume-desc':
+      return sorted.sort((a, b) => byVolume(a, b, -1))
+    case 'name':
+      return sorted.sort((a, b) => a.model.localeCompare(b.model, 'ru'))
+    default:
+      return sorted.sort(
+        (a, b) =>
+          Number(hasPhoto(b)) - Number(hasPhoto(a)) || Number(isInStock(b)) - Number(isInStock(a)),
+      )
+  }
+}
+
 /**
  * Каталог: загружает модели из JSON, отбирает их по выбранным параметрам и держит выбор в адресе страницы.
  * Карточки выводятся порциями по мере прокрутки: моделей сотни, а видно десяток.
@@ -108,6 +150,8 @@ export const initCatalog = (): void => {
   const more = form.querySelector<HTMLButtonElement>('[data-catalog-more]')
   const moreLabel = form.querySelector<HTMLElement>('[data-catalog-more-label]')
   const viewInputs = [...form.querySelectorAll<HTMLInputElement>('input[name="view"]')]
+  const sortSelect = form.querySelector<HTMLSelectElement>('[data-catalog-sort]')
+  const activeList = form.querySelector<HTMLElement>('[data-active-list]')
   const bar = document.querySelector<HTMLElement>('[data-filter-bar]')
   const dock = document.querySelector<HTMLElement>('[data-filter-dock]')
   const sentinel = document.querySelector<HTMLElement>('[data-catalog-sentinel]')
@@ -124,30 +168,49 @@ export const initCatalog = (): void => {
 
   // Появление карточек: каждая выезжает снизу с проявлением (стили .ccard.is-pending и .is-revealed).
   // При «уменьшить движение» карточки видны сразу
+  // Показ карточек по очереди: пачка вошедших в окно идёт со сдвигом по задержке
+  const revealCards = (cards: HTMLElement[]): void => {
+    for (const [index, card] of cards.entries()) {
+      const delay = Math.min(index * REVEAL_STAGGER, REVEAL_STAGGER_LIMIT)
+
+      cardObserver?.unobserve(card)
+      card.style.setProperty('--reveal-delay', `${String(delay)}ms`)
+      card.classList.remove(PENDING_CLASS)
+      card.classList.add(REVEALED_CLASS)
+
+      // После показа состояние снимается: дальше карточка живёт обычной жизнью (наведение, переходы)
+      setTimeout(() => {
+        card.classList.remove(REVEALED_CLASS)
+        card.style.removeProperty('--reveal-delay')
+      }, REVEAL_TIME + delay)
+    }
+  }
+
   const cardObserver = matchMedia(REDUCED_MOTION_QUERY).matches
     ? undefined
     : new IntersectionObserver(
-        (entries, observer) => {
-          const entered = entries.filter((entry) => entry.isIntersecting)
-
-          for (const [index, entry] of entered.entries()) {
-            const card = entry.target as HTMLElement
-            const delay = Math.min(index * REVEAL_STAGGER, REVEAL_STAGGER_LIMIT)
-
-            observer.unobserve(card)
-            card.style.setProperty('--reveal-delay', `${String(delay)}ms`)
-            card.classList.remove(PENDING_CLASS)
-            card.classList.add(REVEALED_CLASS)
-
-            // После показа состояние снимается: дальше карточка живёт обычной жизнью (наведение, переходы)
-            setTimeout(() => {
-              card.classList.remove(REVEALED_CLASS)
-              card.style.removeProperty('--reveal-delay')
-            }, REVEAL_TIME + delay)
-          }
+        (entries) => {
+          revealCards(
+            entries
+              .filter((entry) => entry.isIntersecting)
+              .map((entry) => entry.target as HTMLElement),
+          )
         },
         { threshold: REVEAL_VISIBLE_SHARE },
       )
+
+  // Страховка: карточки, которые уже на экране, но наблюдатель о них не сообщил (первый экран после загрузки), показываются сами
+  const revealVisible = (): void => {
+    const visible = [...list.querySelectorAll<HTMLElement>(`.${PENDING_CLASS}`)].filter((card) => {
+      const box = card.getBoundingClientRect()
+
+      return box.bottom > 0 && box.top < window.innerHeight * 0.95
+    })
+
+    if (visible.length > 0) {
+      revealCards(visible)
+    }
+  }
 
   // Поиск по коду и названию приходит из шапки в адресе страницы (?q=…) и держится, пока его не сбросят
   let searchQuery = new URLSearchParams(location.search).get(SEARCH_PARAMETER)?.trim() ?? ''
@@ -313,6 +376,19 @@ export const initCatalog = (): void => {
       if (!group.disabled && options.length > 0) {
         group.hidden = options.every((option) => option.hidden)
       }
+
+      // Группа блокируется, когда у выбранных моделей нет ни одного её значения (УВТ у технической воды и т. п.)
+      const visible = options.filter((option) => !option.hidden)
+      const isBlocked =
+        !group.hidden &&
+        visible.length > 0 &&
+        visible.every((option) => {
+          const input = option.querySelector<HTMLInputElement>('input')
+
+          return input?.disabled === true && !input.checked
+        })
+
+      group.classList.toggle('is-blocked', isBlocked)
     }
 
     // Подсказка в полях объёма: доступные сейчас крайние значения
@@ -378,11 +454,15 @@ export const initCatalog = (): void => {
   }
 
   const applyFilter = (state: FilterState): void => {
-    matches = items.filter((item) => isMatch(item, state))
+    matches = sortItems(
+      items.filter((item) => isMatch(item, state)),
+      sortSelect?.value ?? SORT_DEFAULT,
+    )
     renderedCount = 0
     cardObserver?.disconnect()
     list.replaceChildren()
     renderBatch()
+    window.setTimeout(revealVisible, 200)
 
     for (const counter of counters) {
       counter.textContent = `${String(matches.length)} ${pluralModels(matches.length)}`
@@ -397,7 +477,12 @@ export const initCatalog = (): void => {
 
     for (const [name, value] of new FormData(form)) {
       // Вид «сетка» по умолчанию в адрес не попадает
-      if (typeof value === 'string' && value !== '' && !(name === 'view' && value === 'grid')) {
+      if (
+        typeof value === 'string' &&
+        value !== '' &&
+        !(name === 'view' && value === 'grid') &&
+        !(name === SORT_FIELD && value === SORT_DEFAULT)
+      ) {
         parameters.append(name, value)
       }
     }
@@ -426,6 +511,86 @@ export const initCatalog = (): void => {
     document.querySelector('.menu__link--stock')?.classList.toggle('is-current', isStock)
   }
 
+  // Выбранные параметры в панели: каждый снимается крестиком
+  const syncActive = (): void => {
+    if (!activeList) {
+      return
+    }
+
+    const tags: { label: string; remove: () => void }[] = []
+
+    for (const input of optionInputs) {
+      if (input.checked && isGroupActive(input)) {
+        // Подпись чипа без счётчика количества (он лежит в дочернем элементе)
+        const label =
+          input.closest('label')?.querySelector('.chip__label')?.firstChild?.textContent?.trim() ??
+          input.value
+
+        tags.push({
+          label,
+          remove: () => {
+            input.checked = false
+            update()
+          },
+        })
+      }
+    }
+
+    const from = volumeFromInput?.value.trim() ?? ''
+    const to = volumeToInput?.value.trim() ?? ''
+
+    if (from !== '' || to !== '') {
+      tags.push({
+        label:
+          `Объём ${from === '' ? 'до' : 'от'} ${[from, to].filter((part) => part !== '').join(' до ')} м³`.replace(
+            'от  до',
+            'до',
+          ),
+        remove: () => {
+          for (const input of [volumeFromInput, volumeToInput]) {
+            if (input) {
+              input.value = ''
+            }
+          }
+
+          update()
+        },
+      })
+    }
+
+    if (searchQuery !== '') {
+      tags.push({
+        label: `Поиск: ${searchQuery}`,
+        remove: () => {
+          searchQuery = ''
+          searchTokens = []
+
+          if (headerSearch) {
+            headerSearch.value = ''
+          }
+
+          update()
+        },
+      })
+    }
+
+    activeList.replaceChildren(
+      ...tags.map((tag) => {
+        const item = document.createElement('li')
+        const button = document.createElement('button')
+
+        button.type = 'button'
+        button.className = 'cfilter__tag'
+        button.setAttribute('aria-label', `Убрать: ${tag.label}`)
+        button.textContent = tag.label
+        button.addEventListener('click', tag.remove)
+        item.append(button)
+
+        return item
+      }),
+    )
+  }
+
   // Пересчёт по ходу ввода: без снятия выбора
   const refresh = (): void => {
     const state = readState()
@@ -434,6 +599,7 @@ export const initCatalog = (): void => {
     syncOptions(state)
     applyFilter(state)
     syncBadges()
+    syncActive()
   }
 
   const update = (): void => {
@@ -477,6 +643,12 @@ export const initCatalog = (): void => {
       input.checked = input.value === (parameters.get('view') === 'list' ? 'list' : 'grid')
     }
 
+    if (sortSelect) {
+      const requestedSort = parameters.get(SORT_FIELD) ?? SORT_DEFAULT
+
+      sortSelect.value = SORT_VALUES.has(requestedSort) ? requestedSort : SORT_DEFAULT
+    }
+
     syncView()
   }
 
@@ -516,6 +688,10 @@ export const initCatalog = (): void => {
   // Остальные параметры раскрываются прямо под панелью; плавающая плашка возвращает к панели и раскрывает их
   const setExpanded = (isExpanded: boolean): void => {
     form.classList.toggle(COLLAPSED_CLASS, !isExpanded)
+
+    if (isExpanded) {
+      form.dispatchEvent(new Event('catalog-expand'))
+    }
     more?.setAttribute('aria-expanded', String(isExpanded))
 
     if (moreLabel) {
@@ -527,11 +703,78 @@ export const initCatalog = (): void => {
     setExpanded(form.classList.contains(COLLAPSED_CLASS))
   })
 
+  // Панель параметров закрывается по Escape и по щелчку вне панели
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !form.classList.contains(COLLAPSED_CLASS)) {
+      setExpanded(false)
+      more?.focus()
+    }
+  })
+
+  document.addEventListener('click', (event) => {
+    if (
+      !form.classList.contains(COLLAPSED_CLASS) &&
+      event.target instanceof Node &&
+      !form.contains(event.target) &&
+      !document.querySelector('.cside')?.contains(event.target)
+    ) {
+      setExpanded(false)
+    }
+  })
+
+  // Раскрытые параметры закрываются, когда страницу прокручивают вниз заметно дальше места, где их открыли
+  // (сдвиг от самого раскрытия и первые доли секунды после него не считаются)
+  const COLLAPSE_AFTER_SCROLL = 160
+  const COLLAPSE_GRACE_MS = 600
+  let openedAt = 0
+  let openedScroll = 0
+
+  form.addEventListener('catalog-expand', () => {
+    openedAt = performance.now()
+    openedScroll = window.scrollY
+  })
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (form.classList.contains(COLLAPSED_CLASS)) {
+        return
+      }
+
+      if (
+        performance.now() - openedAt > COLLAPSE_GRACE_MS &&
+        window.scrollY > openedScroll + COLLAPSE_AFTER_SCROLL
+      ) {
+        setExpanded(false)
+      }
+    },
+    { passive: true },
+  )
+
   for (const button of document.querySelectorAll<HTMLElement>('[data-filter-up]')) {
     button.addEventListener('click', () => {
       setExpanded(true)
       getLenis()?.scrollTo(form, { offset: -90 })
     })
+  }
+
+  // Закреплённая панель стоит под шапкой сайта, пока та видна (прокрутка вверх), и у верха окна, когда шапка спрятана
+  const siteHeader = document.querySelector<HTMLElement>('[data-header]')
+  const catalogRoot = document.querySelector<HTMLElement>('.catalog')
+
+  if (siteHeader && catalogRoot) {
+    const syncOffset = (): void => {
+      catalogRoot.style.setProperty(
+        '--cside-top',
+        siteHeader.classList.contains('is-hidden') ? '0px' : 'var(--header-h)',
+      )
+    }
+
+    new MutationObserver(syncOffset).observe(siteHeader, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+    syncOffset()
   }
 
   // Вид списка: сетка или список. Выбор виден в адресе (?view=list)

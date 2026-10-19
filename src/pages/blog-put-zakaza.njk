@@ -1,2 +1,11 @@
-{% extends "layout.njk" %} {% set pageTitle = "Заводской ритм" %} {% set currentPage =
-"blog/factory-rhythm" %} {% block content %}{% endblock %}
+{% extends "layout.njk" %}
+{% set pagePath = "/blog-put-zakaza.html" %}
+{% set slug = "put-zakaza" %}
+{% set post = blog.bySlug[slug] %}
+{% set pageTitle = post.seoTitle %}
+{% set pageDescription = post.description %}
+{% set currentPage = "blog/" + post.rubricId %}
+{% set pageClass = "article" %}
+{% block content %}
+  {% include "article-page.njk" %}
+{% endblock %}

@@ -1,4 +1,4 @@
-// Oswald (заголовки), Manrope (текст), JetBrains Mono (подписи)
+// Oswald (заголовки) и Manrope (текст) как в hero, JetBrains Mono (данные)
 import '@fontsource-variable/oswald/wght.css'
 import '@fontsource-variable/manrope/wght.css'
 import '@fontsource-variable/jetbrains-mono/wght.css'
