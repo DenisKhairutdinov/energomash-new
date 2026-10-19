@@ -389,16 +389,29 @@
   .prose {
     display: grid;
     gap: 1.1rem;
-    max-inline-size: 46rem;
+    max-inline-size: 60rem;
     font-size: clamp(1.05rem, 1rem + 0.2vw, 1.25rem);
     line-height: 1.7;
+  }
+
+  // Абзацы заполняют строку до края колонки (pretty оставлял короткие обрывки строк)
+  .prose p,
+  .prose li {
+    text-wrap: wrap;
+  }
+
+  // Вводный абзац статьи и пояснение секции внутри текста: тот же текст, чуть крупнее, на всю колонку
+  .prose > .ip__note {
+    max-inline-size: none;
+    font-size: var(--fs-l);
+    line-height: 1.6;
   }
 
   .prose h2,
   .prose h3 {
     margin-block-start: 1.25rem;
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1.02;
     text-transform: uppercase;
   }
@@ -415,11 +428,47 @@
   .prose ol {
     display: grid;
     gap: 0.6rem;
-    padding-inline-start: 1.4rem;
+    padding-inline-start: 0;
   }
 
-  .prose li::marker {
+  // Текст пунктов стоит на одной линии с абзацами, маркер выносится в поле слева
+  .prose li {
+    position: relative;
+  }
+
+  .prose li::before {
+    position: absolute;
+    inset-inline-start: -1.1em;
     color: var(--accent-text);
+    content: '–';
+  }
+
+  .prose ol {
+    counter-reset: prose-ol;
+  }
+
+  .prose ol > li {
+    counter-increment: prose-ol;
+  }
+
+  .prose ol > li::before {
+    inset-inline-start: -1.6em;
+    font-variant-numeric: tabular-nums;
+    content: counter(prose-ol) '.';
+  }
+
+  @media (width < 900px) {
+    .prose li {
+      padding-inline-start: 1.25em;
+    }
+
+    .prose li::before {
+      inset-inline-start: 0;
+    }
+
+    .prose ol > li {
+      padding-inline-start: 1.6em;
+    }
   }
 
   .prose a {
@@ -499,7 +548,23 @@
   .callout ul {
     display: grid;
     gap: 0.4rem;
-    padding-inline-start: 1.2rem;
+    padding-inline-start: 0;
+  }
+
+  .callout li {
+    position: relative;
+  }
+
+  .callout li::before {
+    position: absolute;
+    inset-inline-start: -1.1em;
+    color: var(--accent-text);
+    content: '–';
+  }
+
+  .callout p,
+  .callout li {
+    text-wrap: wrap;
   }
 
   // Вопросы и ответы (строки .faq__item лежат в _sections.scss); в тёмной секции строки белые
@@ -573,7 +638,7 @@
   .ip__tile-title {
     font-family: var(--font-display);
     font-size: clamp(1.4rem, 1rem + 0.9vw, 2rem);
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1.05;
     text-transform: uppercase;
   }
@@ -949,7 +1014,7 @@
   .bl__title {
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 1rem + 1.4vw, 2.6rem);
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1;
     text-transform: uppercase;
   }
@@ -1031,7 +1096,7 @@
   .ct__place-title {
     font-family: var(--font-display);
     font-size: clamp(1.5rem, 1rem + 1vw, 2.25rem);
-    font-weight: 400;
+    font-weight: 300;
     text-transform: uppercase;
   }
 
@@ -1374,7 +1439,7 @@
   .mf__step-title {
     font-family: var(--font-display);
     font-size: clamp(1.75rem, 1rem + 1.8vw, 3rem);
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1;
     text-transform: uppercase;
   }
