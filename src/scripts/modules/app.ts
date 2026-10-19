@@ -14,7 +14,6 @@ import { initPerformance } from './perf'
 import { initPicker } from './picker'
 import { initJump } from './jump'
 import { initProduct } from './product'
-import { initPurposes, initTiles } from './purposes'
 import { initRequestTone } from './request-tone'
 import { initReveal } from './reveal'
 import { initSearch } from './search'
@@ -43,19 +42,6 @@ export const startApp = (): void => {
   initLeasing()
   initGeography()
   initWaterRipples()
-  initPurposes()
-
-  const blog = document.querySelector<HTMLElement>('.blog')
-
-  if (blog) {
-    // Фото карточек блога следует за курсором, как в «Каталоге по назначению»
-    initTiles(blog)
-  }
-
-  // То же у карточек статей на внутренних страницах (список блога, «Читайте также»)
-  for (const root of document.querySelectorAll<HTMLElement>('.bl, .ap__related')) {
-    initTiles(root)
-  }
 
   initJump()
   initRequestTone()

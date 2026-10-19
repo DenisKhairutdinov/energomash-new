@@ -1,6 +1,6 @@
 {# Каталог по назначению (редизайн с нуля, 2026-10-17): оставлен только вариант 1 (выбор владельца 2026-10-19), переключатель и второй вариант убраны. #}
 {# Вариант 1: секция на весь экран, сетка в стык от края до края окна на 12 колонках. #}
-{# Первая строка: акцентный блок с заголовком (колонки 1–4) и две плитки по 4 колонки, вторая строка: четыре плитки по 3 колонки. Фото крупные, чёрно-белые, при наведении возвращается цвет и кадр слегка следует за курсором (scripts/modules/purposes.ts). #}
+{# Первая строка: акцентный блок с заголовком (колонки 1–4) и две плитки по 4 колонки, вторая строка: четыре плитки по 3 колонки. Фото крупные, чёрно-белые, при наведении возвращается цвет (scripts/modules/purposes.ts). #}
 {% from "icons.njk" import icon %}
 {% from "plural.njk" import plural %}
 <section class="purposes" aria-labelledby="purposes-title" data-purposes data-chapter="Назначение">
@@ -13,7 +13,7 @@
       </div>
     </div>
     {% for item in home.purposes %}
-      <a class="purposes__tile" href="{{ item.url }}" data-tile>
+      <a class="purposes__tile" href="{{ item.url }}">
         <span class="purposes__photo" aria-hidden="true">
           <img
             class="purposes__image"

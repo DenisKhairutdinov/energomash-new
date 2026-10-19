@@ -65,7 +65,7 @@
       {% for relatedSlug in post.related %}
         {% set other = blog.bySlug[relatedSlug] %}
         <li>
-          <a class="bl__card" href="{{ other.url }}" data-tile>
+          <a class="bl__card" href="{{ other.url }}">
             <img class="bl__image" src="/src/assets/models/thumbs/{{ other.cover }}" width="1024" height="683" alt="" loading="lazy" decoding="async" />
             <span class="bl__meta">{{ other.dateShort }} · {{ other.rubric }}</span>
             <span class="bl__text">

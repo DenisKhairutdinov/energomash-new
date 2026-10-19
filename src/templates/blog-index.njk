@@ -35,7 +35,7 @@
   <ul class="bl__list" data-blog-list>
     {% for post in blog.posts | sort(true, false, "datetime") %}
       <li data-rubric="{{ post.rubricId }}">
-        <a class="bl__card" href="{{ post.url }}" data-tile>
+        <a class="bl__card" href="{{ post.url }}">
           <img class="bl__image" src="/src/assets/models/thumbs/{{ post.cover }}" width="1200" height="800" alt="" {% if not loop.first %}loading="lazy"{% endif %} decoding="async" />
           <span class="bl__meta"><time datetime="{{ post.datetime }}">{{ post.dateShort }}</time> · {{ post.rubric }}</span>
           <span class="bl__text">

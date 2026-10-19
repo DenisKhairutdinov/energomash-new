@@ -16,7 +16,7 @@
     </div>
     {% for post in blog.posts | sort(true, false, "datetime") %}
       {% if loop.first %}
-        <a class="news news--lead" href="{{ post.url }}" data-tile>
+        <a class="news news--lead" href="{{ post.url }}">
           <span class="news__photo" aria-hidden="true">
             <img class="news__image" src="/src/assets/models/thumbs/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
           </span>
@@ -33,7 +33,7 @@
     <div class="blog__row">
       {% for post in blog.posts | sort(true, false, "datetime") %}
         {% if not loop.first and loop.index <= 5 %}
-          <a class="news" href="{{ post.url }}" data-tile>
+          <a class="news" href="{{ post.url }}">
             <span class="news__photo" aria-hidden="true">
               <img class="news__image" src="/src/assets/models/thumbs/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
             </span>
