@@ -18,7 +18,7 @@
       {% if loop.first %}
         <a class="news news--lead" href="{{ post.url }}" data-tile>
           <span class="news__photo" aria-hidden="true">
-            <img class="news__image" src="/src/assets/models/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
+            <img class="news__image" src="/src/assets/models/thumbs/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
           </span>
           {{ date(post) }}
           {{ icon("arrow", "news__arrow") }}
@@ -35,7 +35,7 @@
         {% if not loop.first and loop.index <= 5 %}
           <a class="news" href="{{ post.url }}" data-tile>
             <span class="news__photo" aria-hidden="true">
-              <img class="news__image" src="/src/assets/models/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
+              <img class="news__image" src="/src/assets/models/thumbs/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
             </span>
             {{ date(post) }}
             {{ icon("arrow", "news__arrow") }}

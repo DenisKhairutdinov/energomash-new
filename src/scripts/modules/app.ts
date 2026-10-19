@@ -10,6 +10,7 @@ import { initHeader } from './header'
 import { initHero } from './hero'
 import { initLeasing } from './leasing'
 import { initModal } from './modal'
+import { initPerformance } from './perf'
 import { initPicker } from './picker'
 import { initJump } from './jump'
 import { initProduct } from './product'
@@ -27,6 +28,7 @@ import { initWaterRipples } from './water-ripples'
 
 /** Общий запуск всех модулей страницы. */
 export const startApp = (): void => {
+  initPerformance()
   initSmoothScroll()
   initGridOverlay()
   initHeader()

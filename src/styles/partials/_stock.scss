@@ -341,6 +341,59 @@
     transform: translateX(0.4rem);
   }
 
+  // Окна до 1000 px по высоте (fullhd с панелями браузера, 900–960 px): колонка с раскрытой моделью не помещалась,
+  // поэтому заголовок, названия моделей, характеристики и отступы идут от высоты окна
+  @media (height < 1000px) {
+    .stock__intro {
+      gap: 0.6rem;
+      padding-block: clamp(1rem, 3svh, 1.75rem) 0.8rem;
+    }
+
+    .stock__title {
+      font-size: clamp(2.25rem, min(1rem + 3.4vw, 6.5svh), 4rem);
+    }
+
+    .stock__lead {
+      font-size: var(--fs-s);
+      line-height: 1.5;
+    }
+
+    .stock__count {
+      font-size: 1.75rem;
+    }
+
+    .stock__head,
+    .stock__rest {
+      padding-block: clamp(0.3rem, 0.9svh, 0.5rem);
+    }
+
+    .stock__model,
+    .stock__rest-title {
+      font-size: clamp(1.4rem, 3.4svh, 2.4rem);
+    }
+
+    .stock__body-in {
+      gap: 0.5rem;
+    }
+
+    .stock__item.is-active .stock__body-in {
+      padding-block-end: 0.6rem;
+    }
+
+    .stock__specs {
+      gap: 0.5rem 1.5rem;
+      padding-block: 0;
+    }
+
+    .stock__spec-label {
+      font-size: var(--fs-s);
+    }
+
+    .stock__spec-value {
+      font-size: clamp(1.35rem, 2.6svh, 2rem);
+    }
+  }
+
   // Низкие окна (ноутбук): плотнее отступы, чтобы колонка с раскрытой моделью помещалась в экран
   @media (height < 820px) {
     .stock__intro {

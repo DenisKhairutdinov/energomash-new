@@ -10,7 +10,11 @@ export const getLenis = (): Lenis | undefined => lenis
 
 /** Плавный скролл Lenis, связанный с тиком GSAP и ScrollTrigger. При «уменьшить движение» остаётся обычная прокрутка. */
 export const initSmoothScroll = (): void => {
-  if (matchMedia(REDUCED_MOTION_QUERY).matches) {
+  // На слабых машинах (data-perf="low", см. perf.ts) оставляем нативную прокрутку
+  if (
+    matchMedia(REDUCED_MOTION_QUERY).matches ||
+    document.documentElement.dataset['perf'] === 'low'
+  ) {
     return
   }
 

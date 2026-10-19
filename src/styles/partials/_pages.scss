@@ -120,6 +120,15 @@
     overflow: clip;
   }
 
+  // «О заводе»: шапка ниже обычной split (меньше высота и заголовок), чтобы первый экран не съедал полэкрана
+  .ip--about .ip__head--split {
+    min-block-size: clamp(20rem, 46svh, 30rem);
+  }
+
+  .ip--about .ip__head--split .ip__title {
+    font-size: clamp(2.5rem, 1rem + 4vw, 5.25rem);
+  }
+
   .ip__head-photo {
     position: relative;
     aspect-ratio: 16 / 10;

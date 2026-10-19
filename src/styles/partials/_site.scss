@@ -10,3 +10,18 @@
     @include theme-site;
   }
 }
+
+// Слабые машины (html[data-perf='low'], выставляет scripts/modules/perf.ts): плоское стекло без размытия фона и без тяжёлых переходов фильтра.
+// Заливка стекла плотнее, чтобы текст на фото читался без размытия.
+@layer utilities {
+  :root[data-perf='low'] {
+    --glass-dark: var(--glass-dark-strong);
+    --glass-blur: none;
+    --glass-blur-strong: none;
+    --hdr-blur: none;
+  }
+
+  :root[data-perf='low'] .stock__side {
+    backdrop-filter: none;
+  }
+}

@@ -718,6 +718,33 @@
     z-index: 3;
   }
 
+  // В сетке плашка компактнее, чтобы не закрывать фото: меньше отступы, название и характеристики мельче, подписи характеристик у значений
+  .catalog__list[data-view='grid'] .ccard__body {
+    gap: 0.3rem;
+    padding: clamp(0.5rem, 1.1svh, 0.75rem) clamp(0.65rem, 1vw, 0.95rem);
+  }
+
+  .catalog__list[data-view='grid'] .ccard__head {
+    gap: 0.1rem;
+  }
+
+  .catalog__list[data-view='grid'] .ccard__title {
+    font-size: clamp(1.15rem, 0.9rem + 0.7vw, 1.65rem);
+  }
+
+  .catalog__list[data-view='grid'] .ccard__specs {
+    gap: 0.1rem 0.9rem;
+  }
+
+  .catalog__list[data-view='grid'] .ccard__spec {
+    gap: 0.3rem;
+    font-size: var(--fs-xs);
+  }
+
+  .catalog__list[data-view='grid'] .ccard__actions {
+    gap: 0.6rem;
+  }
+
   // Без фото плашка с названием (в сетке) сплошная чёрная: стеклу не за чем размываться, на светлом фоне белый текст иначе не читается
   .catalog__list[data-view='grid'] .ccard__inner:not(:has(.ccard__image.is-loaded)) .ccard__body {
     background: var(--c-black);
@@ -737,11 +764,6 @@
 
   .ccard__inner:hover .ccard__arrow {
     transform: translateX(0.3rem);
-  }
-
-  // Карточки без фото компактнее: в сетке ниже карточек с фото (они идут в конце выдачи)
-  .catalog__list[data-view='grid'] .ccard--nophoto .ccard__inner {
-    aspect-ratio: 16 / 7;
   }
 
   // В сетке «Узнать стоимость» у позиций не в наличии появляется при наведении (на сенсорных показана всегда), у позиций в наличии видна

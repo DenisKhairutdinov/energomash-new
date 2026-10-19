@@ -54,6 +54,15 @@ const readJson = (id: string): unknown => {
 // Параметры, которые не показываем строкой таблицы: назначение и наличие вынесены выше, «дополнительно» служебное
 const HIDDEN_PARAMETERS = new Set(['stock', 'purpose', 'kit'])
 
+interface SpecTile {
+  label: string
+  value: string
+  isNumber: boolean
+}
+
+// Значение длиннее этого числа знаков занимает две ячейки сетки плиток
+const WIDE_VALUE = 22
+
 const drawingClass = (icon: string): string => `drawing--${icon === 'shassi' ? 'chassis' : icon}`
 
 const setText = (selector: string, text: string): void => {
@@ -159,7 +168,9 @@ const renderSpecs = (item: Item, dictionary: DictionaryGroup[]): void => {
     return
   }
 
-  const rows: [string, string][] = []
+  // Плитки: сначала числовые параметры (крупные цифры), затем текстовые; длинные значения занимают две ячейки
+  const numeric: SpecTile[] = []
+  const textual: SpecTile[] = []
 
   for (const group of dictionary) {
     if (HIDDEN_PARAMETERS.has(group.name)) {
@@ -168,27 +179,36 @@ const renderSpecs = (item: Item, dictionary: DictionaryGroup[]): void => {
 
     const value = formatValue(group, item)
 
-    if (value !== undefined) {
-      rows.push([group.label, value])
+    if (value === undefined) {
+      continue
     }
+
+    const isNumber = group.kind === 'range'
+
+    ;(isNumber ? numeric : textual).push({ label: group.label, value, isNumber })
   }
+
+  const tiles = [...numeric, ...textual]
 
   if (item.code) {
-    rows.unshift(['Код', item.code])
+    tiles.push({ label: 'Код', value: item.code, isNumber: false })
   }
 
-  for (const [label, value] of rows) {
+  for (const { label, value, isNumber } of tiles) {
     const wrap = document.createElement('div')
     const dt = document.createElement('dt')
     const dd = document.createElement('dd')
 
+    wrap.className = 'pdp__spec'
+    wrap.classList.toggle('pdp__spec--num', isNumber)
+    wrap.classList.toggle('pdp__spec--wide', value.length > WIDE_VALUE)
     dt.textContent = label
     dd.textContent = value
     wrap.append(dt, dd)
     table.append(wrap)
   }
 
-  table.hidden = rows.length === 0
+  table.hidden = tiles.length === 0
 }
 
 const renderAbout = (item: Item, copy: ProductCopy | undefined): void => {

@@ -88,8 +88,16 @@
   }
 
   .blog[data-v='2'] .blog__button {
+    --btn-hover-bg: var(--c-white);
+    --btn-hover-fg: var(--c-black);
+
     color: var(--c-white);
     background: var(--accent);
+  }
+
+  // Правило выше тяжелее общего `.button:hover`, поэтому цвет текста при наведении задаём здесь
+  .blog[data-v='2'] .blog__button:is(:hover, :focus-visible) {
+    color: var(--btn-hover-fg);
   }
 
   // =====================================================================

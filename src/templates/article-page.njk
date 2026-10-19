@@ -66,7 +66,7 @@
         {% set other = blog.bySlug[relatedSlug] %}
         <li>
           <a class="bl__card" href="{{ other.url }}" data-tile>
-            <img class="bl__image" src="/src/assets/models/{{ other.cover }}" width="1024" height="683" alt="" loading="lazy" decoding="async" />
+            <img class="bl__image" src="/src/assets/models/thumbs/{{ other.cover }}" width="1024" height="683" alt="" loading="lazy" decoding="async" />
             <span class="bl__meta">{{ other.dateShort }} · {{ other.rubric }}</span>
             <span class="bl__text">
               <span class="bl__title">{{ other.title }}</span>

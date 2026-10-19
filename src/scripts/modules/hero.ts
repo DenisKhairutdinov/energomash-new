@@ -62,12 +62,17 @@ export const initHero = (ready: Promise<void>): void => {
       intro.play()
     })
 
-    // Прокрутка: старт всегда с исходных значений, сглаживание scrub убирает рывки
+    // Прокрутка: старт всегда с исходных значений. Сглаживает Lenis, поэтому scrub без задержки (двойное сглаживание
+    // тянуло анимацию за прокруткой и держало кадры дольше). На слабых машинах привязка к прокрутке не создаётся
     const scrollTrigger = {
       trigger: hero,
       start: 'top top',
       end: 'bottom top',
-      scrub: 1.2,
+      scrub: true,
+    }
+
+    if (document.documentElement.dataset['perf'] === 'low') {
+      return
     }
 
     gsap.fromTo(

@@ -117,10 +117,12 @@
     background: var(--accent);
   }
 
-  // Характеристики: строка «название слева, значение справа», без линий
+  // Характеристики плитками в стык в чёрной колонке: светло-серая плита, значение крупно сверху, подпись под ним.
+  // Числовые параметры идут первыми и крупнее, длинные значения (шасси, перечни) занимают обе ячейки ряда; при наведении плитка белая
   .pdp__specs {
     display: grid;
-    gap: 0.15rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
     margin: 0;
   }
 
@@ -128,28 +130,49 @@
     display: none;
   }
 
-  .pdp__specs > div {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-    gap: 0.75rem;
-    align-items: baseline;
-    padding-block: 0.35rem;
+  .pdp__spec {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    justify-content: space-between;
+    min-inline-size: 0;
+    min-block-size: clamp(4.25rem, 8svh, 5.5rem);
+    padding: clamp(0.55rem, 1.2svh, 0.85rem) clamp(0.7rem, 1vw, 0.9rem);
+    color: var(--c-black);
+    background: var(--c-light);
+    transition: background-color 0.3s var(--ease-out);
   }
 
-  .pdp__specs dt {
-    font-size: var(--fs-s);
-    color: var(--c-gray);
+  .pdp__spec:hover {
+    background: var(--c-white);
   }
 
-  .pdp__specs dd {
+  .pdp__spec dd {
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(1.1rem, 0.9rem + 0.35vw, 1.4rem);
     font-weight: 260;
     font-variant-numeric: tabular-nums;
     line-height: 1.1;
-    text-align: end;
     text-transform: uppercase;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  .pdp__spec--num dd {
+    font-size: clamp(1.6rem, 1rem + 1.1vw, 2.25rem);
+    line-height: 0.95;
+  }
+
+  .pdp__spec--wide,
+  .pdp__spec:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .pdp__spec dt {
+    order: 1;
+    font-size: var(--fs-xs);
+    color: var(--c-black);
   }
 
   .pdp__actions {
@@ -298,19 +321,28 @@
     list-style: none;
   }
 
+  // Горизонтальная карточка: фото слева на ~40% ширины, справа название, тип и характеристики; не плашка поверх фото, как в каталоге.
+  // При наведении карточка становится чёрной, текст белым, подписи серыми
   .pdp__card-link {
+    --card-label: var(--c-black);
+
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-columns: minmax(0, 1fr);
     block-size: 100%;
     color: var(--c-black);
     text-decoration: none;
     background: var(--c-light);
-    transition: background-color 0.3s var(--ease-out);
+    transition:
+      color 0.35s var(--ease-out),
+      background-color 0.35s var(--ease-out);
   }
 
   .pdp__card-link:hover,
   .pdp__card-link:focus-visible {
-    background: var(--c-white);
+    --card-label: var(--c-gray);
+
+    color: var(--c-white);
+    background: var(--c-black);
   }
 
   .pdp__card-photo {
@@ -319,10 +351,12 @@
     aspect-ratio: 3 / 2;
     overflow: clip;
     color: var(--c-gray);
-    background: var(--c-light);
+    background: var(--c-white);
   }
 
   .pdp__card-image {
+    position: absolute;
+    inset: 0;
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
@@ -334,22 +368,23 @@
   }
 
   .pdp__card-body {
-    display: grid;
-    gap: 0.6rem;
-    align-content: start;
-    padding: clamp(0.9rem, 1.4vw, 1.25rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: clamp(1rem, 1.6vw, 1.5rem);
   }
 
+  // Статус сверху, название крупно под ним, тип — подпись
   .pdp__card-head {
     display: flex;
-    gap: 0.75rem;
-    align-items: start;
-    justify-content: space-between;
+    flex-direction: column-reverse;
+    gap: 0.6rem;
+    align-items: flex-start;
   }
 
   .pdp__card-title {
     font-family: var(--font-display);
-    font-size: clamp(1.4rem, 1rem + 0.8vw, 2rem);
+    font-size: clamp(1.6rem, 1rem + 1.2vw, 2.4rem);
     font-weight: 250;
     line-height: 1;
     text-transform: uppercase;
@@ -357,7 +392,6 @@
   }
 
   .pdp__card-badge {
-    flex: none;
     padding: 0.25rem 0.5rem;
     font-size: var(--fs-xs);
     font-weight: 600;
@@ -369,29 +403,37 @@
 
   .pdp__card-type {
     font-size: var(--fs-s);
+    color: var(--card-label);
+    transition: color 0.35s var(--ease-out);
   }
 
+  // Характеристики внизу карточки, значение над подписью, две колонки
   .pdp__card-specs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem 1rem;
-    padding-block-start: 0.4rem;
+    gap: 0.75rem 1rem;
+    padding-block-start: 0.75rem;
+    margin-block-start: auto;
   }
 
   .pdp__card-spec {
-    display: grid;
+    display: flex;
+    flex-direction: column-reverse;
     gap: 0.1rem;
   }
 
   .pdp__card-spec-label {
     font-size: var(--fs-xs);
-    color: var(--c-gray);
+    color: var(--card-label);
+    transition: color 0.35s var(--ease-out);
   }
 
   .pdp__card-spec-value {
     font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 260;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
     text-transform: uppercase;
   }
 
@@ -412,7 +454,16 @@
     }
 
     .pdp__cards {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pdp__card-link {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+
+    .pdp__card-photo {
+      min-block-size: 15rem;
+      aspect-ratio: auto;
     }
 
     .pdp__about {

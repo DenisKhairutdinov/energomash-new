@@ -93,9 +93,15 @@ const buildChapters = (): void => {
     }
   }
 
+  // Тон номеров читает раскладку и стили (elementsFromPoint, getComputedStyle), поэтому при прокрутке считаем не чаще раза в 120 мс
+  let toneTimer: number | undefined
+
   const scheduleTone = (): void => {
-    if (toneFrame === 0) {
-      toneFrame = window.requestAnimationFrame(updateTone)
+    if (toneFrame === 0 && toneTimer === undefined) {
+      toneTimer = window.setTimeout(() => {
+        toneTimer = undefined
+        toneFrame = window.requestAnimationFrame(updateTone)
+      }, 120)
     }
   }
 
@@ -224,7 +230,7 @@ export const initCinema = (): void => {
         start: 'center center',
         end: () => `+=${String(distance())}`,
         pin: true,
-        scrub: 0.8,
+        scrub: true,
         invalidateOnRefresh: true,
         // Пин пересчитывается первым: распорка пина (длина ленты) должна существовать, когда считаются триггеры секций ниже
         refreshPriority: -10,
