@@ -954,6 +954,36 @@
       align-self: stretch;
     }
 
+    // Чипы назначения и «Только в наличии» идут одним потоком: группы и обёртки не создают своих боксов
+    .cfilter__quick {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+    }
+
+    .cfilter__quick .cfilter__block:not([hidden]),
+    .cfilter__quick .cfilter__options {
+      display: contents;
+    }
+
+    .cfilter__quick .chip__label {
+      padding-inline: 0.7rem;
+    }
+
+    // Строка состояния слева: «Найдено», затем выбранные параметры и сброс, без разброса по краям
+    .cfilter__status {
+      align-self: center;
+    }
+
+    .cfilter__status .cfilter__active {
+      flex: 0 1 auto;
+    }
+
+    .cfilter__status .cfilter__found {
+      order: -1;
+      margin-inline-start: 0;
+    }
+
     .cfilter__quick .cfilter__label {
       position: absolute;
       inline-size: 1px;
