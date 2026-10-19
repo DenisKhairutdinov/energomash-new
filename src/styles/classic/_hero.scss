@@ -118,6 +118,11 @@
   gap: 0.75rem;
 }
 
+// «Заказать звонок» в hero без рамки: плашка стекла сама отделяет кнопку от фона
+.hero__actions .button--glass {
+  border-color: transparent;
+}
+
 .hero__bottom {
   display: grid;
   gap: 0.75rem;

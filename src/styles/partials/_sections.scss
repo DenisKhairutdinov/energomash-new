@@ -1467,6 +1467,11 @@
       grid-template-columns: var(--side-x) minmax(0, 1fr);
     }
 
+    // Первая карточка вплотную к акцентному блоку: зазор слева убран, границы колонок совпадают с соседними секциями
+    .blog__intro + .news {
+      margin-inline-start: -0.25rem;
+    }
+
     .blog__row {
       grid-template-columns: repeat(4, minmax(0, 1fr));
       grid-column: 1 / -1;
