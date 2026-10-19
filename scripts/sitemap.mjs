@@ -15,7 +15,11 @@ const pages = readdirSync('src/pages')
 const blog = JSON.parse(readFileSync('src/data/blog.json', 'utf8')).blog
 const dates = new Map(blog.posts.map((post) => [post.url, post.datetime]))
 
-const urls = ['/', ...pages]
+// Страницы моделей создаёт scripts/prerender-models.mjs после сборки
+const { items } = JSON.parse(readFileSync('public/data/catalog.json', 'utf8'))
+const models = items.map((item) => `/model/${encodeURIComponent(item.id)}.html`)
+
+const urls = ['/', ...pages, ...models]
   .map((path) => {
     const lastmod = dates.get(path)
 
@@ -27,4 +31,4 @@ writeFileSync(
   'public/sitemap.xml',
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
 )
-console.log(`sitemap: ${String(pages.length + 1)} адресов`)
+console.log(`sitemap: ${String(pages.length + 1)} страниц и ${String(models.length)} моделей`)

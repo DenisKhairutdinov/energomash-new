@@ -650,3 +650,13 @@ Hero в целом остаётся, правки точечные (стили �
 
 - Из `deny` в `.claude/settings.json` убраны 28 маркетинговых скиллов проекта (`ad-creative`, `ads`, `aso`, `attribution`, `churn-prevention`, `co-marketing`, `cold-email`, `community-marketing`, `directory-submissions`, `emails`, `events`, `free-tools`, `influencer-marketing`, `launch`, `marketing-council`, `marketing-loops`, `marketing-plan`, `onboarding`, `paywalls`, `pricing`, `prospecting`, `public-relations`, `referrals`, `revops`, `sales-enablement`, `signup`, `sms`, `social`). Раздел в `CLAUDE.md` и `docs/other-skills.md` обновлён. Вступает в силу в новой сессии.
 - Деплой: Git Bash превращал `--base=/energomash-new/` в `C:/Program Files/Git/...`; в `scripts/deploy-ghpages.sh` добавлен `MSYS_NO_PATHCONV=1`. Сайт пересобран и залит (стили и скрипты отдаются). Если `git commit` в скрипте падает с segfault, залить `dist` в `gh-pages` вручную обычным `git`.
+
+## 2026-10-19: конкуренты, ниша, контент и SEO
+
+Подробности и выводы: `docs/competitors-seo.md`; что подтвердить у заказчика: `docs/content-needed.md` (раздел про статьи).
+
+- **Исследование:** открыты главные FoxTank, BONUM, УралСпецТранс (ГРАЗ не загрузился). У всех нет FAQ и полезных статей, цены скрыты. Поиск по российским ресурсам недоступен (поиск работает по зарубежной выдаче), частотность запросов не измерялась.
+- **SEO в коде:** готовые страницы 892 моделей (`scripts/prerender-models.mjs`, `dist/model/<id>.html`, свой title и описание, canonical, Product и BreadcrumbList), `scripts/seo-postbuild.mjs` (объединение FAQPage и разметка «Частых вопросов» в 38 статьях), noindex для оболочки `product.html` и ошибок, WebSite+SearchAction на главной, FAQPage в макросе `faq` и на главной, 892 модели в sitemap (955 адресов), текст и ссылки под списком каталога. Шаги добавлены в `npm run build` и в `scripts/deploy-ghpages.sh`.
+- **Контент:** 8 тонких статей расширены, 7 новых (окупаемость, чек-лист выбора, питьевая вода, лизинг, вакуумная техника, АТЗ, материал корпуса); всего 38 статей, в среднем около 530 слов (было 410). Перелинковка статей и 8 посадочных.
+- **Проверки по собранному сайту:** 967 страниц, 81 671 внутренних ссылок, битых нет, JSON-LD разбирается, дублей title и описаний у моделей нет; `tsc`, ESLint и Stylelint чистые.
+- **Открыто:** подтвердить сайт в Вебмастере и Search Console и отправить sitemap; номера счётчиков Метрики; реальные отзывы, сертификаты и отгрузки; частотность запросов; проверка чисел в новых статьях технологом (список в `content-needed.md`); номер постановления и срок субсидии.

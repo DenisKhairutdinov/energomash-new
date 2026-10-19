@@ -1,6 +1,5 @@
-import { photoUrl } from './catalog-data'
+import { modelUrl, photoUrl } from './catalog-data'
 
-const PRODUCT_URL = `${import.meta.env.BASE_URL}product.html?id=`
 const STOCK_IN = 'in'
 const STOCK_BADGE = 'В наличии'
 
@@ -114,7 +113,7 @@ export const createProductCard = (
   }
 
   for (const link of links) {
-    link.href = `${PRODUCT_URL}${encodeURIComponent(item.id)}`
+    link.href = modelUrl(item.id)
   }
 
   if (model) {

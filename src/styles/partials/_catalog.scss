@@ -515,6 +515,62 @@
     gap: 0.25rem;
   }
 
+  // Текст каталога под списком: заголовок, абзацы в одну колонку по ширине строки, ссылки на разделы плитками в стык
+  .catalog__about {
+    display: grid;
+    gap: 1.25rem;
+    padding: calc(var(--sec-pad-y) * 1.5) var(--edge);
+  }
+
+  .catalog__about-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1rem + 1.6vw, 2.75rem);
+    font-weight: 250;
+    line-height: 1.05;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  .catalog__about-text {
+    display: grid;
+    gap: 1rem;
+    max-inline-size: 46rem;
+    font-size: var(--fs-m);
+    line-height: 1.6;
+  }
+
+  .catalog__about-sub {
+    margin-block-start: 0.75rem;
+    font-size: var(--fs-m);
+    font-weight: 600;
+  }
+
+  .catalog__about-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .catalog__about-links a {
+    display: block;
+    padding: 0.9rem 1.1rem;
+    color: var(--c-black);
+    text-decoration: none;
+    background: var(--c-light);
+    transition:
+      color 0.3s var(--ease-out),
+      background-color 0.3s var(--ease-out);
+  }
+
+  .catalog__about-links a:hover,
+  .catalog__about-links a:focus-visible {
+    color: var(--c-white);
+    background: var(--c-black);
+  }
+
   .catalog__empty {
     padding: 4rem var(--edge);
     color: var(--paper-70);

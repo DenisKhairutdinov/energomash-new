@@ -1,6 +1,5 @@
-import { loadCatalog, photoUrl } from './catalog-data'
+import { loadCatalog, modelUrl, photoUrl } from './catalog-data'
 
-const PRODUCT_URL = `${import.meta.env.BASE_URL}product.html?id=`
 const STOCK_IN = 'in'
 const RELATED_COUNT = 4
 const ACTIVE = 'is-active'
@@ -168,6 +167,9 @@ const renderSpecs = (item: Item, dictionary: DictionaryGroup[]): void => {
     return
   }
 
+  // Готовая страница уже содержит характеристики (для поиска и без JS): строим заново из словаря, чтобы не задваивать
+  table.replaceChildren()
+
   // Плитки: сначала числовые параметры (крупные цифры), затем текстовые; длинные значения занимают две ячейки
   const numeric: SpecTile[] = []
   const textual: SpecTile[] = []
@@ -223,6 +225,9 @@ const renderAbout = (item: Item, copy: ProductCopy | undefined): void => {
   setText('[data-pdp-about-text]', `${purpose.text} ${copy.types[item.type] ?? ''}`.trim())
 
   const features = document.querySelector<HTMLElement>('[data-pdp-features]')
+
+  // На готовой странице модели список уже есть в HTML: строим заново, чтобы не задваивать
+  features?.replaceChildren()
 
   for (const feature of purpose.features) {
     const li = document.createElement('li')
@@ -284,7 +289,7 @@ const renderRelated = (item: Item, items: Item[]): void => {
     const specs = el('span', 'pdp__card-specs')
     const url = other.photos.map((name) => photoUrl(name)).find((value) => value !== undefined)
 
-    link.href = `${PRODUCT_URL}${encodeURIComponent(other.id)}`
+    link.href = modelUrl(other.id)
 
     if (url) {
       const image = el('img', 'pdp__card-image')
@@ -334,7 +339,8 @@ export const initProduct = async (): Promise<void> => {
     return
   }
 
-  const id = new URLSearchParams(location.search).get('id')
+  // Готовая страница модели несёт id в атрибуте, оболочка product.html получает его из адреса
+  const id = root.dataset['modelId'] ?? new URLSearchParams(location.search).get('id')
   const dictionary = (readJson('catalog-dictionary') as DictionaryGroup[] | undefined) ?? []
   const copy = readJson('product-copy') as { product: ProductCopy } | ProductCopy | undefined
   const productCopy = copy && 'product' in copy ? copy.product : copy
@@ -354,7 +360,9 @@ export const initProduct = async (): Promise<void> => {
       return
     }
 
-    document.title = `${item.model} — Энергомаш`
+    if (!root.dataset['modelId']) {
+      document.title = `${item.model} — Энергомаш`
+    }
     setText('[data-pdp-type]', item.typeLabel)
     setText('[data-pdp-title]', item.model)
 

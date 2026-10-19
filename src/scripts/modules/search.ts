@@ -1,4 +1,4 @@
-import { loadCatalog } from './catalog-data'
+import { loadCatalog, modelUrl } from './catalog-data'
 import { isSearchMatch, parseQuery, searchRank, type Searchable } from './search-match'
 
 const FORM_SELECTOR = '[data-search]'
@@ -6,7 +6,6 @@ const INPUT_SELECTOR = '[data-search-input]'
 const RESULTS_SELECTOR = '[data-search-results]'
 const TOGGLE_SELECTOR = '[data-search-toggle]'
 
-const PRODUCT_URL = `${import.meta.env.BASE_URL}product.html?id=`
 const CATALOG_URL = `${import.meta.env.BASE_URL}catalog.html?q=`
 const MAX_RESULTS = 8
 
@@ -80,7 +79,7 @@ export const initSearch = (): void => {
         const link = createNode('a', 'search__item')
         const row = createNode('span', 'search__row')
 
-        link.href = `${PRODUCT_URL}${encodeURIComponent(item.id)}`
+        link.href = modelUrl(item.id)
         link.id = `search-result-${String(index)}`
         link.setAttribute('role', 'option')
         row.append(createNode('span', 'search__name', item.model))

@@ -21,4 +21,5 @@
       </details>
     {% endfor %}
   </div>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{% for item in home.faq %}{"@type":"Question","name":{{ item.question | striptags | dump | safe }},"acceptedAnswer":{"@type":"Answer","text":{{ item.answer | striptags | dump | safe }}}}{% if not loop.last %},{% endif %}{% endfor %}]}</script>
 </section>

@@ -60,7 +60,7 @@
         "articles": [
           "nizhniy-nalivi-rekuperaciya-parov",
           "kak-vybrat-obem-i-sekcii",
-          "dopog-i-reglamenty"
+          "kak-vybrat-polupricep-cisternu-dlya-nefteproduktov"
         ]
       },
       {
@@ -113,7 +113,7 @@
         "articles": [
           "termoizolyaciya-poliuretan-ili-minvata",
           "zimnyaya-ekspluataciya-cisterny",
-          "podveska-ressornaya-ili-pnevmaticheskaya"
+          "material-cisterny-stal-aluminiy-nerzhaveyka"
         ]
       },
       {
@@ -162,7 +162,7 @@
         ],
         "articles": [
           "kak-vybrat-obem-i-sekcii",
-          "zimnyaya-ekspluataciya-cisterny",
+          "cisterna-dlya-pitevoy-vody-trebovaniya",
           "to-cisterny-chto-i-kogda"
         ]
       },
@@ -212,7 +212,7 @@
         ],
         "articles": [
           "to-cisterny-chto-i-kogda",
-          "tipichnye-oshibki-ekspluatacii",
+          "vakuumnaya-cisterna-ili-vakuumnaya-mashina",
           "srok-sluzhby-i-modernizaciya"
         ]
       },
@@ -258,7 +258,7 @@
           ]
         ],
         "articles": [
-          "dopog-i-reglamenty",
+          "avtotoplivozapravschik-ustroystvo-i-vybor",
           "zazemlenie-i-staticheskoe-electrichestvo",
           "garantiya-chto-pokryvaet"
         ]
@@ -313,7 +313,7 @@
         "articles": [
           "to-cisterny-chto-i-kogda",
           "tipichnye-oshibki-ekspluatacii",
-          "garantiya-chto-pokryvaet"
+          "cisterna-dlya-pitevoy-vody-trebovaniya"
         ]
       },
       {
@@ -358,7 +358,7 @@
           ]
         ],
         "articles": [
-          "termoizolyaciya-poliuretan-ili-minvata",
+          "vakuumnaya-cisterna-ili-vakuumnaya-mashina",
           "zimnyaya-ekspluataciya-cisterny",
           "dopog-i-reglamenty"
         ]
@@ -408,7 +408,7 @@
           ]
         ],
         "articles": [
-          "zimnyaya-ekspluataciya-cisterny",
+          "vakuumnaya-cisterna-ili-vakuumnaya-mashina",
           "tipichnye-oshibki-ekspluatacii",
           "to-cisterny-chto-i-kogda"
         ]
@@ -474,7 +474,7 @@
         "articles": [
           "nizhniy-nalivi-rekuperaciya-parov",
           "kak-vybrat-obem-i-sekcii",
-          "dopog-i-reglamenty"
+          "kak-vybrat-polupricep-cisternu-dlya-nefteproduktov"
         ]
       },
       "neftevozy": {
@@ -527,7 +527,7 @@
         "articles": [
           "termoizolyaciya-poliuretan-ili-minvata",
           "zimnyaya-ekspluataciya-cisterny",
-          "podveska-ressornaya-ili-pnevmaticheskaya"
+          "material-cisterny-stal-aluminiy-nerzhaveyka"
         ]
       },
       "vodovozy": {
@@ -576,7 +576,7 @@
         ],
         "articles": [
           "kak-vybrat-obem-i-sekcii",
-          "zimnyaya-ekspluataciya-cisterny",
+          "cisterna-dlya-pitevoy-vody-trebovaniya",
           "to-cisterny-chto-i-kogda"
         ]
       },
@@ -626,7 +626,7 @@
         ],
         "articles": [
           "to-cisterny-chto-i-kogda",
-          "tipichnye-oshibki-ekspluatacii",
+          "vakuumnaya-cisterna-ili-vakuumnaya-mashina",
           "srok-sluzhby-i-modernizaciya"
         ]
       },
@@ -672,7 +672,7 @@
           ]
         ],
         "articles": [
-          "dopog-i-reglamenty",
+          "avtotoplivozapravschik-ustroystvo-i-vybor",
           "zazemlenie-i-staticheskoe-electrichestvo",
           "garantiya-chto-pokryvaet"
         ]
@@ -727,7 +727,7 @@
         "articles": [
           "to-cisterny-chto-i-kogda",
           "tipichnye-oshibki-ekspluatacii",
-          "garantiya-chto-pokryvaet"
+          "cisterna-dlya-pitevoy-vody-trebovaniya"
         ]
       },
       "avtocisterny-dlya-sbora-nefti": {
@@ -772,7 +772,7 @@
           ]
         ],
         "articles": [
-          "termoizolyaciya-poliuretan-ili-minvata",
+          "vakuumnaya-cisterna-ili-vakuumnaya-mashina",
           "zimnyaya-ekspluataciya-cisterny",
           "dopog-i-reglamenty"
         ]
@@ -822,7 +822,7 @@
           ]
         ],
         "articles": [
-          "zimnyaya-ekspluataciya-cisterny",
+          "vakuumnaya-cisterna-ili-vakuumnaya-mashina",
           "tipichnye-oshibki-ekspluatacii",
           "to-cisterny-chto-i-kogda"
         ]

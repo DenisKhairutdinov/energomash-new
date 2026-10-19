@@ -25,6 +25,15 @@ const fetchOnce = <Data>(path: string): Promise<Data> => {
   return request as Promise<Data>
 }
 
+/**
+ * Адрес страницы модели. В сборке это готовая страница model/<id>.html (её делает scripts/prerender-models.mjs: свой title,
+ * характеристики в HTML, разметка Product), в dev-сервере таких файлов нет, там работает оболочка product.html?id=.
+ */
+export const modelUrl = (id: string): string =>
+  import.meta.env.PROD
+    ? `${BASE_URL}model/${encodeURIComponent(id)}.html`
+    : `${BASE_URL}product.html?id=${encodeURIComponent(id)}`
+
 /** Модели и позиции склада со всеми параметрами фильтра (около 0,8 МБ). */
 export const loadCatalog = (): Promise<{ items: unknown[] }> =>
   fetchOnce<{ items: unknown[] }>('data/catalog.json')

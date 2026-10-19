@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ pageTitleFull or (pageTitle if ("Энергомаш" in pageTitle) else (pageTitle + " — Энергомаш")) }}</title>
     {% if pageDescription %}<meta name="description" content="{{ pageDescription }}" />{% endif %}
+    {# Служебные страницы и оболочка карточки модели не индексируются; страницы моделей создаёт scripts/prerender-models.mjs #}
+    {% if pageRobots %}<meta name="robots" content="{{ pageRobots }}" />{% endif %}
     {% set seoTitle = pageTitleFull or (pageTitle if ("Энергомаш" in pageTitle) else (pageTitle + " — Энергомаш")) %}
     {% if pagePath %}
       <link rel="canonical" href="{{ site.url }}{{ pagePath }}" />
@@ -50,6 +52,19 @@
         ]
       }
     </script>
+    {% if pageClass == "home" %}
+      {# Поле поиска по каталогу для расширенного сниппета; поиск принимает запрос в параметре q #}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "{{ site.name }}",
+          "url": "{{ site.url }}/",
+          "inLanguage": "ru",
+          "potentialAction": { "@type": "SearchAction", "target": { "@type": "EntryPoint", "urlTemplate": "{{ site.url }}/catalog.html?q={search_term_string}" }, "query-input": "required name=search_term_string" }
+        }
+      </script>
+    {% endif %}
   </head>
   <body class="page{% if pageClass %} page--{{ pageClass }}{% endif %}">
     <a class="skip-link" href="#main">Перейти к содержимому</a>

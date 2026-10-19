@@ -9,6 +9,8 @@ BASE=/energomash-new/
 npm run sitemap
 npm run typecheck
 npx vite build --base=$BASE
+node scripts/prerender-models.mjs dist
+node scripts/seo-postbuild.mjs dist
 node scripts/prefix-base.mjs $BASE dist
 touch dist/.nojekyll
 REV=$(git rev-parse --short HEAD)

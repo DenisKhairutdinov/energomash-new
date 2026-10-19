@@ -93,4 +93,6 @@
       </details>
     {% endfor %}
   </div>
+  {# Разметка FAQPage по тем же вопросам, что видны на странице (текст ответа без тегов) #}
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{% for item in items %}{"@type":"Question","name":{{ item[0] | striptags | dump | safe }},"acceptedAnswer":{"@type":"Answer","text":{{ item[1] | striptags | dump | safe }}}}{% if not loop.last %},{% endif %}{% endfor %}]}</script>
 {% endmacro %}

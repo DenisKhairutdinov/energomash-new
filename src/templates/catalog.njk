@@ -162,6 +162,33 @@
     </div>
   </div>
 
+  {# Текст каталога и ссылки на разделы: список моделей рисует скрипт, поэтому для поиска и для тех, кто листает вниз, остаётся этот блок #}
+  <section class="catalog__about" aria-labelledby="catalog-about-title">
+    <h2 class="catalog__about-title" id="catalog-about-title">Каталог полуприцепов-цистерн и автоцистерн</h2>
+    <div class="catalog__about-text">
+      <p>В каталоге завода «Энергомаш» {{ home.catalogTotals.total }} {{ plural(home.catalogTotals.total, "модель", "модели", "моделей") }}, из них {{ home.catalogTotals.inStock }} {{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} в наличии на складе. Это полуприцепы-цистерны и автоцистерны на шасси КАМАЗ, Урал и других производителей, навесное оборудование под шасси заказчика и вакуумная техника. Цену не показываем в каталоге: она зависит от комплектации, шасси и способа оплаты, поэтому её рассчитывает менеджер по заявке.</p>
+      <p>Подбирайте технику по типу и назначению, объёму, числу секций, осям и подвеске. Модели в наличии отгружаем в течение нескольких дней, остальные изготавливаем под заказ. Если подходящей комплектации нет, завод соберёт цистерну <a href="/blog-cisterna-pod-tehzadanie.html">под техническое задание</a>.</p>
+    </div>
+    <h3 class="catalog__about-sub">Техника по назначению</h3>
+    <ul class="catalog__about-links">
+      <li><a href="/benzovozy.html">Бензовозы</a></li>
+      <li><a href="/neftevozy.html">Нефтевозы</a></li>
+      <li><a href="/avtotoplivozapravschiki.html">Автотопливозаправщики</a></li>
+      <li><a href="/vodovozy.html">Водовозы</a></li>
+      <li><a href="/cisterny-dlya-pitevoy-vody.html">Цистерны для питьевой воды</a></li>
+      <li><a href="/vakuumnye-cisterny.html">Вакуумные цистерны</a></li>
+      <li><a href="/avtocisterny-dlya-sbora-nefti.html">Автоцистерны для сбора нефти</a></li>
+      <li><a href="/kommunalnye-vakuumnye-mashiny.html">Коммунальные вакуумные машины</a></li>
+    </ul>
+    <h3 class="catalog__about-sub">Как выбрать</h3>
+    <ul class="catalog__about-links">
+      <li><a href="/guide.html">Как выбрать цистерну: пошаговый подбор</a></li>
+      <li><a href="/blog-kak-vybrat-obem-i-sekcii.html">Объём и число секций</a></li>
+      <li><a href="/blog-benzovoz-ili-avtocisterna-chto-vybrat.html">Бензовоз или автоцистерна</a></li>
+      <li><a href="/leasing.html">Лизинг и субсидия</a></li>
+    </ul>
+  </section>
+
   {# Заготовка карточки: скрипт копирует её и подставляет данные модели #}
   <template data-catalog-template>
     <li class="ccard">
