@@ -97,8 +97,14 @@ export const initReveal = (): void => {
 
   gsap.matchMedia().add(NO_PREFERENCE, () => {
     // Начальное состояние выставляется сразу, чтобы блок не мигал перед появлением; при «уменьшить движение» этот код не запускается
-    gsap.set(HIDDEN_WIPE, { clipPath: 'inset(100% 0% 0% 0%)' })
-    gsap.set(BLOCKS, { y: 28, autoAlpha: 0 })
+    // Только для блоков, которые есть на странице: на внутренних страницах GSAP иначе пишет в консоль «target not found»
+    if (document.querySelector(HIDDEN_WIPE)) {
+      gsap.set(HIDDEN_WIPE, { clipPath: 'inset(100% 0% 0% 0%)' })
+    }
+
+    if (document.querySelector(BLOCKS)) {
+      gsap.set(BLOCKS, { y: 28, autoAlpha: 0 })
+    }
 
     // Меню шапки открывается по-старому (триггер ScrollTrigger)
     ScrollTrigger.batch('.menu__feature', {

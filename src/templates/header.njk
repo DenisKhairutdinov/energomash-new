@@ -5,6 +5,10 @@
     <a class="header__logo" href="/" aria-label="Энергомаш, на главную">
       <img src="/src/assets/images/logo.svg" width="176" height="27" alt="Энергомаш" />
     </a>
+    {# Звонок на телефоне: номер спрятан в меню, а для B2B это главное действие; от 1280 px номер и кнопка в самой ленте #}
+    <a class="header__call" href="{{ home.contacts.phoneHref }}" aria-label="Позвонить: {{ home.contacts.phone }}">
+      {{ icon("phone", "header__call-icon") }}
+    </a>
     <button
       class="header__burger"
       type="button"

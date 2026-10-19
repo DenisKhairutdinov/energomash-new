@@ -1,4 +1,4 @@
-// Шрифты (Sofia Sans Extra Condensed, Onest, JetBrains Mono; Oswald и Manrope только для classic-hero) и стили Lenis подключаются в scripts/main.ts
+// Шрифты (Oswald для заголовков, Manrope для текста) и стили Lenis подключаются в scripts/main.ts
 @layer reset {
   *,
   *::before,
@@ -74,13 +74,13 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    font-weight: 260;
+    font-weight: 300;
     text-wrap: balance;
   }
 
-  // Заголовки первого уровня везде одного тонкого веса
-  h1 {
-    font-weight: 220;
+  // Лестница толщины Oswald: крупнее 56 px тонкий (200–260), 32–56 px 300, мельче 32 px 400
+  h3 {
+    font-weight: 400;
   }
 
   input,
@@ -200,17 +200,17 @@
   // Заголовок секции: высокий тонкий узкий шрифт капсом
   .section-title {
     font-size: var(--fs-title);
-    font-weight: 220;
+    font-weight: 300;
     line-height: 0.92;
     text-transform: uppercase;
     letter-spacing: 0;
   }
 
-  // Мелкая техническая подпись: данные, метки, номера
+  // Мелкая техническая подпись: данные, метки, номера (основной шрифт, цифры одной ширины)
   .mono {
-    font-family: var(--font-mono);
     font-size: var(--fs-xs);
-    font-weight: 400;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }

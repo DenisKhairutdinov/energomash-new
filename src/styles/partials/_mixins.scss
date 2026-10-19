@@ -13,7 +13,7 @@
   --field-hover: var(--c-black);
   --hover-fill: var(--accent);
   --focus-fill: var(--c-black);
-  --accent-text: var(--accent);
+  --accent-text: var(--accent-hi);
   --btn-line: var(--c-gray);
   --btn-hover-bg: var(--paper);
   --btn-hover-fg: var(--ink);
@@ -61,6 +61,9 @@
 
   --paper: var(--c-white);
   --ink: var(--c-black);
+
+  // Стекло всегда тёмное: акцентный текст на нём светлый, даже внутри светлой секции
+  --accent-text: var(--accent-hi);
 
   color: var(--c-white);
   background: var(--glass-dark);
@@ -183,7 +186,7 @@
   --btn-line: var(--c-black);
   --hover-fill: var(--c-white);
   --focus-fill: var(--c-white);
-  --accent-text: var(--accent);
+  --accent-text: var(--accent-lo);
 
   color: var(--paper);
   background: var(--ink);
@@ -219,23 +222,23 @@
   --btn-line: var(--c-gray);
   --hover-fill: var(--accent);
   --focus-fill: var(--c-black);
-  --accent-text: var(--accent);
+  --accent-text: var(--accent-hi);
 
   color: var(--paper);
 }
 
-// Секция на акцентном поле: текст и заголовки чёрные, плитки остаются тёмными
+// Секция на акцентном поле: текст и заголовки белые (4,7:1 на #b85533; чёрный дал бы 3,6:1), плитки остаются тёмными
 @mixin accent-surface {
-  --paper: var(--c-black);
-  --paper-60: var(--c-black);
-  --paper-70: var(--c-black);
-  --paper-80: var(--c-black);
-  --paper-85: var(--c-black);
-  --paper-90: var(--c-black);
-  --fg-2: var(--c-black);
-  --accent-text: var(--c-black);
+  --paper: var(--c-white);
+  --paper-60: var(--c-white);
+  --paper-70: var(--c-white);
+  --paper-80: var(--c-white);
+  --paper-85: var(--c-white);
+  --paper-90: var(--c-white);
+  --fg-2: var(--c-white);
+  --accent-text: var(--c-white);
 
-  color: var(--c-black);
+  color: var(--c-white);
   background: var(--accent);
 }
 

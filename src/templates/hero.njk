@@ -38,12 +38,7 @@
     </div>
   </div>
 
-  <ul class="hero__utp container">
-    {% for item in home.hero.utp %}
-      <li><a class="hero__utp-link glass" href="{{ item.url }}" data-hero-glass><span>{{ item.title }}</span>{{ icon("arrow", "hero__utp-icon") }}</a></li>
-    {% endfor %}
-  </ul>
-
+  {# Ярлыки Лизинг, Субсидия, Документы, Сервис убраны с первого экрана (2026-10-19): их 7 выборов в точке решения было слишком много; они остаются в меню «Условия» и в секциях ниже #}
   <div class="hero__bottom container">
     <div class="hero__cats">
       <a class="cat glass" href="/catalog.html?type=semitrailer" data-hero-glass>

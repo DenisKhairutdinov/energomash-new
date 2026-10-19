@@ -62,6 +62,14 @@ const initMenuMarker = (header: HTMLElement): void => {
   })
 
   place(rest)
+
+  // Ширина пунктов меняется, когда подгружается шрифт: без повторного замера пластина остаётся по старой ширине и наезжает на соседа
+  void document.fonts.ready.then(() => {
+    place(rest)
+  })
+  window.addEventListener('load', () => {
+    place(rest)
+  })
 }
 
 const LIGHT_ABOVE = 0.45

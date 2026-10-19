@@ -168,7 +168,7 @@
   .shipments__model {
     font-family: var(--font-display);
     font-size: clamp(2rem, 1rem + 2.4vw, 3.8rem);
-    font-weight: 240;
+    font-weight: 300;
     line-height: 0.98;
     text-transform: uppercase;
   }
@@ -263,7 +263,7 @@
   .shipments__all-title {
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 1rem + 4.2vw, 6rem);
-    font-weight: 230;
+    font-weight: 300;
     line-height: 0.92;
     text-transform: uppercase;
   }
@@ -411,7 +411,7 @@
     gap: 1.25rem var(--col-gap);
     align-items: center;
     padding: clamp(1.5rem, 4svh, 2.75rem) clamp(1.1rem, 1.8vw, 1.75rem);
-    color: var(--ink);
+    color: var(--c-white);
     background: var(--accent);
   }
 
@@ -425,7 +425,7 @@
   .leasing__payment {
     font-family: var(--font-display);
     font-size: clamp(3rem, 1rem + 4.4vw, 6.5rem);
-    font-weight: 230;
+    font-weight: 300;
     font-variant-numeric: tabular-nums;
     line-height: 0.95;
     color: var(--paper);
@@ -445,7 +445,7 @@
   .leasing__summary dd {
     font-family: var(--font-display);
     font-size: clamp(1.3rem, 3svh, 1.9rem);
-    font-weight: 260;
+    font-weight: 400;
     font-variant-numeric: tabular-nums;
     line-height: 1.1;
   }
@@ -523,7 +523,7 @@
     align-items: baseline;
     font-family: var(--font-display);
     font-size: clamp(2rem, 5svh, 3.6rem);
-    font-weight: 260;
+    font-weight: 300;
     font-variant-numeric: tabular-nums;
     line-height: 1;
   }
@@ -663,7 +663,7 @@
   .process__step {
     font-family: var(--font-display);
     font-size: clamp(1.5rem, 1rem + 1vw, 2.25rem);
-    font-weight: 240;
+    font-weight: 400;
     line-height: 1.05;
     text-transform: uppercase;
   }
@@ -801,7 +801,7 @@
     place-items: center;
     inline-size: 2.25rem;
     block-size: 2.25rem;
-    color: var(--ink);
+    color: var(--c-white);
     background: var(--accent);
     transition:
       color 0.4s,
@@ -821,7 +821,7 @@
   .docs__name {
     font-family: var(--font-display);
     font-size: clamp(1.5rem, 3.4svh, 2.4rem);
-    font-weight: 250;
+    font-weight: 400;
     line-height: 1;
     text-transform: uppercase;
   }
@@ -840,14 +840,14 @@
     place-items: center start;
     padding: clamp(1.1rem, 2.4svh, 1.75rem) var(--edge) clamp(1.1rem, 2.4svh, 1.75rem)
       clamp(1.1rem, 1.6vw, 1.75rem);
-    color: var(--ink);
+    color: var(--c-white);
     background: var(--accent);
   }
 
   .service__title {
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 1rem + 1.4vw, 2.6rem);
-    font-weight: 240;
+    font-weight: 400;
     line-height: 0.98;
     text-transform: uppercase;
   }
@@ -951,10 +951,10 @@
 
   .faq__text {
     font-family: var(--font-display);
-    font-size: clamp(1.4rem, 3.2svh, 2.4rem);
-    font-weight: 250;
-    line-height: 1.05;
-    text-transform: uppercase;
+    font-size: clamp(1.25rem, 2.6svh, 1.9rem);
+    font-weight: 400;
+    line-height: 1.2;
+    text-wrap: balance;
   }
 
   .faq__mark {
@@ -1027,7 +1027,7 @@
     gap: 2rem;
     justify-content: space-between;
     padding: var(--sec-pad-y) var(--col-gap) var(--sec-pad-y) var(--edge);
-    color: var(--ink);
+    color: var(--c-white);
     background: var(--accent);
   }
 
@@ -1112,14 +1112,14 @@
     align-items: baseline;
     font-family: var(--font-display);
     line-height: 0.9;
-    color: var(--accent);
+    color: var(--accent-text);
     text-transform: uppercase;
     text-shadow: 0 1px 14px color-mix(in oklch, var(--c-black) 55%, transparent);
   }
 
   .news__day {
     font-size: clamp(3rem, 1rem + 3vw, 5rem);
-    font-weight: 260;
+    font-weight: 300;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1169,14 +1169,14 @@
 
   .news:hover .news__arrow,
   .news:focus-visible .news__arrow {
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .news__title {
     max-inline-size: 90%;
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 1rem + 1.4vw, 3rem);
-    font-weight: 240;
+    font-weight: 400;
     line-height: 1;
     text-transform: uppercase;
   }
@@ -1263,7 +1263,7 @@
   .request__phone {
     font-family: var(--font-display);
     font-size: clamp(2rem, 1rem + 2.2vw, 3.6rem);
-    font-weight: 240;
+    font-weight: 300;
     line-height: 1;
     color: var(--paper);
     text-decoration: none;
@@ -1344,7 +1344,7 @@
   }
 
   .request .field__control::placeholder {
-    color: var(--c-gray);
+    color: color-mix(in oklch, var(--fg-2) 72%, transparent);
   }
 
   // Контуры фокуса в заявке тонкие, 1 px

@@ -2,9 +2,9 @@
 // Цвета не переопределяются: старый hero берёт общую палитру сайта (пять цветов, partials/_tokens.scss). Стекло hero оставлено прежним.
 @mixin legacy-vars {
   // Стекло старого hero как было (не трогаем)
-  --glass-dark: oklch(17% 0.008 60deg / 44%);
-  --glass-dark-strong: oklch(17% 0.008 60deg / 44%);
-  --glass-clear: oklch(17% 0.008 60deg / 44%);
+  --glass-dark: oklch(17% 0.008 60deg / 60%);
+  --glass-dark-strong: oklch(15.5% 0.008 255deg / 74%);
+  --glass-clear: oklch(15.5% 0.008 255deg / 36%);
 
   // Тона hero (стекло и фото): как было
   --paper-5: oklch(96.8% 0.004 255deg / 5%);
@@ -31,12 +31,11 @@
   --field: oklch(96.8% 0.004 255deg / 7%);
   --field-hover: oklch(96.8% 0.004 255deg / 12%);
   --btn-line: oklch(96.8% 0.004 255deg / 45%);
-  --glass-blur: blur(5px);
-  --glass-blur-strong: blur(5px) saturate(1.5);
+  --glass-blur: blur(12px) saturate(1.15);
+  --glass-blur-strong: blur(14px) saturate(1.1);
   --font-display: 'Oswald Variable', 'Arial Narrow', sans-serif;
   --font-text: 'Manrope Variable', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --fs-xs: 0.75rem;
+  --fs-xs: 0.8125rem;
   --fs-s: 0.875rem;
   --fs-m: 1rem;
   --fs-l: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);

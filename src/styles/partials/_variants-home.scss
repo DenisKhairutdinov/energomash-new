@@ -159,7 +159,7 @@
   .leasing[data-v='1'] .leasing__result {
     @include dark-surface;
 
-    color: var(--ink);
+    color: var(--c-white);
     background: var(--accent);
   }
 

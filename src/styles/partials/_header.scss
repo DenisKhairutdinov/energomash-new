@@ -22,11 +22,11 @@
     // Палитра шапки: тёплый графит, акцент владельца без изменений
     --hdr-fg: var(--c-white);
     --hdr-fg-2: var(--paper-70);
-    --hdr-glass: oklch(17% 0.008 60deg / 38%);
-    --hdr-glass-solid: oklch(17% 0.008 60deg / 44%);
+    --hdr-glass: oklch(17% 0.008 60deg / 56%);
+    --hdr-glass-solid: oklch(17% 0.008 60deg / 68%);
     --hdr-plate: var(--paper-15);
     --hdr-cell: var(--paper-9);
-    --hdr-blur: blur(5px) saturate(1.5);
+    --hdr-blur: blur(12px) saturate(1.15);
 
     position: fixed;
     inset-block-start: 0;
@@ -55,9 +55,11 @@
     --hdr-cell: var(--paper-13);
   }
 
-  .header.is-solid[data-tone='light'] {
-    --hdr-glass: oklch(14% 0.008 60deg / 68%);
-    --hdr-glass-solid: oklch(14% 0.008 60deg / 74%);
+  // Светлый фон под лентой (внутренние страницы, каталог): лента плотнее, а неактивные пункты светлее, иначе серое на сером не читается
+  .header[data-tone='light'] {
+    --hdr-glass: oklch(15% 0.008 60deg / 84%);
+    --hdr-glass-solid: oklch(15% 0.008 60deg / 90%);
+    --hdr-fg-2: oklch(88% 0.004 255deg);
   }
 
   // Скрим под открытыми панелями: плоская затемняющая заливка, без размытия
@@ -103,9 +105,22 @@
   .header__bar {
     position: relative;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     align-items: stretch;
     min-block-size: var(--bar-h);
+  }
+
+  .header__call {
+    display: grid;
+    place-items: center;
+    inline-size: var(--bar-h);
+    color: var(--accent-hi);
+    text-decoration: none;
+  }
+
+  .header__call-icon {
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
   }
 
   .header__bar::before {
@@ -242,7 +257,6 @@
   .header__phone {
     padding: 0.7rem 0.75rem;
     margin-inline-start: -0.75rem;
-    font-family: var(--font-mono);
     font-size: var(--fs-s);
     font-variant-numeric: tabular-nums;
     color: var(--hdr-fg-2);
@@ -367,7 +381,7 @@
     padding: 0.4rem 0;
     font-family: var(--font-display);
     font-size: clamp(1.75rem, 1.2rem + 1.4vw, 2.5rem);
-    font-weight: 260;
+    font-weight: 400;
     color: var(--hdr-fg);
     background: transparent;
     border: 0;
@@ -464,7 +478,7 @@
     padding-block: 0.7rem;
     font-family: var(--font-display);
     font-size: var(--fs-xl);
-    font-weight: 260;
+    font-weight: 400;
     color: inherit;
     text-transform: uppercase;
     text-decoration: none;
@@ -538,7 +552,8 @@
 
   // Рабочий вид от 1280 px
   @media (width >= 1280px) {
-    .header__burger {
+    .header__burger,
+    .header__call {
       display: none;
     }
 
@@ -782,7 +797,7 @@
       display: block;
       font-family: var(--font-display);
       font-size: clamp(2.6rem, 1.8rem + 2vw, 4.25rem);
-      font-weight: 220;
+      font-weight: 300;
       line-height: 0.95;
       text-transform: uppercase;
     }
@@ -816,7 +831,7 @@
       margin-inline: -0.75rem;
       font-family: var(--font-display);
       font-size: clamp(1.3rem, 1.05rem + 0.5vw, 1.65rem);
-      font-weight: 260;
+      font-weight: 400;
       line-height: 1.05;
       color: var(--hdr-fg);
       text-transform: uppercase;
@@ -854,7 +869,7 @@
       justify-content: flex-start;
       padding-block: 0;
       font-size: clamp(1.6rem, 1.2rem + 0.8vw, 2.1rem);
-      font-weight: 260;
+      font-weight: 400;
       line-height: 1;
     }
 

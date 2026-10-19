@@ -10,9 +10,14 @@
     --c-white: #fcfdfe;
     --c-gray: #b9bbbe;
     --c-light: #eceef1;
-    --accent: #c8603d;
+
+    // Акцент: заливка кнопок и плит (белый текст на ней 4,7:1). Для самого текста акцент светлеет на тёмном и темнеет на светлом,
+    // иначе контраст ниже 4,5:1
+    --accent: #b85533;
     --accent-deep: var(--accent);
-    --accent-text: var(--accent);
+    --accent-hi: #e07d58;
+    --accent-lo: #a64a2b;
+    --accent-text: var(--accent-hi);
 
     // Тёмный контекст (по умолчанию): все поверхности чёрные, текст белый, второстепенный текст и линии серые.
     // Имена --paper-N сохранены, значения сплошные: от 80 и выше белый, 55–75 серый, до 35 чёрный (то есть «ничего»).
@@ -50,21 +55,20 @@
     --focus-fill: var(--c-black);
 
     // Стекло поверх фото: как было, не меняется (владелец: «стекла не трогай»). Плоская заливка, без градиента.
-    --glass-dark: oklch(17% 0.008 60deg / 44%);
-    --glass-dark-strong: oklch(15.5% 0.008 255deg / 52%);
-    --glass-clear: oklch(15.5% 0.008 255deg / 20%);
-    --glass-accent: #c8603dcc;
-    --accent-glass: #c8603db8;
-    --glass-blur: blur(5px) saturate(1.5);
-    --glass-blur-strong: blur(6px);
+    --glass-dark: oklch(17% 0.008 60deg / 60%);
+    --glass-dark-strong: oklch(15.5% 0.008 255deg / 74%);
+    --glass-clear: oklch(15.5% 0.008 255deg / 36%);
+    --glass-accent: #b85533d9;
+    --accent-glass: #b85533cc;
+    --glass-blur: blur(12px) saturate(1.15);
+    --glass-blur-strong: blur(14px) saturate(1.1);
 
-    // Шрифты как в hero: заголовки Oswald, текст Manrope, моноширинный только для данных
+    // Шрифты: заголовки Oswald, текст и данные Manrope (цифры одной ширины через tabular-nums), больше семейств нет
     --font-display: 'Oswald Fit', 'Oswald Variable', 'Arial Narrow', sans-serif;
     --font-text: 'Manrope Variable', system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
     // Размеры текста. Заголовки узкие, поэтому крупнее прежних
-    --fs-xs: 0.75rem;
+    --fs-xs: 0.8125rem;
     --fs-s: 0.875rem;
     --fs-m: 1rem;
     --fs-l: clamp(1.0625rem, 1rem + 0.3vw, 1.3125rem);
@@ -115,7 +119,7 @@
     --site-line: var(--c-gray);
     --site-field: var(--c-black);
     --site-field-hover: var(--c-black);
-    --site-accent-text: var(--accent);
+    --site-accent-text: var(--accent-hi);
     --site-btn-line: var(--c-gray);
     --site-halo: var(--c-black);
     --site-hover-fill: var(--accent);
@@ -133,7 +137,7 @@
     --site-line: var(--c-gray);
     --site-field: var(--c-white);
     --site-field-hover: var(--c-light);
-    --site-accent-text: var(--accent);
+    --site-accent-text: var(--accent-lo);
     --site-btn-line: var(--c-black);
     --site-halo: var(--c-white);
     --site-hover-fill: var(--c-white);
@@ -155,7 +159,7 @@
     --field-hover: var(--c-black);
     --hover-fill: var(--accent);
     --focus-fill: var(--c-black);
-    --accent-text: var(--accent);
+    --accent-text: var(--accent-hi);
     --btn-line: var(--c-gray);
     --btn-hover-bg: var(--paper);
     --btn-hover-fg: var(--ink);

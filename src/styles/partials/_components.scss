@@ -109,7 +109,7 @@
   }
 
   .button--compact {
-    min-block-size: 2.5rem;
+    min-block-size: 2.75rem;
     padding-inline: 1.1rem;
     font-size: var(--fs-s);
   }
@@ -127,7 +127,6 @@
 
   .button__badge {
     padding: 0.2rem 0.45rem;
-    font-family: var(--font-mono);
     font-size: var(--fs-xs);
     font-variant-numeric: tabular-nums;
     background: color-mix(in oklch, var(--c-black) 24%, transparent);
@@ -186,8 +185,7 @@
   }
 
   .field__control::placeholder {
-    color: var(--fg-2);
-    opacity: 0.7;
+    color: color-mix(in oklch, var(--fg-2) 72%, transparent);
   }
 
   .field__control--area {
@@ -423,7 +421,7 @@
     align-items: baseline;
     font-family: var(--font-display);
     font-size: var(--fs-xl);
-    font-weight: 260;
+    font-weight: 400;
   }
 
   .range__value--input {

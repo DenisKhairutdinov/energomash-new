@@ -24,7 +24,6 @@ export const initHero = (ready: Promise<void>): void => {
   const sides = gsap.utils.toArray<HTMLElement>('[data-hero-side]', hero)
   // Стеклянные плашки анимируются сами, а не через общий контейнер: прозрачность контейнера делает его «корнем фона»,
   // и размытие у плашек внутри пропадает до конца анимации
-  const links = gsap.utils.toArray<HTMLElement>('.hero__utp [data-hero-glass]', hero)
   const panels = gsap.utils.toArray<HTMLElement>('.hero__bottom [data-hero-glass]', hero)
   const bottom = hero.querySelector<HTMLElement>('.hero__bottom')
 
@@ -44,12 +43,6 @@ export const initHero = (ready: Promise<void>): void => {
         { y: 36, autoAlpha: 0 },
         { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.14 },
         0.8,
-      )
-      .fromTo(
-        links,
-        { y: 36, autoAlpha: 0 },
-        { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.08 },
-        0.94,
       )
       .fromTo(
         panels,

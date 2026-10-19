@@ -133,7 +133,7 @@
   .purposes__number {
     font-family: var(--font-display);
     font-size: clamp(2.5rem, 1rem + 2.6vw, 4.25rem);
-    font-weight: 260;
+    font-weight: 300;
     font-variant-numeric: tabular-nums;
     line-height: 0.9;
   }
@@ -149,7 +149,7 @@
     max-inline-size: 100%;
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 1rem + 1.2vw, 2.9rem);
-    font-weight: 240;
+    font-weight: 400;
     line-height: 0.98;
     text-transform: uppercase;
     overflow-wrap: anywhere;

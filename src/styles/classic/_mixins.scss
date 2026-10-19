@@ -10,7 +10,7 @@
   --btn-ink-fg: var(--ink);
   --field: color-mix(in oklch, var(--c-white) 7%, transparent);
   --field-hover: color-mix(in oklch, var(--c-white) 12%, transparent);
-  --accent-text: var(--accent);
+  --accent-text: var(--accent-hi);
   --btn-line: color-mix(in oklch, var(--c-white) 45%, transparent);
   --btn-hover-bg: var(--paper);
   --btn-hover-fg: var(--ink);
@@ -51,7 +51,7 @@
 // «Морозное» стекло: ровная полупрозрачная подложка и размытие с насыщением. Без рамок и градиентов: объём даёт мягкая тень.
 @mixin glass($strength: 'dark') {
   background: var(--glass-dark);
-  backdrop-filter: var(--glass-blur) saturate(1.5);
+  backdrop-filter: var(--glass-blur);
 
   @if $strength == 'strong' {
     background: var(--glass-dark-strong);

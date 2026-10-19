@@ -35,10 +35,10 @@
 
   // Двухтоновая фраза: яркая основа, приглушённое продолжение (приём Oxide)
   .footer__statement {
-    max-inline-size: 22ch;
+    max-inline-size: 26ch;
     font-family: var(--font-display);
-    font-size: var(--fs-title-s);
-    font-weight: 240;
+    font-size: clamp(2rem, 1rem + 2.6vw, 3.5rem);
+    font-weight: 300;
     line-height: 0.98;
     text-transform: uppercase;
     text-wrap: balance;
@@ -83,7 +83,7 @@
   .footer__phone {
     font-family: var(--font-display);
     font-size: var(--fs-xl);
-    font-weight: 260;
+    font-weight: 400;
     font-variant-numeric: tabular-nums;
     color: var(--fg);
     text-decoration: none;
@@ -110,7 +110,6 @@
   }
 
   .footer__data {
-    font-family: var(--font-mono);
     font-size: var(--fs-s);
     font-variant-numeric: tabular-nums;
   }
