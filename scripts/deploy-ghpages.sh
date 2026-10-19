@@ -2,6 +2,9 @@
 # Деплой на GitHub Pages (ветка gh-pages, адрес https://deniskhairutdinov.github.io/energomash-new/).
 # Собирает сайт с базой /energomash-new/, дописывает базу к корневым ссылкам страниц и заливает dist в ветку gh-pages.
 set -e
+# Git Bash на Windows превращает аргумент вида /energomash-new/ в путь C:/Program Files/Git/energomash-new/ и ломает ссылки на стили и скрипты
+export MSYS_NO_PATHCONV=1
+export MSYS2_ARG_CONV_EXCL='*'
 BASE=/energomash-new/
 npm run sitemap
 npm run typecheck
