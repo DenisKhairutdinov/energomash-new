@@ -113,30 +113,22 @@
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
-    filter: grayscale(1);
     transform: scale(1.04);
-    transition:
-      filter 0.7s var(--ease-out),
-      transform 1.2s var(--ease-out);
+    transition: transform 1.2s var(--ease-out);
   }
 
+  // Цветность фото и затемнение задаёт cinema.ts по положению кадра в ленте (--dim, проценты черного, и filter у фото);
+  // без скрипта (телефон, reduced motion) фото цветные
   .shipments__link::after {
     position: absolute;
     inset: 0;
     z-index: -1;
     content: '';
-    background: color-mix(in oklch, var(--c-black) 44%, transparent);
-    transition: background-color 0.6s var(--ease-out);
-  }
-
-  .shipments__link:hover::after,
-  .shipments__link:focus-visible::after {
-    background: color-mix(in oklch, var(--c-black) 10%, transparent);
+    background: color-mix(in oklch, var(--c-black) calc(var(--dim, 10) * 1%), transparent);
   }
 
   .shipments__link:hover .shipments__image,
   .shipments__link:focus-visible .shipments__image {
-    filter: none;
     transform: none;
   }
 

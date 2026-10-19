@@ -214,11 +214,31 @@ export const initCinema = (): void => {
       above.style.zIndex = '1'
     }
 
+    // Цвет фото зависит от положения кадра в окне ленты: кадр у левого края цветной, чем дальше от него (в любую сторону), тем серее;
+    // при прокрутке цвет плавно переходит от уходящего кадра к следующему
+    const items = [...track.querySelectorAll<HTMLElement>('.shipments__link')]
+    const tint = (): void => {
+      const left = viewport.getBoundingClientRect().left
+
+      for (const link of items) {
+        const box = link.getBoundingClientRect()
+        const gray = Math.min(Math.abs(box.left - left) / Math.max(box.width, 1), 1)
+        const image = link.querySelector<HTMLElement>('.shipments__image')
+
+        if (image) {
+          image.style.filter = `grayscale(${gray.toFixed(3)})`
+        }
+
+        link.style.setProperty('--dim', (10 + 34 * gray).toFixed(1))
+      }
+    }
+
     const follow = (self: ScrollTrigger): void => {
       const length = self.end - self.start
 
       setAbove?.(self.progress * length)
       setBelow?.(-(1 - self.progress) * length)
+      tint()
     }
 
     gsap.to(track, {
@@ -240,6 +260,11 @@ export const initCinema = (): void => {
     })
 
     return () => {
+      for (const link of items) {
+        link.style.removeProperty('--dim')
+        link.querySelector<HTMLElement>('.shipments__image')?.style.removeProperty('filter')
+      }
+
       gsap.set(
         [above, below].filter((item) => item instanceof HTMLElement),
         {
