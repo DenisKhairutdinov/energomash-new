@@ -825,24 +825,41 @@
     transform: translateX(0.3rem);
   }
 
-  // В сетке «Узнать стоимость» у позиций не в наличии появляется при наведении (на сенсорных показана всегда), у позиций в наличии видна
+  // В сетке на мыши видно только название: характеристики и «Узнать стоимость» выезжают снизу при наведении на карточку (на сенсорных видны всегда)
   @media (hover: hover) and (pointer: fine) {
-    .catalog__list[data-view='grid'] .ccard:not(.ccard--stock) .ccard__price {
-      opacity: 0;
-      transform: translateY(0.4rem);
-      transition:
-        opacity 0.3s var(--ease-out),
-        transform 0.3s var(--ease-out),
-        color 0.4s var(--ease-out);
+    .catalog__list[data-view='grid'] .ccard__body {
+      gap: 0;
     }
 
-    .catalog__list[data-view='grid'] .ccard:not(.ccard--stock) .ccard__inner:hover .ccard__price,
-    .catalog__list[data-view='grid']
-      .ccard:not(.ccard--stock)
-      .ccard__inner:focus-within
-      .ccard__price {
+    .catalog__list[data-view='grid'] .ccard__specs,
+    .catalog__list[data-view='grid'] .ccard__actions {
+      max-block-size: 0;
+      padding-block-start: 0;
+      overflow: clip;
+      visibility: hidden;
+      opacity: 0;
+      transform: translateY(0.6rem);
+      transition:
+        max-block-size 0.45s var(--ease-out),
+        padding-block-start 0.45s var(--ease-out),
+        opacity 0.3s var(--ease-out),
+        transform 0.45s var(--ease-out),
+        visibility 0s 0.45s;
+    }
+
+    .catalog__list[data-view='grid'] .ccard__inner:is(:hover, :focus-within) .ccard__specs,
+    .catalog__list[data-view='grid'] .ccard__inner:is(:hover, :focus-within) .ccard__actions {
+      max-block-size: 6rem;
+      padding-block-start: 0.4rem;
+      visibility: visible;
       opacity: 1;
       transform: none;
+      transition:
+        max-block-size 0.45s var(--ease-out),
+        padding-block-start 0.45s var(--ease-out),
+        opacity 0.3s 0.08s var(--ease-out),
+        transform 0.45s var(--ease-out),
+        visibility 0s;
     }
   }
 
