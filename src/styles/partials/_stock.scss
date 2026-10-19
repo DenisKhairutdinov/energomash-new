@@ -149,7 +149,7 @@
     gap: 1rem;
     align-items: center;
     justify-content: space-between;
-    padding: clamp(0.5rem, 1.6svh, 0.9rem) 1rem;
+    padding: clamp(0.4rem, 1.2svh, 0.65rem) 1rem;
   }
 
   // Вся строка модели ссылка: подсветка при наведении и фокусе на всей площади
@@ -161,7 +161,7 @@
   .stock__model {
     min-inline-size: 0;
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 4.2svh, 3.4rem);
+    font-size: clamp(1.35rem, 3.4svh, 2.5rem);
     font-weight: 300;
     line-height: 1;
     text-transform: uppercase;
@@ -192,7 +192,7 @@
   .stock__body-in {
     display: grid;
     visibility: hidden;
-    gap: 1rem;
+    gap: 0.6rem;
     min-block-size: 0;
     padding-inline: 1rem;
     overflow: clip;
@@ -204,7 +204,7 @@
 
   .stock__item.is-active .stock__body-in {
     visibility: visible;
-    padding-block-end: 0.85rem;
+    padding-block-end: 0.65rem;
     opacity: 1;
     transition:
       opacity 0.5s var(--ease-out) 0.15s,
@@ -219,13 +219,13 @@
   .stock__specs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem 1.5rem;
-    padding-block: 0.25rem;
+    gap: 0.6rem 1.25rem;
+    padding-block: 0;
   }
 
   .stock__spec {
     display: grid;
-    gap: 0.2rem;
+    gap: 0.1rem;
   }
 
   .stock__spec-label {
@@ -236,7 +236,7 @@
 
   .stock__spec-value {
     font-family: var(--font-display);
-    font-size: clamp(1.25rem, 2.4svh, 1.8rem);
+    font-size: clamp(1.1rem, 2svh, 1.5rem);
     font-weight: 300;
     font-variant-numeric: tabular-nums;
     line-height: 1;

@@ -289,6 +289,7 @@
 .picker__field--volume {
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 1rem;
+  align-content: center;
   align-items: center;
   min-block-size: var(--pick-h);
 }
@@ -448,6 +449,11 @@
 
   .picker__field--type {
     grid-column: span 8;
+  }
+
+  // Чипы типа груза прижаты к правому краю панели
+  .picker__field--purpose .picker__chips {
+    justify-content: flex-end;
   }
 
   .picker__field--purpose {

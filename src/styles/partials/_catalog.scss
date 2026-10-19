@@ -136,10 +136,6 @@
       background-color 0.3s;
   }
 
-  .ctype:hover .ctype__body {
-    background: var(--c-gray);
-  }
-
   .ctype__input:checked + .ctype__body {
     color: var(--c-white);
     background: var(--c-black);
@@ -173,6 +169,18 @@
     inset-inline-end: -1.5rem;
     inline-size: 62%;
     color: var(--c-gray);
+    transition: transform 0.9s var(--ease-out);
+  }
+
+  // Наведение: фон плитки не меняется, чертёж едет по X влево
+  .ctype:hover .ctype__drawing {
+    transform: translateX(-1.25rem);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ctype:hover .ctype__drawing {
+      transform: none;
+    }
   }
 
   // ---------- Параметры фильтра
