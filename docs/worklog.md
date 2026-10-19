@@ -645,3 +645,8 @@ Hero в целом остаётся, правки точечные (стили �
 - **Блог:** у кнопки «Все статьи» при наведении текст становится чёрным (селектор варианта перебивал ховер).
 - **Страница модели:** характеристики остаются на первом экране, теперь плитками; «Похожие модели» горизонтальными карточками (фото слева, при наведении чёрные).
 - Не проверено: мобильная ширина страницы модели, реальный старый ПК (замеры только в headless Chrome).
+
+## 2026-10-19: маркетинговые скиллы
+
+- Из `deny` в `.claude/settings.json` убраны 28 маркетинговых скиллов проекта (`ad-creative`, `ads`, `aso`, `attribution`, `churn-prevention`, `co-marketing`, `cold-email`, `community-marketing`, `directory-submissions`, `emails`, `events`, `free-tools`, `influencer-marketing`, `launch`, `marketing-council`, `marketing-loops`, `marketing-plan`, `onboarding`, `paywalls`, `pricing`, `prospecting`, `public-relations`, `referrals`, `revops`, `sales-enablement`, `signup`, `sms`, `social`). Раздел в `CLAUDE.md` и `docs/other-skills.md` обновлён. Вступает в силу в новой сессии.
+- Деплой: Git Bash превращал `--base=/energomash-new/` в `C:/Program Files/Git/...`; в `scripts/deploy-ghpages.sh` добавлен `MSYS_NO_PATHCONV=1`. Сайт пересобран и залит (стили и скрипты отдаются). Если `git commit` в скрипте падает с segfault, залить `dist` в `gh-pages` вручную обычным `git`.

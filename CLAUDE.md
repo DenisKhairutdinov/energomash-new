@@ -19,7 +19,8 @@ Vite + TypeScript, без фреймворка (vanilla-ts).
 - Для дизайна, редизайна и анимаций используй только `impeccable`, `taste-skill` (Leonxlnx, внутри `design-taste-frontend`) и `animate` (Эмиль Ковальски).
 - GSAP включён: `gsap-core`, `gsap-timeline`, `gsap-scrolltrigger`, `gsap-plugins`, `gsap-utils`, `gsap-performance`. `gsap-react` и `gsap-frameworks` остаются отключены (стек без фреймворка).
 - Маркетинговые скиллы включены с 2026-10-18 для наполнения сайта контентом: `copywriting`, `copy-editing`, `content-strategy`, `seo`, `seo-audit`, `ai-seo`, `schema`, `site-architecture`, `cro`, `marketing-psychology`, `offers`, `popups`, `analytics`, `ab-testing`, `customer-research`, `competitors`, `competitor-profiling`, `brand`, `product-marketing`, `marketing-ideas`, `lead-magnets`, `programmatic-seo`, `yandex-direct`. Вызывай их перед текстами и структурой страниц.
-- Все остальные скиллы отключены (`permissions.deny` в `.claude/settings.json`) и не используются.
+- Остальные маркетинговые скиллы включены с 2026-10-19 (владелец): `ad-creative`, `ads`, `aso`, `attribution`, `churn-prevention`, `co-marketing`, `cold-email`, `community-marketing`, `directory-submissions`, `emails`, `events`, `free-tools`, `influencer-marketing`, `launch`, `marketing-council`, `marketing-loops`, `marketing-plan`, `onboarding`, `paywalls`, `pricing`, `prospecting`, `public-relations`, `referrals`, `revops`, `sales-enablement`, `signup`, `sms`, `social`. Вызывай по задаче; те, что заточены под SaaS (`signup`, `onboarding`, `paywalls`, `churn-prevention`, `aso`), на B2B-витрине применяй только там, где задача действительно про это.
+- Остальные (не маркетинговые и не дизайнерские) скиллы отключены (`permissions.deny` в `.claude/settings.json`) и не используются.
 - Правило сбора референсов (Awwwards и остальные источники) снято: референсы перед задачей не собирай.
 - Чтобы вернуть остальные скиллы, удали блок `deny` в `.claude/settings.json` и перепиши этот раздел.
 
@@ -41,7 +42,7 @@ Vite + TypeScript, без фреймворка (vanilla-ts).
 - Доступность: планка WCAG 2.2 AA, даже если скилл называет 2.1.
 - Анимация: сначала нативный CSS, GSAP для сложных последовательностей, pin и scrub.
 - `front-comments`, `front-refactor` запускать только по прямой просьбе.
-- Не применять: SaaS-маркетинг (signup, onboarding, paywalls, churn, ASO и т. п.), `raaaf-*`, `gh-cli`, `vite-agents-project-scaffolder`, `gsap-react`, `gsap-frameworks`.
+- Не применять: `raaaf-*`, `gh-cli`, `vite-agents-project-scaffolder`, `gsap-react`, `gsap-frameworks`.
 
 ## Типографика текста
 

@@ -31,8 +31,8 @@
 
 Сайт производителя цистерн (B2B, Россия), vanilla Vite, нет репозитория и нет приложений.
 
-- **SaaS-маркетинг:** `signup`, `onboarding`, `paywalls`, `churn-prevention`, `referrals`, `aso`, `attribution`, `revops`, `free-tools`, `directory-submissions`, `marketing-loops`.
-- **Зарубежные каналы:** `ads` (Google, Meta, LinkedIn), `cold-email`, `sms`, `social`, `influencer-marketing`, `public-relations`, `co-marketing`, `community-marketing`, `events`, `launch`: по запросу, не по умолчанию.
+- **Маркетинговые скиллы включены** (владелец, 2026-10-19, убраны из `deny`), но выбирай по задаче, не вызывай подряд. Заточены под SaaS и приложения, поэтому на B2B-витрине применяются только там, где задача про это: `signup`, `onboarding`, `paywalls`, `churn-prevention`, `referrals`, `aso`, `attribution`, `revops`, `free-tools`, `directory-submissions`, `marketing-loops`.
+- **Зарубежные каналы:** `ads` (Google, Meta, LinkedIn), `cold-email`, `sms`, `social`, `influencer-marketing`, `public-relations`, `co-marketing`, `community-marketing`, `events`, `launch`: брать по запросу и адаптировать под российский рынок (Яндекс Директ, Telegram, VK).
 - **Процесс чужого репозитория и приложений:** `raaaf-*` (особенно `raaaf-delegate`: объявляет себя «режимом работы по умолчанию»; не включать без запроса), `gh-cli`, `agentic-actions-auditor`, `raaaf-store-assets`.
 - **Каркас проекта:** `vite-agents-project-scaffolder`: проект уже создан, повторно не запускать.
 - **React и фреймворки:** `gsap-react`, `gsap-frameworks`.
