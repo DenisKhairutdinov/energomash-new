@@ -1,14 +1,11 @@
-{# Подвал на 12 колонках: утверждение и звонок (1–8, 10–12), блоки: связь, разделы и «Покупателю» рядом, адреса, реквизиты; правовая строка. Слово завода убрано. #}
-{% from "icons.njk" import icon %}
-{% from "plural.njk" import plural %}
+{# Подвал: логотип и утверждение слева, звонок справа; ниже контакты, навигация, адреса, реквизиты и правовая строка. #}
 <footer class="footer theme-dark" data-footer>
   <div class="footer__top container grid">
     <a class="footer__logo" href="/" aria-label="Энергомаш, на главную">
       <span class="footer__logo-mark" aria-hidden="true"></span>
     </a>
     <p class="footer__statement">
-      Завод-производитель полуприцепов-цистерн и автоцистерн.
-      <span>{{ home.catalogTotals.total }} {{ plural(home.catalogTotals.total, "модель", "модели", "моделей") }} в каталоге, {{ home.catalogTotals.inStock }} {{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} в наличии.</span>
+      Завод-производитель<br />полуприцепов-цистерн и автоцистерн
     </p>
     <div class="footer__call">
       <button class="button" type="button" data-modal-open="call">
