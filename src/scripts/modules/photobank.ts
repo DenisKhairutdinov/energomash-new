@@ -1,5 +1,7 @@
 import logoUrl from '../../assets/images/logo.svg?url'
 
+import { runWhenIdle } from './preload'
+
 /**
  * Фотобанк: мозаика из фотографий техники в форме логотипа «Энергомаш».
  * Наведение показывает кадр, клик открывает его крупно (dialog со стрелками и клавиатурой).
@@ -58,6 +60,14 @@ const LETTER_EDGES = [0.08, 0.19, 0.31, 0.4, 0.5, 0.61, 0.75, 0.87, 1]
 // для посетителя. Общий уровень = число фото / ёмкость; у каждой части он свой, поэтому заполнение выглядит живым.
 const CAPACITY = 24
 const FILL = Math.min(1, PHOTOS.length / CAPACITY)
+
+/** Прогрев во время интро: миниатюры и логотип мозаики загружаются заранее (мозаика строится после интро). */
+export function warmPhotobank(): void {
+  runWhenIdle(() => {
+    for (const photo of PHOTOS) new Image().src = thumbOf(photo.file)
+    new Image().src = logoUrl
+  })
+}
 
 // Тип элемента задаёт вызывающий: так не нужны приведения типов на каждой выборке
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters

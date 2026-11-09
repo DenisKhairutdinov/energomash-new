@@ -1,22 +1,11 @@
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { getLenis } from './smooth'
-
-const DESKTOP_QUERY = '(min-width: 900px) and (prefers-reduced-motion: no-preference)'
-const SNAP_IN = 0.6
-const SNAP_OUT = 0.4
-const SETTLE_MS = 260
-const SNAP_SECONDS = 1.1
-const GESTURE_GAP_MS = 220
-const INPUT_WINDOW_MS = 700
-const REARM_DISTANCE = 60
-const RELEASE_GAIN = 1
-const NAV_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '])
-
 const ACTIVE = 'is-active'
 const PLAYING = 'is-playing'
 
-const initSticky = (root: HTMLElement): void => {
+/**
+ * Шапка прячется, пока блок «Техника в наличии» виден больше чем наполовину.
+ * Прокрутка блоком не удерживается и не «примагничивается»: страница едет без задержек (убрано по просьбе владельца 2026-11-09).
+ */
+const initHeaderAway = (root: HTMLElement): void => {
   const header = document.querySelector<HTMLElement>('[data-header]')
 
   new IntersectionObserver(
@@ -25,153 +14,6 @@ const initSticky = (root: HTMLElement): void => {
     },
     { threshold: [0, 0.25, 0.5, 0.75, 1] },
   ).observe(root)
-
-  gsap.registerPlugin(ScrollTrigger)
-
-  gsap.matchMedia().add(DESKTOP_QUERY, () => {
-    const lenis = getLenis()
-
-    if (!lenis) {
-      return undefined
-    }
-
-    let top = root.getBoundingClientRect().top + window.scrollY
-    let lastScroll = lenis.scroll
-    let lastInput = 0
-    let lastWheel = 0
-    let direction = 1
-    let held = false
-    let armed = true
-    let idle: number | undefined
-
-    const measure = (): void => {
-      top = root.getBoundingClientRect().top + window.scrollY
-    }
-
-    const hold = (): void => {
-      held = true
-      lenis.scrollTo(top, { immediate: true, force: true })
-      lenis.stop()
-    }
-
-    // Новая серия: Lenis снова слушает колесо, первому движению серии добавляем его величину, чтобы отклик не терялся
-    const release = (delta: number): void => {
-      held = false
-      armed = false
-      lenis.start()
-
-      if (delta !== 0) {
-        lenis.scrollTo(top + delta * RELEASE_GAIN, { duration: 0.4 })
-      }
-    }
-
-    const onWheel = (event: WheelEvent): void => {
-      const now = performance.now()
-      const gap = now - lastWheel
-
-      lastWheel = now
-      lastInput = now
-
-      if (held && gap > GESTURE_GAP_MS) {
-        release(event.deltaY)
-      }
-    }
-
-    const onKey = (event: KeyboardEvent): void => {
-      if (!NAV_KEYS.has(event.key)) {
-        return
-      }
-
-      lastInput = performance.now()
-
-      if (held) {
-        release(
-          event.key === 'ArrowUp' || event.key === 'PageUp' || event.key === 'Home' ? -120 : 120,
-        )
-      }
-    }
-
-    const goTo = (y: number): void => {
-      lenis.scrollTo(y, { duration: SNAP_SECONDS, easing: (x) => 1 - (1 - x) ** 3 })
-    }
-
-    // Мягкое примагничивание: только когда прокрутка остановилась и только в сторону движения (пользователя не тянет назад)
-    const settle = (): void => {
-      if (held) {
-        return
-      }
-
-      const y = lenis.scroll
-      const vh = window.innerHeight
-
-      if (direction > 0 && y < top - 4 && top - y <= vh * SNAP_IN) {
-        goTo(top)
-      } else if (direction < 0 && y > top + 4 && y - top <= vh * SNAP_OUT) {
-        goTo(top)
-      }
-    }
-
-    const onScroll = (): void => {
-      const scroll = lenis.scroll
-      const previous = lastScroll
-
-      lastScroll = scroll
-
-      if (Math.abs(scroll - previous) > 0.5) {
-        direction = scroll > previous ? 1 : -1
-      }
-
-      if (held) {
-        if (Math.abs(scroll - top) > 1) {
-          lenis.scrollTo(top, { immediate: true, force: true })
-        }
-
-        return
-      }
-
-      if (!armed) {
-        if (Math.abs(scroll - top) > REARM_DISTANCE) {
-          armed = true
-        }
-
-        return
-      }
-
-      // Секция достигнута (пересечена граница «ровно от верха до низа») вслед за колёсиком или клавишей: залипаем
-      const crossed = (previous - top) * (scroll - top) <= 0 && previous !== scroll
-
-      if (crossed && performance.now() - lastInput < INPUT_WINDOW_MS) {
-        hold()
-
-        return
-      }
-
-      window.clearTimeout(idle)
-      idle = window.setTimeout(settle, SETTLE_MS)
-    }
-
-    const off = lenis.on('scroll', onScroll)
-
-    window.addEventListener('wheel', onWheel, { passive: true })
-    window.addEventListener('keydown', onKey)
-    window.addEventListener('resize', measure)
-    ScrollTrigger.addEventListener('refresh', measure)
-
-    if (import.meta.env.DEV) {
-      // Для проверки в браузере: window.stockHold() возвращает состояние
-      Reflect.set(window, 'stockHold', () => ({ held, armed, top }))
-    }
-
-    return () => {
-      window.clearTimeout(idle)
-      off()
-      window.removeEventListener('wheel', onWheel)
-      window.removeEventListener('keydown', onKey)
-      window.removeEventListener('resize', measure)
-      ScrollTrigger.removeEventListener('refresh', measure)
-      lenis.start()
-    }
-  })
 }
 
 /** Слайдер техники: широкое фото, сведения о модели и ручное или автоматическое переключение. */
@@ -293,5 +135,5 @@ export const initSlider = (): void => {
   ).observe(root)
 
   show(0)
-  initSticky(root)
+  initHeaderAway(root)
 }

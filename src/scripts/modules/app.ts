@@ -12,6 +12,7 @@ import { initIntro } from './intro'
 import { initLeasing } from './leasing'
 import { initModal } from './modal'
 import { initPerformance } from './perf'
+import { preloadDuringIntro } from './preload'
 import { initPicker } from './picker'
 import { initJump } from './jump'
 import { initProduct } from './product'
@@ -25,8 +26,8 @@ import { initVariants } from './variants'
 import { initTheme } from './theme'
 import { initWow } from './wow'
 
-/** Общий запуск всех модулей страницы. */
-export const startApp = (): void => {
+/** Общий запуск всех модулей страницы. Возвращает промис, который разрешается, когда интро открыло страницу (без интро сразу). */
+export const startApp = (): Promise<void> => {
   initPerformance()
   initSmoothScroll()
   initGridOverlay()
@@ -50,11 +51,17 @@ export const startApp = (): void => {
   initReveal()
   initWow()
 
-  initHero(initIntro())
+  const introDone = initIntro()
+
+  initHero(introDone)
   initCinema()
+  // Пока играет интро, сайт догружается
+  preloadDuringIntro()
 
   // Фото меняют высоту секций после загрузки: пересчитываем позиции триггеров
   window.addEventListener('load', () => {
     ScrollTrigger.refresh()
   })
+
+  return introDone
 }

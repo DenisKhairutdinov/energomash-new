@@ -3,15 +3,35 @@ import { getLenis } from './smooth'
 
 const SESSION_KEY = 'energomash-intro-v1'
 
-/** Draw the brand, hold briefly, then reveal the home page. */
+/** Интро считается показанным с момента старта: перезагрузка, переходы по сайту и возврат на главную его не повторяют (один раз за сессию). */
+const markSeen = (): void => {
+  try {
+    sessionStorage.setItem(SESSION_KEY, 'seen')
+  } catch {
+    /* Storage may be unavailable. */
+  }
+}
+
+/**
+ * Интро полностью закончено: чёрный экран растворился и убран (без интро разрешается сразу). Тяжёлые модули (3D-помощник,
+ * фотобанк) стартуют только после этого, чтобы их работа не попадала на растворение и не вызывала подёргивание.
+ */
+let resolveFinished: () => void = () => undefined
+export const introFinished = new Promise<void>((resolve) => {
+  resolveFinished = resolve
+})
+
+/** Draw the brand, hold briefly, then reveal the home page. Разрешается, когда интро открыло страницу. */
 export function initIntro(): Promise<void> {
   const root = document.documentElement
   const overlay = document.querySelector<HTMLElement>('[data-intro]')
   const hero = document.querySelector<HTMLElement>('[data-hero]')
   if (!overlay || !hero || !root.hasAttribute('data-intro-pending')) {
     root.removeAttribute('data-intro-pending')
+    resolveFinished()
     return Promise.resolve()
   }
+  markSeen()
 
   return new Promise<void>((resolve) => {
     const select = (name: string): HTMLElement | null =>
@@ -42,15 +62,15 @@ export function initIntro(): Promise<void> {
       reduced.removeEventListener('change', finish)
       for (const node of siblings) node.inert = false
       overlay.remove()
+      // Сначала сообщаем, что страница открыта, и только потом снимаем атрибуты: иначе reveal() заново выставит
+      // data-intro-revealing, и шапка проявлялась бы уже после интро
+      reveal()
       root.removeAttribute('data-intro-pending')
       root.removeAttribute('data-intro-revealing')
+      root.removeAttribute('data-intro-warm')
       getLenis()?.start()
-      try {
-        sessionStorage.setItem(SESSION_KEY, 'seen')
-      } catch {
-        /* Storage may be unavailable. */
-      }
-      reveal()
+      markSeen()
+      resolveFinished()
       if (
         document.activeElement === document.body ||
         document.activeElement === overlay ||
@@ -60,8 +80,17 @@ export function initIntro(): Promise<void> {
           previousFocus.focus({ preventScroll: true })
       }
     }
+    // Пропуск (кнопка, Escape): не обрываем кадр, а плавно открываем страницу за 0,7 с
+    let fading = false
+    const fadeOut = (): void => {
+      if (finished || fading) return
+      fading = true
+      timeline.pause()
+      reveal()
+      gsap.to(overlay, { opacity: 0, duration: 0.7, ease: 'power2.inOut', onComplete: finish })
+    }
     const onKey = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') finish()
+      if (event.key === 'Escape') fadeOut()
       if (event.key === 'Tab') {
         event.preventDefault()
         skip?.focus()
@@ -71,7 +100,7 @@ export function initIntro(): Promise<void> {
       finish()
     }
     const watchdog = window.setTimeout(finish, 14000)
-    skip?.addEventListener('click', finish)
+    skip?.addEventListener('click', fadeOut)
     window.addEventListener('keydown', onKey)
     window.addEventListener('resize', onResize)
     window.addEventListener('pagehide', finish)
@@ -123,8 +152,18 @@ export function initIntro(): Promise<void> {
       .to(select('sheen'), { x: 180, duration: 1.2, ease: 'power1.inOut' }, 5.1)
       .set(select('sheen'), { autoAlpha: 0 }, 6.3)
       .to(select('brand'), { opacity: 0, y: -12, duration: 0.8 }, 6.75)
+      // Прогрев: страница рисуется под непрозрачным чёрным экраном заранее (первая отрисовка всей страницы тяжёлая),
+      // поэтому в момент раскрытия подёргивания нет (см. _intro.scss)
+      .call(
+        () => {
+          root.setAttribute('data-intro-warm', '')
+        },
+        [],
+        4.2,
+      )
       .call(reveal, [], 7.05)
-      .to(overlay, { opacity: 0, duration: 1, ease: 'power2.inOut' }, 7.05)
+      // Долгое мягкое растворение чёрного экрана: за ним уже виден hero, шапка плавно проявляется (см. _intro.scss)
+      .to(overlay, { opacity: 0, duration: 1.5, ease: 'sine.inOut' }, 7.05)
       .call(finish)
 
     // The watchdog always releases the page if initialization stalls.

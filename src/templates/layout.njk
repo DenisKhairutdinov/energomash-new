@@ -29,6 +29,7 @@
         if (root.dataset.page === 'home' && !location.hash) {
           var repeatIntro = new URLSearchParams(location.search).get('intro') === '1'
           var seenIntro = false
+          // Интро показывается один раз за сессию (вкладку браузера); флаг ставит intro.ts в момент старта интро
           try { seenIntro = sessionStorage.getItem('energomash-intro-v1') === 'seen' } catch (error) { /* storage disabled */ }
           if (repeatIntro || !seenIntro) {
             root.setAttribute('data-intro-pending', '')

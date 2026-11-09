@@ -85,9 +85,11 @@
       transition: background-color 160ms ease-out;
     }
 
+    // На наведении ячейка получает тонкое золотое кольцо внутри (сетка обрезана маской логотипа, снаружи кольцо не видно)
     &:hover::after,
     &:focus-visible::after {
       background: oklch(100% 0 0deg / 28%);
+      box-shadow: inset 0 0 0 1px var(--gold);
     }
 
     &:hover,

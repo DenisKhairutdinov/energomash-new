@@ -73,7 +73,9 @@
   display: grid;
   gap: 2rem;
   align-self: end;
-  padding-block: calc(var(--header-h) + 3rem) 1.25rem;
+
+  // Снизу запас как у убранной полосы подбора: кнопки и лид не прижаты к краю экрана
+  padding-block: calc(var(--header-h) + 3rem) clamp(2rem, 5svh, 3.5rem);
 }
 
 .hero__title {

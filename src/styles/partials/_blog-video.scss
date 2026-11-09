@@ -22,8 +22,9 @@
       outline-offset: -4px;
     }
 
+    // Золотая деталь: рубрика «Видео · длительность» на тёмной обложке
     .news__rubric {
-      color: var(--accent-hi);
+      color: var(--gold-hi);
     }
 
     .news__title {
@@ -92,10 +93,13 @@
     background: var(--c-black);
   }
 
+  // Тонкая золотая метка у подписи ролика
   .video-dialog__caption {
+    padding-inline-start: 0.75rem;
     margin-block: 0.75rem 0;
     font-size: var(--fs-s);
     line-height: 1.5;
+    border-inline-start: 2px solid var(--gold);
   }
 
   .video-dialog__close {

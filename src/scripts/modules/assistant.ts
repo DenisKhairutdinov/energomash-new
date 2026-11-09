@@ -2,6 +2,16 @@ import portrait from '../../assets/assistant-engineer.png'
 import modelUrl from '../../assets/assistant-model.glb?url'
 import { mountAssistantModel } from './assistant-model'
 import { mountAssistantChat } from './assistant-chat'
+import { runWhenIdle } from './preload'
+
+/** Прогрев во время интро: файл модели и код three качаются заранее, сама сцена строится после интро. */
+export function warmAssistant(): void {
+  runWhenIdle(() => {
+    void fetch(modelUrl).catch(() => undefined)
+    void import('three')
+    void import('three/examples/jsm/loaders/GLTFLoader.js')
+  })
+}
 
 /** Помощник завода: 3D-образ и чат по данным сайта; сообщения на сервер не отправляются. */
 export function initAssistant(): void {
