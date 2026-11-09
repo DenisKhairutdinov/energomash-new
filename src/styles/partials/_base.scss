@@ -47,16 +47,18 @@
 }
 
 @layer base {
-  // Скроллбар страницы скрыт на всём сайте: прокрутка колесом, клавишами и тачем работает как раньше, а ширина окна не прыгает,
-  // когда Lenis останавливает страницу (залипание секции наличия, scripts/modules/slider.ts). Положение видно по навигатору глав
   html {
+    overflow-x: clip;
     scroll-padding-block-start: var(--header-h);
     text-size-adjust: 100%;
+  }
+
+  html[data-page='home'] {
     scrollbar-width: none;
   }
 
   /* stylelint-disable selector-no-vendor-prefix */
-  html::-webkit-scrollbar {
+  html[data-page='home']::-webkit-scrollbar {
     display: none;
   }
   /* stylelint-enable selector-no-vendor-prefix */

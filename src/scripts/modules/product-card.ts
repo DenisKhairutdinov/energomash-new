@@ -19,7 +19,7 @@ const drawingClass = (icon: string): string => `drawing--${icon === 'shassi' ? '
 
 /**
  * Карточка из заготовки (templates/catalog.njk, <template data-catalog-template>): фото или силуэт типа техники,
- * код и плашка наличия, название со ссылкой, характеристики, кнопка запроса стоимости.
+ * код и плашка наличия, категория и название со ссылкой, кнопка запроса КП.
  * Нет фото (или оно не загрузилось) — остаётся силуэт с подписью «фото скоро появится».
  */
 export const createProductCard = (
@@ -34,8 +34,6 @@ export const createProductCard = (
   const type = card.querySelector<HTMLElement>('[data-card-type]')
   const links = card.querySelectorAll<HTMLAnchorElement>('[data-card-link]')
   const model = card.querySelector<HTMLElement>('[data-card-model]')
-  const specs = card.querySelector<HTMLElement>('[data-card-specs]')
-  const sample = card.querySelector<HTMLElement>('[data-card-spec]')
   const price = card.querySelector<HTMLElement>('[data-modal-open]')
   const label = `${item.typeLabel} ${item.model}`
 
@@ -118,26 +116,6 @@ export const createProductCard = (
 
   if (model) {
     model.textContent = item.model
-  }
-
-  if (specs && sample) {
-    sample.remove()
-
-    for (const [name, value] of item.specs) {
-      const spec = sample.cloneNode(true) as HTMLElement
-      const specLabel = spec.querySelector<HTMLElement>('[data-card-spec-label]')
-      const specValue = spec.querySelector<HTMLElement>('[data-card-spec-value]')
-
-      if (specLabel) {
-        specLabel.textContent = name
-      }
-
-      if (specValue) {
-        specValue.textContent = String(value)
-      }
-
-      specs.append(spec)
-    }
   }
 
   return card

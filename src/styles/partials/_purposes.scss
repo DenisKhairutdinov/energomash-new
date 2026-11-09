@@ -195,12 +195,12 @@
 
     .purposes__grid {
       grid-template-columns:
-        calc(100vw / 4)
-        calc(var(--side-x) - 100vw / 4)
-        calc(100vw / 2 - var(--side-x))
+        calc(100% / 4)
+        calc(var(--side-x) - 100% / 4)
+        calc(100% / 2 - var(--side-x))
         calc(var(--side-x) / 2)
-        calc(100vw / 4 - var(--side-x) / 2)
-        calc(100vw / 4);
+        calc(100% / 4 - var(--side-x) / 2)
+        calc(100% / 4);
       gap: 0;
       block-size: clamp(34rem, 76svh, 50rem);
     }
