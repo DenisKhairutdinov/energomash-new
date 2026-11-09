@@ -220,3 +220,8 @@
     --btn-hover-fg: var(--ink);
   }
 }
+
+:root {
+  --assistant-line: oklch(100% 0 0deg / 16%);
+  --assistant-backdrop: oklch(0% 0 0deg / 45%);
+}

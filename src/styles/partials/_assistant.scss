@@ -1,0 +1,222 @@
+.assistant {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline-end: 1rem;
+  z-index: 80;
+  font-family: var(--font-text);
+  color: var(--c-white);
+}
+
+.assistant__launcher {
+  display: block;
+  padding: 0;
+  color: var(--c-white);
+  cursor: pointer;
+  background: none;
+  border: 0;
+
+  .assistant__model {
+    display: block;
+    inline-size: 200px;
+    block-size: 190px;
+    pointer-events: none;
+    background: transparent;
+  }
+}
+
+/* Окно помощника: тёмное стекло, прямые углы и акцент сайта */
+.assistant__dialog {
+  position: fixed;
+  inset-block: auto 1rem;
+  inset-inline: auto 1rem;
+  inline-size: min(420px, calc(100vw - 2rem));
+  max-block-size: calc(100svh - 2rem);
+  padding: 1.5rem;
+  margin: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--c-white);
+  background: var(--glass-dark-strong);
+  border: 1px solid var(--assistant-line);
+  border-radius: 0;
+  backdrop-filter: var(--glass-blur-strong);
+
+  &::backdrop {
+    background: var(--assistant-backdrop);
+  }
+}
+
+.assistant__close {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  font-size: 1.75rem;
+  color: var(--c-white);
+  cursor: pointer;
+  background: none;
+  border: 0;
+  transition: color 160ms ease-out;
+
+  &:hover {
+    color: var(--accent-hi);
+  }
+}
+
+.assistant__intro {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding-block-end: 1rem;
+  border-block-end: 1px solid var(--assistant-line);
+
+  img {
+    inline-size: 30%;
+    block-size: 90px;
+    object-fit: contain;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+}
+
+.assistant__eyebrow {
+  margin-block: 0 0.35rem;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-hi);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.assistant__log {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  min-block-size: 140px;
+  max-block-size: min(38svh, 320px);
+  padding-inline-end: 0.25rem;
+  margin-block: 1rem 0.75rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.assistant__msg {
+  max-inline-size: 88%;
+  padding: 0.65rem 0.8rem;
+  margin: 0;
+  font-size: var(--fs-s);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+
+  a {
+    color: var(--accent-hi);
+    text-underline-offset: 3px;
+  }
+}
+
+.assistant__msg--bot {
+  justify-self: start;
+  background: var(--glass-clear);
+  border: 1px solid var(--assistant-line);
+}
+
+.assistant__msg--user {
+  justify-self: end;
+  color: var(--c-white);
+  background: var(--accent);
+}
+
+.assistant__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-block-end: 0.75rem;
+
+  button {
+    min-block-size: 40px;
+    padding: 0.4rem 0.75rem;
+    font: inherit;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-white);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    background: none;
+    border: 1px solid var(--assistant-line);
+    transition:
+      background-color 160ms ease-out,
+      border-color 160ms ease-out;
+
+    &:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+  }
+}
+
+.assistant__form {
+  display: flex;
+
+  input {
+    inline-size: 100%;
+    min-inline-size: 0;
+    min-block-size: 48px;
+    padding: 0.65rem 0.8rem;
+    font: inherit;
+    font-size: var(--fs-s);
+    color: var(--c-white);
+    background: var(--glass-clear);
+    border: 1px solid var(--assistant-line);
+    border-inline-end: 0;
+
+    &::placeholder {
+      color: var(--c-gray);
+    }
+
+    &:focus-visible {
+      outline: 0;
+      border-color: var(--accent-hi);
+    }
+  }
+
+  button {
+    flex: 0 0 48px;
+    font-size: 1.5rem;
+    color: var(--c-white);
+    cursor: pointer;
+    background: var(--accent);
+    border: 0;
+    transition: background-color 160ms ease-out;
+
+    &:hover {
+      background: var(--accent-lo);
+    }
+  }
+}
+
+.assistant :focus-visible {
+  outline: 2px solid var(--accent-hi);
+  outline-offset: 3px;
+}
+
+@media (width <= 600px) {
+  .assistant__launcher .assistant__model {
+    inline-size: 150px;
+    block-size: 142px;
+  }
+
+  .assistant__dialog {
+    padding: 1.25rem;
+  }
+}

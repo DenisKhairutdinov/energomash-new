@@ -6,3 +6,6 @@ import 'lenis/dist/lenis.css'
 import { startApp } from './modules/app'
 
 startApp()
+
+import { initAssistant } from './modules/assistant'
+initAssistant()
