@@ -193,36 +193,36 @@
 }
 
 @mixin dark-surface {
-  --ink: var(--c-black);
-  --ink-soft: var(--c-black);
-  --ink-3: var(--c-black);
-  --paper: var(--c-white);
-  --paper-5: var(--c-black);
-  --paper-8: var(--c-black);
-  --paper-9: var(--c-black);
-  --paper-13: var(--c-black);
-  --paper-15: var(--c-black);
-  --paper-16: var(--c-black);
-  --paper-20: var(--c-black);
-  --paper-22: var(--c-black);
-  --paper-35: var(--c-black);
-  --paper-55: var(--c-gray);
-  --paper-60: var(--c-gray);
-  --paper-65: var(--c-gray);
-  --paper-70: var(--c-gray);
-  --paper-75: var(--c-gray);
-  --paper-80: var(--c-white);
-  --paper-85: var(--c-white);
-  --paper-88: var(--c-white);
-  --paper-90: var(--c-white);
-  --fg-2: var(--c-gray);
-  --field: var(--c-black);
-  --field-hover: var(--c-black);
-  --line: var(--c-gray);
-  --btn-line: var(--c-gray);
-  --hover-fill: var(--accent);
-  --focus-fill: var(--c-black);
-  --accent-text: var(--accent-hi);
+  --ink: var(--site-bg);
+  --ink-soft: var(--site-bg-2);
+  --ink-3: var(--site-bg-3);
+  --paper: var(--site-fg);
+  --paper-5: var(--site-bg-2);
+  --paper-8: var(--site-bg-2);
+  --paper-9: var(--site-bg-2);
+  --paper-13: var(--site-bg-2);
+  --paper-15: var(--site-bg-2);
+  --paper-16: var(--site-bg-2);
+  --paper-20: var(--site-bg-2);
+  --paper-22: var(--site-bg-2);
+  --paper-35: var(--site-bg-3);
+  --paper-55: var(--site-fg-2);
+  --paper-60: var(--site-fg-2);
+  --paper-65: var(--site-fg-2);
+  --paper-70: var(--site-fg-2);
+  --paper-75: var(--site-fg-2);
+  --paper-80: var(--site-fg);
+  --paper-85: var(--site-fg);
+  --paper-88: var(--site-fg);
+  --paper-90: var(--site-fg);
+  --fg-2: var(--site-fg-2);
+  --field: var(--site-field);
+  --field-hover: var(--site-field-hover);
+  --line: var(--site-line);
+  --btn-line: var(--site-btn-line);
+  --hover-fill: var(--site-hover-fill);
+  --focus-fill: var(--site-focus-fill);
+  --accent-text: var(--site-accent-text);
 
   color: var(--paper);
 }

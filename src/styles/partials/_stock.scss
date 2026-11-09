@@ -1,97 +1,23 @@
-@use 'mixins' as *;
-
-// Техника в наличии (редизайн с нуля, 2026-10-17). Секция на весь экран: фото техники занимает всё поле, поверх слева стеклянная
-// картотека моделей (стекло как в шапке). Выбранная модель раскрывается (тип, характеристики, ссылка), фото меняется плавным проявлением
-// «въезжает справа», над раскрытой строкой идёт индикатор автолистания. Последняя строка залита акцентом. Скрипт: slider.ts.
 @layer sections {
   .stock {
-    position: relative;
+    padding-block: calc(var(--sec-pad-y) * 1.5);
+    color: var(--c-black);
+    background: var(--c-light);
+  }
+
+  .stock__top {
     display: grid;
-    min-block-size: max(100svh, 40rem);
-    overflow: clip;
-    color: var(--paper);
-    background: var(--ink);
-    isolation: isolate;
-  }
-
-  // Слой фото: стопка кадров, ровное затемнение сверху
-  .stock__photos {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-  }
-
-  // Кадры в своём контексте наложения: слайдер поднимает z-index новых кадров без предела, затемнение и виньетка всегда выше них
-  .stock__frames {
-    position: absolute;
-    inset: 0;
-    isolation: isolate;
-  }
-
-  .stock__photos::after {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    content: '';
-
-    // Виньетка: центр кадра (техника) почти не затемнён, края и верх уходят в тёмное
-    background: radial-gradient(
-      ellipse 68% 72% at 62% 58%,
-      color-mix(in oklch, var(--c-black) 0%, transparent) 40%,
-      color-mix(in oklch, var(--c-black) 45%, transparent) 100%
-    );
-  }
-
-  // Кадр: новый плавно проявляется поверх прежнего (прежний остаётся полностью видимым под ним и скрывается, когда новый проявился),
-  // поэтому при быстрой смене моделей не бывает провалов и вспышек. Порядок слоёв задаёт слайдер (z-index)
-  .stock__shot {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-  }
-
-  .stock__shot.is-active {
-    opacity: 1;
-    transition: opacity 0.9s var(--ease-out);
-  }
-
-  .stock__image {
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-    transform: scale(1.08);
-    transition: transform 1.8s var(--ease-out);
-  }
-
-  .stock__shot.is-active .stock__image {
-    transform: none;
-  }
-
-  // Колонка на всю высоту секции (4 колонки сетки на широких экранах): сверху заголовок, пояснение и кнопка, у нижнего края картотека моделей
-  // (под последней строкой отступ от края секции). Справа чистое фото. Стекло как в шапке и меню
-  .stock__inner {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--col-gap);
-  }
-
-  .stock__side {
-    @include glass-tones;
-
-    display: flex;
-    flex-direction: column;
-    grid-column: 1 / -1;
-    justify-content: space-between;
-    background: var(--glass-dark);
-    backdrop-filter: var(--glass-blur);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 6rem);
+    align-items: stretch;
+    padding-block-end: clamp(2.5rem, 5vw, 5rem);
   }
 
   .stock__intro {
     display: grid;
-    gap: 0.9rem;
+    gap: 1.25rem;
+    align-content: start;
     justify-items: start;
-    padding: var(--sec-pad-y) 1rem 1.1rem;
   }
 
   .stock__title {
@@ -100,346 +26,355 @@
   }
 
   .stock__lead {
-    max-inline-size: 28rem;
+    max-inline-size: 32rem;
     font-size: var(--fs-m);
     line-height: 1.6;
-    color: var(--paper-88);
   }
 
   .stock__count {
     font-family: var(--font-display);
-    font-size: 2.25rem;
+    font-size: 1.75em;
     font-weight: 300;
     line-height: 1;
-    color: var(--paper);
   }
 
-  // Строки вплотную, без отступов панели. Выбранная строка залита (--stock-fill); пока идёт автолистание, заливка растёт слева направо
-  // поверх слабого фона (--stock-base) и становится полной к смене модели; на паузе (наведение) строка залита целиком
-  .stock__list {
+  .stock__catalog {
+    --btn-hover-bg: var(--c-black);
+    --btn-hover-fg: var(--c-white);
+
+    color: var(--c-white);
+  }
+
+  .stock__aside {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2vw, 2rem);
+    justify-content: space-between;
+    min-inline-size: 0;
+    padding-inline-start: clamp(1.5rem, 3vw, 3rem);
+    border-inline-start: 1px solid var(--c-gray);
+  }
+
+  .stock__controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-block-start: 0.85rem;
+    border-block-start: 1px solid var(--c-gray);
+  }
+
+  .stock__counter {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: baseline;
+    margin-inline-end: auto;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 1rem + 1vw, 2rem);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .stock__counter-divider {
+    color: var(--c-gray);
+  }
+
+  .stock__control {
     display: grid;
+    place-items: center;
+    inline-size: clamp(3rem, 4vw, 4rem);
+    block-size: clamp(3rem, 4vw, 4rem);
+    color: var(--c-black);
+    cursor: pointer;
+    background: var(--c-white);
+    border: 1px solid var(--c-gray);
+    transition:
+      color 0.25s,
+      background-color 0.25s,
+      border-color 0.25s;
   }
 
-  .stock__item {
-    --stock-fill: var(--paper-16);
-    --stock-base: var(--paper-5);
-
-    position: relative;
-    transition: background-color 0.4s var(--ease-out);
+  .stock__control:hover,
+  .stock__control:focus-visible {
+    color: var(--c-white);
+    background: var(--c-black);
+    border-color: var(--c-black);
   }
 
-  .stock__item.is-active {
-    background: var(--stock-fill);
+  .stock__control-icon {
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
   }
 
-  .stock.is-playing .stock__item.is-active {
-    background: var(--stock-base);
+  .stock__control--prev .stock__control-icon {
+    transform: rotate(180deg);
   }
 
-  .stock__link {
-    position: relative;
-    z-index: 1;
-    display: block;
-    color: inherit;
-    text-decoration: none;
+  .stock__info-stack {
+    display: grid;
+    min-block-size: 13rem;
   }
 
-  .stock__head {
+  .stock__info {
+    display: grid;
+    visibility: hidden;
+    grid-area: 1 / 1;
+    gap: 0.75rem;
+    align-content: start;
+    min-inline-size: 0;
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition:
+      opacity 0.35s var(--ease-out),
+      transform 0.35s var(--ease-out),
+      visibility 0s 0.35s;
+  }
+
+  .stock__info.is-active {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.45s var(--ease-out),
+      transform 0.45s var(--ease-out),
+      visibility 0s;
+  }
+
+  .stock__info-heading {
     display: flex;
     gap: 1rem;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
-    padding: clamp(0.4rem, 1.2svh, 0.65rem) 1rem;
   }
 
-  // Вся строка модели ссылка: подсветка при наведении и фокусе на всей площади
-  .stock__item:not(.is-active) .stock__link:hover,
-  .stock__item:not(.is-active) .stock__link:focus-visible {
-    background: var(--paper-8);
-  }
-
-  .stock__model {
-    min-inline-size: 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.35rem, 3.4svh, 2.5rem);
-    font-weight: 300;
-    line-height: 1;
+  .stock__type,
+  .stock__badge {
+    font-size: var(--fs-s);
+    line-height: 1.35;
     text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
   .stock__badge {
     flex: none;
-    font-size: var(--fs-s);
-    font-weight: 500;
-    color: var(--paper-75);
+    color: var(--accent-lo);
+  }
+
+  .stock__model {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.25rem + 2vw, 3.75rem);
+    font-weight: 300;
+    line-height: 1.05;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
   }
 
-  // Раскрытие строки без анимации высоты в пикселях: grid-template-rows 0fr → 1fr
-  .stock__body {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.55s var(--ease-out);
+  .stock__model a {
+    text-decoration: none;
   }
 
-  .stock__item.is-active .stock__body {
-    grid-template-rows: 1fr;
-  }
-
-  .stock__body-in {
-    display: grid;
-    visibility: hidden;
-    gap: 0.6rem;
-    min-block-size: 0;
-    padding-inline: 1rem;
-    overflow: clip;
-    opacity: 0;
-    transition:
-      opacity 0.3s,
-      visibility 0s 0.55s;
-  }
-
-  .stock__item.is-active .stock__body-in {
-    visibility: visible;
-    padding-block-end: 0.65rem;
-    opacity: 1;
-    transition:
-      opacity 0.5s var(--ease-out) 0.15s,
-      visibility 0s;
-  }
-
-  .stock__type {
-    font-size: var(--fs-m);
-    color: var(--paper-85);
+  .stock__model a:hover,
+  .stock__model a:focus-visible {
+    color: var(--accent-lo);
   }
 
   .stock__specs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem 1.25rem;
-    padding-block: 0;
+    gap: 0.75rem 1rem;
+    margin-block-start: 0.25rem;
   }
 
   .stock__spec {
     display: grid;
-    gap: 0.1rem;
+    gap: 0.15rem;
   }
 
-  .stock__spec-label {
-    font-size: var(--fs-s);
-    font-weight: 400;
-    color: var(--paper-70);
+  .stock__spec dt {
+    font-size: var(--fs-xs);
   }
 
-  .stock__spec-value {
+  .stock__spec dd {
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 2svh, 1.5rem);
-    font-weight: 300;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
+    font-size: clamp(1.1rem, 0.9rem + 0.55vw, 1.5rem);
+    line-height: 1.1;
     text-transform: uppercase;
   }
 
-  .stock__more {
+  .stock__details {
     display: inline-flex;
     gap: 0.5rem;
     align-items: center;
     justify-self: start;
+    margin-block-start: 0.25rem;
     font-size: var(--fs-s);
-    font-weight: 500;
-    color: var(--paper);
+    font-weight: 600;
+    color: var(--accent-lo);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-decoration: none;
-    transition: color 0.25s;
   }
 
-  .stock__link:hover .stock__more,
-  .stock__link:focus-visible .stock__more {
-    color: var(--accent-text);
-  }
-
-  .stock__more-icon {
+  .stock__details-icon {
     inline-size: 1.1rem;
     block-size: 1.1rem;
-    transition: transform 0.4s var(--ease-out);
+    transition: transform 0.3s var(--ease-out);
   }
 
-  .stock__link:hover .stock__more-icon,
-  .stock__link:focus-visible .stock__more-icon {
+  .stock__details:hover .stock__details-icon,
+  .stock__details:focus-visible .stock__details-icon {
     transform: translateX(0.3rem);
   }
 
-  // Индикатор автолистания: заливка всей строки слева направо за время показа модели
-  .stock__progress {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow: clip;
-    pointer-events: none;
-    opacity: 0;
+  .stock__stage {
+    position: relative;
+    block-size: clamp(29rem, 55vw, 48rem);
+    overflow: hidden;
+    background: var(--c-gray);
   }
 
-  .stock__progress::after {
+  .stock__slide {
     position: absolute;
     inset: 0;
-    content: '';
-    background: var(--stock-fill);
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity 0.8s var(--ease-out),
+      visibility 0s 0.8s;
+  }
+
+  .stock__slide.is-active {
+    visibility: visible;
+    opacity: 1;
+    transition:
+      opacity 0.8s var(--ease-out),
+      visibility 0s;
+  }
+
+  .stock__image {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: center 58%;
+  }
+
+  .stock__progress {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 20;
+    block-size: 3px;
+    pointer-events: none;
+    background: var(--c-white);
+  }
+
+  .stock__progress-fill {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    background: var(--accent);
     transform: scaleX(0);
     transform-origin: left;
   }
 
-  .stock.is-playing .stock__item.is-active .stock__progress {
-    opacity: 1;
-  }
-
-  .stock.is-playing .stock__item.is-active .stock__progress::after {
+  .stock.is-playing .stock__progress-fill {
     animation: stock-progress var(--autoplay, 6s) linear forwards;
   }
 
-  // Последняя строка: белое поле с тёмным текстом, при наведении заливается акцентом
-  .stock__item--rest {
-    background: var(--paper);
-    transition: background-color 0.3s var(--ease-out);
-  }
-
-  .stock__item--rest:hover,
-  .stock__item--rest:focus-within {
-    background: var(--accent);
-  }
-
-  .stock__rest {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    justify-content: space-between;
-    padding: clamp(0.5rem, 1.6svh, 0.9rem) 1rem;
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .stock__rest-title {
-    font-family: var(--font-display);
-    font-size: clamp(1.35rem, 3.4svh, 2.5rem);
-    font-weight: 300;
-    line-height: 1;
-    text-transform: uppercase;
-  }
-
-  .stock__rest-icon {
-    flex: none;
-    inline-size: 1.6rem;
-    block-size: 1.6rem;
-    color: var(--ink);
-    transition: transform 0.5s var(--ease-out);
-  }
-
-  .stock__rest:hover .stock__rest-icon,
-  .stock__rest:focus-visible .stock__rest-icon {
-    transform: translateX(0.4rem);
-  }
-
-  // Окна до 1000 px по высоте (fullhd с панелями браузера, 900–960 px): колонка с раскрытой моделью не помещалась,
-  // поэтому заголовок, названия моделей, характеристики и отступы идут от высоты окна
-  @media (height < 1000px) {
-    .stock__intro {
-      gap: 0.6rem;
-      padding-block: clamp(1rem, 3svh, 1.75rem) 0.8rem;
-    }
-
-    .stock__title {
-      font-size: clamp(2.25rem, min(1rem + 3.4vw, 6.5svh), 4rem);
-    }
-
-    .stock__lead {
-      font-size: var(--fs-s);
-      line-height: 1.5;
-    }
-
-    .stock__count {
-      font-size: 1.75rem;
-    }
-
-    .stock__head,
-    .stock__rest {
-      padding-block: clamp(0.3rem, 0.9svh, 0.5rem);
-    }
-
-    .stock__model,
-    .stock__rest-title {
-      font-size: clamp(1.4rem, 3.4svh, 2.4rem);
-    }
-
-    .stock__body-in {
-      gap: 0.5rem;
-    }
-
-    .stock__item.is-active .stock__body-in {
-      padding-block-end: 0.6rem;
-    }
-
-    .stock__specs {
-      gap: 0.5rem 1.5rem;
-      padding-block: 0;
-    }
-
-    .stock__spec-label {
-      font-size: var(--fs-s);
-    }
-
-    .stock__spec-value {
-      font-size: clamp(1.1rem, 2.1svh, 1.5rem);
-    }
-  }
-
-  // Низкие окна (ноутбук): плотнее отступы, чтобы колонка с раскрытой моделью помещалась в экран
-  @media (height < 820px) {
-    .stock__intro {
-      gap: 0.6rem;
-      padding-block-end: 0.75rem;
-    }
-
-    .stock__head,
-    .stock__rest {
-      padding-block: 0.4rem;
-    }
-
-    .stock__specs {
-      gap: 0.6rem 1.5rem;
-    }
-
-    .stock__body-in {
-      gap: 0.5rem;
-    }
-  }
-
-  // Ширина колонки по сетке: пять колонок на средних экранах, четыре на широких (от 1280 px)
-  // Текст колонки стоит на левом краю контейнера, как у остальных секций: стекло выступает за край на отступ колонки (1rem)
   @media (width >= 900px) {
-    .stock__side {
-      grid-column: 1 / span 5;
-      margin-inline-start: -1rem;
+    .stock {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      block-size: 100svh;
+      padding-block: clamp(1.5rem, 4svh, 3.5rem);
+    }
+
+    .stock__top {
+      padding-block-end: clamp(1.5rem, 3svh, 2.5rem);
+    }
+
+    .stock__stage {
+      block-size: auto;
+      min-block-size: 0;
     }
   }
 
   @media (width >= 1280px) {
-    .stock__side {
-      grid-column: 1 / span 4;
+    .stock__specs {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 900px) and (height < 800px) {
+    .stock__intro {
+      gap: 0.8rem;
+    }
+
+    .stock__title {
+      font-size: clamp(2.5rem, 7svh, 4rem);
+    }
+
+    .stock__lead {
+      font-size: var(--fs-s);
+      line-height: 1.45;
+    }
+
+    .stock__aside {
+      gap: 0.9rem;
+    }
+
+    .stock__info-stack {
+      min-block-size: 0;
+    }
+
+    .stock__info {
+      gap: 0.45rem;
+    }
+
+    .stock__model {
+      font-size: clamp(1.8rem, 4.5svh, 2.75rem);
+    }
+
+    .stock__specs {
+      gap: 0.35rem 1rem;
+    }
+  }
+
+  @media (width < 900px) {
+    .stock__top {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .stock__aside {
+      gap: 1.5rem;
+      padding-inline-start: 0;
+      border-inline-start: 0;
+    }
+
+    .stock__info-stack {
+      min-block-size: 12rem;
+    }
+
+    .stock__stage {
+      block-size: clamp(24rem, 70vw, 38rem);
+    }
+  }
+
+  @media (width < 600px) {
+    .stock__top {
+      gap: 2rem;
+    }
+
+    .stock__stage {
+      block-size: clamp(19rem, 80vw, 30rem);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .stock__shot.is-active,
-    .stock__image,
-    .stock__body {
+    .stock__control,
+    .stock__info,
+    .stock__slide,
+    .stock__details-icon {
       transition: none;
-    }
-
-    .stock__image {
-      transform: none;
     }
   }
 }

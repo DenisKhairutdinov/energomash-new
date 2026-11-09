@@ -9,6 +9,16 @@
   isolation: isolate;
 
   @include theme-dark;
+
+  // Текст остаётся белым поверх фотографии, но запасной фон светлой темы не бывает чёрным.
+  --ink: var(--c-gray);
+  --ink-soft: var(--c-light);
+  --paper: var(--c-white);
+}
+
+:root[data-theme='dark'] .hero {
+  --ink: var(--c-black);
+  --ink-soft: var(--c-black);
 }
 
 // Два слоя фото: .hero__media двигается при прокрутке, .hero__zoom отвечает за появление

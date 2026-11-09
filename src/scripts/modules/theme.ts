@@ -3,9 +3,9 @@ const STORAGE_KEY = 'theme'
 type Theme = 'dark' | 'light'
 
 const currentTheme = (): Theme =>
-  document.documentElement.dataset['theme'] === 'light' ? 'light' : 'dark'
+  document.documentElement.dataset['theme'] === 'dark' ? 'dark' : 'light'
 
-/** Переключатель темы: тёмная по умолчанию, выбор хранится в браузере. Начальную тему ставит скрипт в <head>, чтобы страница не мигала. */
+/** Переключатель темы: светлая по умолчанию, выбор хранится в браузере. Начальную тему ставит скрипт в <head>, чтобы страница не мигала. */
 export const initTheme = (): void => {
   const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]')
 
@@ -14,7 +14,12 @@ export const initTheme = (): void => {
   }
 
   const sync = (): void => {
-    button.setAttribute('aria-pressed', String(currentTheme() === 'light'))
+    const isDark = currentTheme() === 'dark'
+    button.setAttribute('aria-pressed', String(isDark))
+    button.title = isDark ? 'Включить светлую тему' : 'Включить тёмную тему'
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', isDark ? '#0e0e0f' : '#fcfdfe')
   }
 
   button.addEventListener('click', () => {

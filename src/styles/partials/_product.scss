@@ -60,7 +60,7 @@
     flex-direction: column;
     gap: 1.5rem;
     padding: calc(var(--header-h) + 1.5rem) clamp(1.25rem, 2vw, 2rem) clamp(1.25rem, 3svh, 2rem);
-    background: var(--c-black);
+    background: var(--ink);
   }
 
   .pdp__back {
@@ -254,7 +254,7 @@
     display: grid;
     gap: 1.5rem 0;
     padding-block: calc(var(--sec-pad-y) * 2);
-    background: var(--c-black);
+    background: var(--ink);
   }
 
   .pdp__about-side {
@@ -341,8 +341,8 @@
   .pdp__card-link:focus-visible {
     --card-label: var(--c-gray);
 
-    color: var(--c-white);
-    background: var(--c-black);
+    color: var(--site-fg);
+    background: var(--site-bg-2);
   }
 
   .pdp__card-photo {

@@ -1,0 +1,42 @@
+{% from "icons.njk" import icon %}
+{% set childImages = [
+  ["semitrailers-light-oil.webp", "semitrailers-dark-oil.webp", "semitrailers-tech-water.webp", "semitrailers-vacuum.webp"],
+  ["chassis-refuelers.webp", "chassis-light-oil.webp", "chassis-dark-oil.webp", "chassis-tech-water.webp", "chassis-drinking-water.webp", "chassis-oil-gathering.webp", "chassis-municipal.webp"]
+] %}
+
+{% macro categoryTile(item, image, eyebrow) %}
+  <a class="category-tiles__card" href="{{ item.url }}">
+    <img
+      class="category-tiles__image"
+      src="/src/assets/category-tiles/{{ image }}"
+      width="1024"
+      height="768"
+      alt=""
+      loading="lazy"
+      decoding="async"
+    />
+    <span class="category-tiles__shade" aria-hidden="true"></span>
+    <span class="category-tiles__content">
+      <span class="category-tiles__eyebrow">{{ eyebrow }}</span>
+      <span class="category-tiles__name">{{ item.title }}</span>
+    </span>
+    {{ icon("arrow", "category-tiles__arrow") }}
+  </a>
+{% endmacro %}
+
+<section class="category-tiles" aria-labelledby="category-tiles-title" data-chapter="Каталог">
+  <div class="category-tiles__grid container">
+    <header class="category-tiles__intro">
+      <h2 class="section-title category-tiles__title" id="category-tiles-title">Каталог<br />техники</h2>
+      <p class="category-tiles__lead">Полуприцепы и автоцистерны для топлива, нефти, воды, пищевых жидкостей и коммунальных задач.</p>
+    </header>
+
+    {% for group in nav.catalog %}
+      {% set groupIndex = loop.index0 %}
+      {% for item in group.children %}
+        {{ categoryTile(item, childImages[groupIndex][loop.index0], group.title) }}
+      {% endfor %}
+    {% endfor %}
+
+  </div>
+</section>

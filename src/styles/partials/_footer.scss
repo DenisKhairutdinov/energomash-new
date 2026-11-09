@@ -6,6 +6,10 @@
   .footer {
     // Линии подвала: серый палитры, заметно тише основного (по просьбе владельца)
     --footer-line: color-mix(in oklch, var(--c-gray) 28%, transparent);
+    --ink: var(--c-black);
+    --ink-soft: var(--c-black);
+    --ink-3: var(--c-black);
+    --paper: var(--c-white);
 
     position: relative;
     overflow: clip;

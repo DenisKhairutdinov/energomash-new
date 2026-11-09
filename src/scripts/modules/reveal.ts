@@ -15,6 +15,7 @@ const BLOCKS = [
   '.request__panel',
   '.leasing__fields > *',
   '.leasing__result',
+  '.category-tiles__card',
   // Внутренние страницы: плитки, цифры, строки списков, выноски, плашки в шапке и в призыве, фильтр и карточки блога
   '.ip__head-in',
   '.ip__cta-in',

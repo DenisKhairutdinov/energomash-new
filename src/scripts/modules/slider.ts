@@ -2,31 +2,20 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { getLenis } from './smooth'
 
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 const DESKTOP_QUERY = '(min-width: 900px) and (prefers-reduced-motion: no-preference)'
-// Примагничивание (доли высоты экрана) и пауза после остановки прокрутки
 const SNAP_IN = 0.6
 const SNAP_OUT = 0.4
 const SETTLE_MS = 260
 const SNAP_SECONDS = 1.1
-// Залипание: пауза между колёсиками, после которой серия считается новой; окно «вслед за вводом пользователя»;
-// расстояние, на которое нужно отъехать от секции, чтобы она снова могла залипнуть; запас, добавляемый к первому колёсику новой серии
 const GESTURE_GAP_MS = 220
 const INPUT_WINDOW_MS = 700
 const REARM_DISTANCE = 60
 const RELEASE_GAIN = 1
 const NAV_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '])
+
 const ACTIVE = 'is-active'
 const PLAYING = 'is-playing'
-const FADE_MS = 950
 
-/**
- * Логика секции на весь экран. Пока на экране больше половины секции, шапка скрыта (`is-away`, шапка тут не появляется).
- * На широких экранах секция «залипает»: когда прокрутка колёсиком доходит до положения «секция ровно от верха до низа экрана»,
- * страница останавливается там и гасит инерцию; дальше она отпускает только после новой серии прокрутки колеса
- * (пауза между колёсиками больше GESTURE_GAP_MS, затем новое движение) или нажатия клавиши прокрутки.
- * Если прокрутка просто остановилась рядом, секция плавно доезжает до границы в сторону движения.
- */
 const initSticky = (root: HTMLElement): void => {
   const header = document.querySelector<HTMLElement>('[data-header]')
 
@@ -185,11 +174,7 @@ const initSticky = (root: HTMLElement): void => {
   })
 }
 
-/**
- * Витрина наличия: картотека моделей и стопка фото. Модель выбирается наведением мыши, фокусом или первым касанием
- * (стрелки вверх и вниз внутри списка); сама листается (data-autoplay секунд на модель), пауза при наведении на картотеку,
- * фокусе и скрытой вкладке. Новый кадр проявляется поверх прежнего.
- */
+/** Слайдер техники: широкое фото, сведения о модели и ручное или автоматическое переключение. */
 export const initSlider = (): void => {
   const root = document.querySelector<HTMLElement>('[data-showcase]')
 
@@ -197,18 +182,22 @@ export const initSlider = (): void => {
     return
   }
 
-  const items = [...root.querySelectorAll<HTMLElement>('[data-item]')]
-  const heads = items.map((item) => item.querySelector<HTMLAnchorElement>('[data-head]'))
-  const photos = [...root.querySelectorAll<HTMLElement>('[data-photo]')]
-  const panel = root.querySelector<HTMLElement>('.stock__side')
+  const slides = [...root.querySelectorAll<HTMLAnchorElement>('[data-slide]')]
+  const infos = [...root.querySelectorAll<HTMLElement>('[data-slide-info]')]
+  const current = root.querySelector<HTMLElement>('[data-slide-current]')
+  const previous = root.querySelector<HTMLButtonElement>('[data-slide-prev]')
+  const next = root.querySelector<HTMLButtonElement>('[data-slide-next]')
   const seconds = Number(root.dataset['autoplay'] ?? 0)
-  const canAutoplay = seconds > 0 && !matchMedia(REDUCED_MOTION_QUERY).matches && items.length > 1
+  const canAutoplay = seconds > 0 && !matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  if (!slides.length || slides.length !== infos.length) {
+    return
+  }
 
   let index = 0
-  let timer: number | undefined
-  let isPaused = false
-  let cleanup: number | undefined
   let layer = 1
+  let visible = false
+  let timer: number | undefined
 
   root.style.setProperty('--autoplay', `${String(seconds)}s`)
 
@@ -220,125 +209,87 @@ export const initSlider = (): void => {
   const schedule = (): void => {
     stop()
 
-    if (!canAutoplay || isPaused) {
+    if (!canAutoplay || !visible || document.hidden || slides.length < 2) {
       return
     }
 
-    // Принудительный перерасчёт стилей, чтобы индикатор начался заново
+    // Перезапускаем полоску прогресса при ручном и автоматическом переключении.
     root.getBoundingClientRect()
     root.classList.add(PLAYING)
     timer = window.setTimeout(() => {
-      show((index + 1) % items.length)
+      show(index + 1)
     }, seconds * 1000)
   }
 
   const show = (target: number): void => {
-    const next = photos[target]
+    const selected = (target + slides.length) % slides.length
 
-    if (target !== index && next) {
-      // Новый кадр кладётся поверх всех и проявляется; прежние остаются видимыми под ним, пока он не проявился полностью
+    if (selected !== index) {
       layer += 1
-      next.style.zIndex = String(layer)
+      const slide = slides[selected]
 
-      // Кадр, который ещё не успел скрыться (быстрый возврат), проявляется заново поверх остальных
-      if (next.classList.contains(ACTIVE)) {
-        next.classList.remove(ACTIVE)
-        next.getBoundingClientRect()
+      if (slide) {
+        slide.style.zIndex = String(layer)
       }
-
-      next.classList.add(ACTIVE)
-      window.clearTimeout(cleanup)
-      cleanup = window.setTimeout(() => {
-        for (const [position, photo] of photos.entries()) {
-          if (position !== index) {
-            photo.classList.remove(ACTIVE)
-          }
-        }
-      }, FADE_MS)
     }
 
-    index = target
+    index = selected
 
-    for (const [position, item] of items.entries()) {
-      const isCurrent = position === index
+    for (const [position, slide] of slides.entries()) {
+      const active = position === index
+      slide.classList.toggle(ACTIVE, active)
+      slide.inert = !active
 
-      item.classList.toggle(ACTIVE, isCurrent)
-      if (isCurrent) {
-        heads[position]?.setAttribute('aria-current', 'true')
+      if (active) {
+        slide.removeAttribute('aria-hidden')
       } else {
-        heads[position]?.removeAttribute('aria-current')
+        slide.setAttribute('aria-hidden', 'true')
       }
+    }
+
+    for (const [position, info] of infos.entries()) {
+      const active = position === index
+      info.classList.toggle(ACTIVE, active)
+      info.inert = !active
+
+      if (active) {
+        info.removeAttribute('aria-hidden')
+      } else {
+        info.setAttribute('aria-hidden', 'true')
+      }
+    }
+
+    if (current) {
+      current.textContent = String(index + 1).padStart(2, '0')
     }
 
     schedule()
   }
 
-  for (const [position, head] of heads.entries()) {
-    head?.addEventListener('pointerenter', (event) => {
-      if (event.pointerType === 'mouse' && position !== index) {
-        show(position)
-      }
-    })
-    // Строка целиком ссылка. Мышью она выбирается наведением, а переход идёт по клику; на сенсорном экране первое касание
-    // только выбирает модель (показывает характеристики), второе открывает карточку
-    head?.addEventListener('click', (event) => {
-      if (position !== index) {
-        event.preventDefault()
-        show(position)
-      }
-    })
-    head?.addEventListener('focus', () => {
-      if (position !== index) {
-        show(position)
-      }
-    })
-    head?.addEventListener('keydown', (event) => {
-      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
-        return
-      }
-
-      event.preventDefault()
-
-      const target = (position + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length
-
-      heads[target]?.focus()
-      show(target)
-    })
-  }
-
-  const pause = (): void => {
-    isPaused = true
-    stop()
-  }
-
-  const resume = (): void => {
-    isPaused = false
-    schedule()
-  }
-
-  panel?.addEventListener('pointerenter', pause)
-  panel?.addEventListener('pointerleave', resume)
-  panel?.addEventListener('focusin', pause)
-  panel?.addEventListener('focusout', resume)
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      pause()
-    } else {
-      resume()
-    }
+  previous?.addEventListener('click', () => {
+    show(index - 1)
+  })
+  next?.addEventListener('click', () => {
+    show(index + 1)
   })
 
-  // Автолистание идёт только пока секция на экране
+  root.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
+      return
+    }
+
+    event.preventDefault()
+    show(index + (event.key === 'ArrowRight' ? 1 : -1))
+  })
+
+  document.addEventListener('visibilitychange', schedule)
+
   new IntersectionObserver(
     ([entry]) => {
-      if (entry?.isIntersecting === true) {
-        resume()
-      } else {
-        pause()
-      }
+      visible = entry?.isIntersecting === true
+      schedule()
     },
-    { threshold: 0.35 },
+    { threshold: 0.25 },
   ).observe(root)
 
   show(0)

@@ -1,68 +1,46 @@
-{# Техника в наличии (редизайн с нуля, 2026-10-17): секция на весь экран, фото техники во всю ширину, поверх слева на всю высоту стеклянная колонка: заголовок, пояснение, кнопка и картотека моделей. #}
-{# Каждая строка модели целиком ссылка на карточку; выбирается наведением мыши, фокусом или первым касанием на сенсорном экране; у выбранной раскрываются тип, характеристики и «Подробнее», фото меняется шторкой «въезжает справа». Листается само (data-autoplay, секунд на модель). Скрипт: scripts/modules/slider.ts. Данные: src/data/home.json, ключ stock. #}
 {% from "icons.njk" import icon %}
 {% from "plural.njk" import plural %}
-{% set restCount = home.catalogTotals.inStock - home.stock.length %}
 <section class="stock" id="stock" aria-labelledby="stock-title" data-showcase data-autoplay="6" data-chapter="Наличие">
-  <div class="stock__photos">
-    <div class="stock__frames">
-    {% for item in home.stock %}
-      <span class="stock__shot{{ ' is-active' if loop.first }}" data-photo>
-        <img
-          class="stock__image"
-          src="/src/assets/models/{{ item.photo }}"
-          width="2400"
-          height="1600"
-          alt="{{ item.type }} {{ item.model }}"
-          {% if not loop.first %}loading="lazy"{% endif %}
-          decoding="async"
-        />
-      </span>
-    {% endfor %}
+  <div class="stock__top container">
+    <div class="stock__intro">
+      <h2 class="section-title stock__title" id="stock-title" data-split>Техника<br />в&nbsp;наличии</h2>
+      <p class="stock__lead"><strong class="stock__count">{{ home.catalogTotals.inStock }}</strong> {{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} на складе. Готовые полуприцепы-цистерны и автоцистерны отгружаем в течение нескольких дней.</p>
+      <a class="button stock__catalog" href="/catalog.html?in-stock=1">Смотреть всё наличие</a>
+    </div>
+
+    <div class="stock__aside">
+      <div class="stock__info-stack">
+        {% for item in home.stock %}
+          <div class="stock__info{{ ' is-active' if loop.first }}" data-slide-info {% if not loop.first %}inert aria-hidden="true"{% endif %}>
+            <div class="stock__info-heading">
+              <span class="stock__type">{{ item.type }}</span>
+              <span class="stock__badge">{{ item.badge }}</span>
+            </div>
+            <h3 class="stock__model"><a href="/product.html?id={{ item.id }}">{{ item.model }}</a></h3>
+            <dl class="stock__specs">
+              {% for spec in item.specs %}
+                <div class="stock__spec"><dt>{{ spec[0] }}</dt><dd>{{ spec[1] }}</dd></div>
+              {% endfor %}
+            </dl>
+            <a class="stock__details" href="/product.html?id={{ item.id }}">Подробнее о модели {{ icon("arrow", "stock__details-icon") }}</a>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="stock__controls" aria-label="Управление слайдером">
+        <span class="stock__counter" aria-live="polite"><span data-slide-current>01</span><span class="stock__counter-divider">/</span><span>0{{ home.stock.length }}</span></span>
+        <button class="stock__control stock__control--prev" type="button" data-slide-prev aria-label="Предыдущая модель">{{ icon("arrow", "stock__control-icon") }}</button>
+        <button class="stock__control" type="button" data-slide-next aria-label="Следующая модель">{{ icon("arrow", "stock__control-icon") }}</button>
+      </div>
     </div>
   </div>
 
-  <div class="stock__inner container">
-    <div class="stock__side">
-      <div class="stock__intro">
-        <h2 class="section-title stock__title" id="stock-title" data-split>Техника<br />в&nbsp;наличии</h2>
-        <p class="stock__lead"><strong class="stock__count">{{ home.catalogTotals.inStock }}</strong> {{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} на складе. Готовые полуприцепы-цистерны и автоцистерны, отгружаем в течение нескольких дней.</p>
-        <a class="button" href="/catalog.html?in-stock=1">Смотреть всё наличие</a>
-      </div>
-
-      <ul class="stock__list" data-list>
-        {% for item in home.stock %}
-          <li class="stock__item{{ ' is-active' if loop.first }}" data-item>
-            <a class="stock__link" href="/product.html" data-head>
-              <span class="stock__head">
-                <span class="stock__model">{{ item.model }}</span>
-                <span class="stock__badge">{{ item.badge }}</span>
-              </span>
-              <span class="stock__body">
-                <span class="stock__body-in">
-                  <span class="stock__type">{{ item.type }}</span>
-                  <span class="stock__specs">
-                    {% for spec in item.specs %}
-                      <span class="stock__spec">
-                        <span class="stock__spec-label">{{ spec[0] }}</span>
-                        <span class="stock__spec-value">{{ spec[1] }}</span>
-                      </span>
-                    {% endfor %}
-                  </span>
-                  <span class="stock__more">Подробнее {{ icon("arrow", "stock__more-icon") }}</span>
-                </span>
-              </span>
-            </a>
-            <span class="stock__progress" aria-hidden="true"></span>
-          </li>
-        {% endfor %}
-        <li class="stock__item stock__item--rest">
-          <a class="stock__rest" href="/catalog.html?in-stock=1">
-            <span class="stock__rest-title">Ещё {{ restCount }} {{ plural(restCount, "модель", "модели", "моделей") }}</span>
-            {{ icon("arrow", "stock__rest-icon") }}
-          </a>
-        </li>
-      </ul>
-    </div>
+  <div class="stock__stage container" aria-label="Фотографии техники в наличии">
+    {% for item in home.stock %}
+      <a class="stock__slide{{ ' is-active' if loop.first }}" data-slide href="/product.html?id={{ item.id }}" aria-label="Подробнее: {{ item.model }}" {% if not loop.first %}inert aria-hidden="true"{% endif %}>
+        <img class="stock__image" src="/src/assets/models/{{ item.photo }}" width="2400" height="1600" alt="{{ item.type }} {{ item.model }}" {% if not loop.first %}loading="lazy"{% endif %} decoding="async" />
+      </a>
+    {% endfor %}
+    <div class="stock__progress" aria-hidden="true"><span class="stock__progress-fill"></span></div>
   </div>
 </section>

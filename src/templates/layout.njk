@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru"{% if pageClass %} data-page="{{ pageClass }}"{% endif %}>
+<html lang="ru" data-theme="light"{% if pageClass %} data-page="{{ pageClass }}"{% endif %}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,7 +19,7 @@
     {% if pageDescription %}<meta property="og:description" content="{{ pageDescription }}" />{% endif %}
     <meta property="og:image" content="{{ site.url }}{{ pageImage or site.ogImage }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#181b21" />
+    <meta name="theme-color" content="#fcfdfe" />
     <link rel="icon" href="/src/assets/favicon.svg" type="image/svg+xml" />
     {# Прелоадер показываем на главной один раз за сессию #}
     <script>
@@ -30,7 +30,7 @@
           var theme = localStorage.getItem('theme')
           if (theme === 'light' || theme === 'dark') root.dataset.theme = theme
         } catch (error) {
-          /* без localStorage остаётся тёмная тема */
+          /* без localStorage остаётся светлая тема */
         }
       })()
     </script>

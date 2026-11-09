@@ -23,7 +23,6 @@ import { initText } from './text'
 import { initVariants } from './variants'
 import { initTheme } from './theme'
 import { initWow } from './wow'
-import { initWaterRipples } from './water-ripples'
 
 /** Общий запуск всех модулей страницы. */
 export const startApp = (): void => {
@@ -41,7 +40,6 @@ export const startApp = (): void => {
   initSlider()
   initLeasing()
   initGeography()
-  initWaterRipples()
 
   initJump()
   initRequestTone()

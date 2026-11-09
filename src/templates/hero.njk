@@ -1,4 +1,4 @@
-{# Hero: фото с рябью, огромный тонкий h1, кнопки, категории и мини-фильтр с быстрыми подборками. #}
+{# Hero: фоновое фото, огромный тонкий h1, кнопки, категории и мини-фильтр с быстрыми подборками. #}
 {# Слои фото: .hero__media двигается и приближается при прокрутке, .hero__zoom отвечает за появление (два разных слоя, чтобы анимации не конфликтовали). #}
 {% from "icons.njk" import icon %}
 {% from "plural.njk" import plural %}
@@ -17,7 +17,6 @@
     </div>
   </div>
   <div class="hero__shade" aria-hidden="true"></div>
-  {# Окно под текстом: курсор над свободной частью фото вызывает рябь (scripts/modules/water-ripples.ts) #}
   <div class="hero__window" aria-hidden="true" data-support-block></div>
 
   <div class="hero__inner container">

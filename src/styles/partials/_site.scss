@@ -1,6 +1,6 @@
 @use 'mixins' as *;
 
-// Сайт: тёмная тема по умолчанию.
+// Сайт следует выбранной теме; светлая используется по умолчанию.
 @layer sections {
   html {
     background: var(--site-bg);
@@ -19,9 +19,5 @@
     --glass-blur: none;
     --glass-blur-strong: none;
     --hdr-blur: none;
-  }
-
-  :root[data-perf='low'] .stock__side {
-    backdrop-filter: none;
   }
 }

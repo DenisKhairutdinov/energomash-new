@@ -1,4 +1,4 @@
-// Токены редизайна 2026-10-17: плоский минимализм без градиентов. Палитра: пять цветов (см. блок «Палитра сайта» ниже). Тёмная тема по умолчанию, светлая включается data-theme="light".
+// Токены редизайна 2026-10-17: плоский минимализм без градиентов. Палитра: пять цветов (см. блок «Палитра сайта» ниже). Светлая тема по умолчанию, тёмная включается data-theme="dark".
 // Старый hero живёт со своими токенами внутри .classic-scope (styles/classic).
 @layer tokens {
   :root {
@@ -19,7 +19,8 @@
     --accent-lo: #a64a2b;
     --accent-text: var(--accent-hi);
 
-    // Тёмный контекст (по умолчанию): все поверхности чёрные, текст белый, второстепенный текст и линии серые.
+    // Базовые значения тёмного контекста. Ниже светлая тема переопределяет их для старых секций,
+    // которые ещё используют имена --ink / --paper напрямую.
     // Имена --paper-N сохранены, значения сплошные: от 80 и выше белый, 55–75 серый, до 35 чёрный (то есть «ничего»).
     --ink: var(--c-black);
     --ink-soft: var(--c-black);
@@ -108,27 +109,9 @@
     --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
-  // Тема сайта: тёмная по умолчанию, светлая включается атрибутом data-theme="light" на <html>.
+  // Тема сайта: светлая по умолчанию, тёмная включается атрибутом data-theme="dark" на <html>.
   // Секции с фото остаются тёмными в любой теме (миксин theme-dark).
   :root {
-    --site-bg: var(--c-black);
-    --site-bg-2: var(--c-black);
-    --site-bg-3: var(--c-black);
-    --site-fg: var(--c-white);
-    --site-fg-2: var(--c-gray);
-    --site-line: var(--c-gray);
-    --site-field: var(--c-black);
-    --site-field-hover: var(--c-black);
-    --site-accent-text: var(--accent-hi);
-    --site-btn-line: var(--c-gray);
-    --site-halo: var(--c-black);
-    --site-hover-fill: var(--accent);
-    --site-focus-fill: var(--c-black);
-
-    color-scheme: dark;
-  }
-
-  :root[data-theme='light'] {
     --site-bg: var(--c-white);
     --site-bg-2: var(--c-light);
     --site-bg-3: var(--c-gray);
@@ -143,7 +126,79 @@
     --site-hover-fill: var(--c-white);
     --site-focus-fill: var(--c-white);
 
+    // Совместимость со старыми секциями: в светлой теме ни одна из их основных поверхностей не остаётся чёрной.
+    --ink: var(--c-white);
+    --ink-soft: var(--c-light);
+    --ink-3: var(--c-gray);
+    --paper: var(--c-black);
+    --paper-5: var(--c-light);
+    --paper-8: var(--c-light);
+    --paper-9: var(--c-light);
+    --paper-13: var(--c-light);
+    --paper-15: var(--c-light);
+    --paper-16: var(--c-light);
+    --paper-20: var(--c-light);
+    --paper-22: var(--c-light);
+    --paper-35: var(--c-gray);
+    --paper-55: var(--c-black);
+    --paper-60: var(--c-black);
+    --paper-65: var(--c-black);
+    --paper-70: var(--c-black);
+    --paper-75: var(--c-black);
+    --paper-80: var(--c-black);
+    --paper-85: var(--c-black);
+    --paper-88: var(--c-black);
+    --paper-90: var(--c-black);
+    --field: var(--c-white);
+    --field-hover: var(--c-light);
+    --hover-fill: var(--c-white);
+    --focus-fill: var(--c-white);
+
     color-scheme: light;
+  }
+
+  :root[data-theme='dark'] {
+    --site-bg: var(--c-black);
+    --site-bg-2: var(--c-black);
+    --site-bg-3: var(--c-black);
+    --site-fg: var(--c-white);
+    --site-fg-2: var(--c-gray);
+    --site-line: var(--c-gray);
+    --site-field: var(--c-black);
+    --site-field-hover: var(--c-black);
+    --site-accent-text: var(--accent-hi);
+    --site-btn-line: var(--c-gray);
+    --site-halo: var(--c-black);
+    --site-hover-fill: var(--accent);
+    --site-focus-fill: var(--c-black);
+    --ink: var(--c-black);
+    --ink-soft: var(--c-black);
+    --ink-3: var(--c-black);
+    --paper: var(--c-white);
+    --paper-5: var(--c-black);
+    --paper-8: var(--c-black);
+    --paper-9: var(--c-black);
+    --paper-13: var(--c-black);
+    --paper-15: var(--c-black);
+    --paper-16: var(--c-black);
+    --paper-20: var(--c-black);
+    --paper-22: var(--c-black);
+    --paper-35: var(--c-black);
+    --paper-55: var(--c-gray);
+    --paper-60: var(--c-gray);
+    --paper-65: var(--c-gray);
+    --paper-70: var(--c-gray);
+    --paper-75: var(--c-gray);
+    --paper-80: var(--c-white);
+    --paper-85: var(--c-white);
+    --paper-88: var(--c-white);
+    --paper-90: var(--c-white);
+    --field: var(--c-black);
+    --field-hover: var(--c-black);
+    --hover-fill: var(--accent);
+    --focus-fill: var(--c-black);
+
+    color-scheme: dark;
   }
 
   // Классы для готовой разметки (модальное окно, подвал): те же значения, что у миксинов

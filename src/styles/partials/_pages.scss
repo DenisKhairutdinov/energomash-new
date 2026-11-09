@@ -33,7 +33,7 @@
     padding-block-end: clamp(1.5rem, 5svh, 3rem);
     overflow: clip;
     color: var(--c-white);
-    background: var(--c-black);
+    background: var(--site-bg-2);
   }
 
   .ip__head-bg {
@@ -64,7 +64,7 @@
     align-items: end;
     min-block-size: clamp(20rem, 46svh, 32rem);
     padding-block-end: clamp(2rem, 6svh, 4rem);
-    background: var(--c-black);
+    background: var(--ink);
   }
 
   .ip__head--dark .ip__title {
@@ -180,7 +180,7 @@
     block-size: clamp(18rem, 56svh, 38rem);
     margin: 0;
     overflow: clip;
-    background: var(--c-black);
+    background: var(--site-bg-2);
     isolation: isolate;
   }
 
@@ -220,7 +220,7 @@
     display: grid;
     gap: clamp(2rem, 6svh, 4rem);
     padding-block: calc(var(--sec-pad-y) * 2);
-    background: var(--c-black);
+    background: var(--ink);
   }
 
   .ip__nums-head {
@@ -356,7 +356,7 @@
 
     --tile: var(--c-white);
 
-    background: var(--c-black);
+    background: var(--ink);
   }
 
   .ip__side {
@@ -513,8 +513,8 @@
 
   .prose th {
     font-weight: 600;
-    color: var(--c-white);
-    background: var(--c-black);
+    color: var(--site-fg);
+    background: var(--site-bg-3);
   }
 
   .prose .tablewrap {
@@ -775,7 +775,7 @@
     padding-block: calc(var(--sec-pad-y) * 2);
     overflow: clip;
     color: var(--c-white);
-    background: var(--c-black);
+    background: var(--site-bg-2);
     isolation: isolate;
   }
 
@@ -866,8 +866,8 @@
   }
 
   .ap__share a:hover {
-    color: var(--c-white);
-    background: var(--c-black);
+    color: var(--site-fg);
+    background: var(--site-bg-3);
   }
 
   .ap__main {
@@ -928,8 +928,8 @@
   }
 
   .bl__chip.is-active {
-    color: var(--c-white);
-    background: var(--c-black);
+    color: var(--site-fg);
+    background: var(--site-bg-3);
   }
 
   .bl__chip-n {
@@ -960,7 +960,7 @@
     overflow: clip;
     color: var(--c-white);
     text-decoration: none;
-    background: var(--c-black);
+    background: var(--site-bg-2);
     isolation: isolate;
   }
 
@@ -1055,7 +1055,7 @@
 
   .ct {
     display: grid;
-    background: var(--c-black);
+    background: var(--site-bg);
   }
 
   .ct__list {
@@ -1072,10 +1072,10 @@
     gap: 0.35rem;
     padding: 1rem 1.25rem;
     font: inherit;
-    color: var(--c-white);
+    color: var(--paper);
     text-align: start;
     cursor: pointer;
-    background: var(--c-black);
+    background: var(--ink);
     border: 0;
     transition:
       background-color 0.3s var(--ease-out),
@@ -1393,7 +1393,7 @@
     display: grid;
     gap: clamp(2rem, 6svh, 4rem);
     padding-block: calc(var(--sec-pad-y) * 2);
-    background: var(--c-black);
+    background: var(--ink);
   }
 
   .mf__process-head {
@@ -1415,8 +1415,8 @@
     gap: 0.5rem 2rem;
     align-items: baseline;
     padding: clamp(1rem, 2.4svh, 1.75rem) var(--edge);
-    color: var(--c-white);
-    background: var(--c-black);
+    color: var(--paper);
+    background: var(--ink);
     transition:
       color 0.35s var(--ease-out),
       background-color 0.35s var(--ease-out);
