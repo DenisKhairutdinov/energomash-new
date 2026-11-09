@@ -1,4 +1,10 @@
-import type { BufferAttribute, Material, PerspectiveCamera, SkinnedMesh, WebGLRenderer } from 'three'
+import type {
+  BufferAttribute,
+  Material,
+  PerspectiveCamera,
+  SkinnedMesh,
+  WebGLRenderer,
+} from 'three'
 
 // Шея в координатах сетки модели: выше HEAD_FROM голова целиком, ниже NECK_Y тело неподвижно
 const NECK_Y = -0.22
@@ -42,7 +48,9 @@ export async function mountAssistantModel(
 
   // Светлее: материал не металлический, текстура подсвечивается собственным свечением
   if (skinned) {
-    const materials: Material[] = Array.isArray(skinned.material) ? skinned.material : [skinned.material]
+    const materials: Material[] = Array.isArray(skinned.material)
+      ? skinned.material
+      : [skinned.material]
     for (const material of materials) {
       const lit = material as Material & {
         map?: unknown
@@ -75,7 +83,8 @@ export async function mountAssistantModel(
   const camera: PerspectiveCamera = new THREE.PerspectiveCamera(25, 1, 0.01, 1000)
   const halfTan = Math.tan((camera.fov * Math.PI) / 360)
   const aspect = canvas.clientWidth / canvas.clientHeight
-  const distance = Math.max(size.y / (2 * halfTan), size.x / (2 * halfTan * aspect)) * 1.08 + size.z / 2
+  const distance =
+    Math.max(size.y / (2 * halfTan), size.x / (2 * halfTan * aspect)) * 1.08 + size.z / 2
   camera.position.set(center.x, center.y, center.z + distance)
   camera.lookAt(center)
 
@@ -141,7 +150,11 @@ export async function mountAssistantModel(
       out[i + 1] = ry + PIVOT.y
       out[i + 2] = rz + PIVOT.z
       if (normals && restNormal) {
-        const [nx, ny, nz] = rotate(restNormal[i] ?? 0, restNormal[i + 1] ?? 0, restNormal[i + 2] ?? 0)
+        const [nx, ny, nz] = rotate(
+          restNormal[i] ?? 0,
+          restNormal[i + 1] ?? 0,
+          restNormal[i + 2] ?? 0,
+        )
         normals[i] = nx
         normals[i + 1] = ny
         normals[i + 2] = nz
@@ -159,7 +172,8 @@ export async function mountAssistantModel(
     yaw += (goalYaw - yaw) * 0.15
     pitch += (goalPitch - pitch) * 0.15
     draw()
-    if (Math.abs(goalYaw - yaw) > 0.002 || Math.abs(goalPitch - pitch) > 0.002) requestAnimationFrame(tick)
+    if (Math.abs(goalYaw - yaw) > 0.002 || Math.abs(goalPitch - pitch) > 0.002)
+      requestAnimationFrame(tick)
     else running = false
   }
 

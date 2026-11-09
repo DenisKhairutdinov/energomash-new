@@ -8,6 +8,7 @@ import { initGeography } from './geography'
 import { initGridOverlay } from './grid-overlay'
 import { initHeader } from './header'
 import { initHero } from './hero'
+import { initIntro } from './intro'
 import { initLeasing } from './leasing'
 import { initModal } from './modal'
 import { initPerformance } from './perf'
@@ -49,7 +50,7 @@ export const startApp = (): void => {
   initReveal()
   initWow()
 
-  initHero(Promise.resolve())
+  initHero(initIntro())
   initCinema()
 
   // Фото меняют высоту секций после загрузки: пересчитываем позиции триггеров

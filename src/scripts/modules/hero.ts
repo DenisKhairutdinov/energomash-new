@@ -15,6 +15,8 @@ export const initHero = (ready: Promise<void>): void => {
     return
   }
 
+  const hasIntro = document.documentElement.hasAttribute('data-intro-pending')
+
   gsap.registerPlugin(ScrollTrigger)
 
   const media = hero.querySelector<HTMLElement>('[data-hero-media]')
@@ -31,7 +33,12 @@ export const initHero = (ready: Promise<void>): void => {
     const intro = gsap.timeline({ paused: true, defaults: { ease: 'power4.out' } })
 
     intro
-      .fromTo(zoom, { scale: 1.2 }, { scale: 1, duration: 2.6, ease: 'power3.out' }, 0)
+      .fromTo(
+        zoom,
+        { scale: hasIntro ? 1 : 1.2 },
+        { scale: 1, duration: 2.6, ease: 'power3.out' },
+        0,
+      )
       .fromTo(
         lines,
         { yPercent: 118, autoAlpha: 1 },

@@ -26,6 +26,18 @@
       ;(function () {
         var root = document.documentElement
         root.classList.add('js')
+        if (root.dataset.page === 'home' && !location.hash) {
+          var repeatIntro = new URLSearchParams(location.search).get('intro') === '1'
+          var seenIntro = false
+          try { seenIntro = sessionStorage.getItem('energomash-intro-v1') === 'seen' } catch (error) { /* storage disabled */ }
+          if (repeatIntro || !seenIntro) {
+            root.setAttribute('data-intro-pending', '')
+            window.setTimeout(function () {
+              root.removeAttribute('data-intro-pending')
+              root.removeAttribute('data-intro-revealing')
+            }, 9000)
+          }
+        }
         try {
           var theme = localStorage.getItem('theme')
           if (theme === 'light' || theme === 'dark') root.dataset.theme = theme
@@ -68,6 +80,7 @@
   </head>
   <body class="page{% if pageClass %} page--{{ pageClass }}{% endif %}">
     <a class="skip-link" href="#main">Перейти к содержимому</a>
+    {% if pageClass == "home" %}{% include "intro.njk" %}{% endif %}
     {% include "header.njk" %}
     <main id="main">
       {% block content %}{% endblock %}
