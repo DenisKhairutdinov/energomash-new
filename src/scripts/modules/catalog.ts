@@ -2,12 +2,10 @@ import { loadCatalog, photoUrl } from './catalog-data'
 import { createProductCard, type CardItem } from './product-card'
 import { isSearchMatch, parseQuery } from './search-match'
 import { enhanceSelect } from './select'
-import { getLenis } from './smooth'
 
 const GROUP_SELECTOR = '[data-catalog-group]'
 const OPTION_SELECTOR = '[data-catalog-option]'
 
-const COLLAPSED_CLASS = 'cfilter--collapsed'
 const SEARCH_PARAMETER = 'q'
 const SEARCH_INPUT_SELECTOR = '[data-search-input]'
 
@@ -147,18 +145,16 @@ export const initCatalog = (): void => {
   const optionInputs = [...form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')]
   const volumeFromInput = form.querySelector<HTMLInputElement>('[name="volume-from"]')
   const volumeToInput = form.querySelector<HTMLInputElement>('[name="volume-to"]')
-  const extra = form.querySelector<HTMLElement>('[data-catalog-extra]')
-  const more = form.querySelector<HTMLButtonElement>('[data-catalog-more]')
-  const moreLabel = form.querySelector<HTMLElement>('[data-catalog-more-label]')
-  const viewInputs = [...form.querySelectorAll<HTMLInputElement>('input[name="view"]')]
-  const sortSelect = form.querySelector<HTMLSelectElement>('[data-catalog-sort]')
+  const viewInputs = [
+    ...document.querySelectorAll<HTMLInputElement>('input[name="view"][form="catalog-filter"]'),
+  ]
+  const sortSelect = document.querySelector<HTMLSelectElement>('[data-catalog-sort]')
   const sortUi = sortSelect ? enhanceSelect(sortSelect, 'catalog-sort-label') : null
   const activeList = form.querySelector<HTMLElement>('[data-active-list]')
-  const bar = document.querySelector<HTMLElement>('[data-filter-bar]')
-  const dock = document.querySelector<HTMLElement>('[data-filter-dock]')
+  const sidebar = document.querySelector<HTMLElement>('.cside')
+  const siteHeader = document.querySelector<HTMLElement>('[data-header]')
   const sentinel = document.querySelector<HTMLElement>('[data-catalog-sentinel]')
   const counters = document.querySelectorAll<HTMLElement>('[data-catalog-count]')
-  const badges = document.querySelectorAll<HTMLElement>('[data-filter-badge]')
   const empty = document.querySelector<HTMLElement>('[data-catalog-empty]')
   const error = document.querySelector<HTMLElement>('[data-catalog-error]')
   const resets = document.querySelectorAll<HTMLButtonElement>('[data-catalog-reset]')
@@ -167,6 +163,21 @@ export const initCatalog = (): void => {
     (element): element is HTMLInputElement =>
       element instanceof HTMLInputElement && element.name === TYPE_FIELD,
   )
+
+  const syncSidebar = (): void => {
+    sidebar?.style.setProperty(
+      '--cside-top',
+      siteHeader?.classList.contains('is-hidden') ? '0.75rem' : 'calc(var(--header-h) + 0.75rem)',
+    )
+  }
+
+  if (siteHeader) {
+    new MutationObserver(syncSidebar).observe(siteHeader, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+  }
+  syncSidebar()
 
   // Появление карточек: каждая выезжает снизу с проявлением (стили .ccard.is-pending и .is-revealed).
   // При «уменьшить движение» карточки видны сразу
@@ -405,20 +416,6 @@ export const initCatalog = (): void => {
     }
   }
 
-  // Число выбранных остальных параметров: на кнопках «Все параметры» и «Фильтры»
-  const syncBadges = (): void => {
-    const inExtra = [...(extra?.querySelectorAll<HTMLInputElement>('input:checked') ?? [])].length
-    const volumes = [volumeFromInput, volumeToInput].filter(
-      (input) => input !== null && input.value.trim() !== '',
-    ).length
-    const total = inExtra + (volumes > 0 ? 1 : 0)
-
-    for (const badge of badges) {
-      badge.textContent = String(total)
-      badge.hidden = total === 0
-    }
-  }
-
   // Следующая порция карточек. Пока метка конца списка остаётся в зоне догрузки, добавляем ещё:
   // наблюдатель сообщает только о входе в зону, а не о том, что метка всё ещё в ней
   const renderBatch = (): void => {
@@ -600,7 +597,6 @@ export const initCatalog = (): void => {
     syncMenu()
     syncOptions(state)
     applyFilter(state)
-    syncBadges()
     syncActive()
   }
 
@@ -688,98 +684,6 @@ export const initCatalog = (): void => {
     event.preventDefault()
   })
 
-  // Остальные параметры раскрываются прямо под панелью; плавающая плашка возвращает к панели и раскрывает их
-  const setExpanded = (isExpanded: boolean): void => {
-    form.classList.toggle(COLLAPSED_CLASS, !isExpanded)
-
-    if (isExpanded) {
-      form.dispatchEvent(new Event('catalog-expand'))
-    }
-    more?.setAttribute('aria-expanded', String(isExpanded))
-
-    if (moreLabel) {
-      moreLabel.textContent = isExpanded ? 'Скрыть параметры' : 'Все параметры'
-    }
-  }
-
-  more?.addEventListener('click', () => {
-    setExpanded(form.classList.contains(COLLAPSED_CLASS))
-  })
-
-  // Панель параметров закрывается по Escape и по щелчку вне панели
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !form.classList.contains(COLLAPSED_CLASS)) {
-      setExpanded(false)
-      more?.focus()
-    }
-  })
-
-  document.addEventListener('click', (event) => {
-    if (
-      !form.classList.contains(COLLAPSED_CLASS) &&
-      event.target instanceof Node &&
-      !form.contains(event.target) &&
-      !document.querySelector('.cside')?.contains(event.target)
-    ) {
-      setExpanded(false)
-    }
-  })
-
-  // Раскрытые параметры закрываются, когда страницу прокручивают вниз заметно дальше места, где их открыли
-  // (сдвиг от самого раскрытия и первые доли секунды после него не считаются)
-  const COLLAPSE_AFTER_SCROLL = 160
-  const COLLAPSE_GRACE_MS = 600
-  let openedAt = 0
-  let openedScroll = 0
-
-  form.addEventListener('catalog-expand', () => {
-    openedAt = performance.now()
-    openedScroll = window.scrollY
-  })
-
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (form.classList.contains(COLLAPSED_CLASS)) {
-        return
-      }
-
-      if (
-        performance.now() - openedAt > COLLAPSE_GRACE_MS &&
-        window.scrollY > openedScroll + COLLAPSE_AFTER_SCROLL
-      ) {
-        setExpanded(false)
-      }
-    },
-    { passive: true },
-  )
-
-  for (const button of document.querySelectorAll<HTMLElement>('[data-filter-up]')) {
-    button.addEventListener('click', () => {
-      setExpanded(true)
-      getLenis()?.scrollTo(form, { offset: -90 })
-    })
-  }
-
-  // Закреплённая панель стоит под шапкой сайта, пока та видна (прокрутка вверх), и у верха окна, когда шапка спрятана
-  const siteHeader = document.querySelector<HTMLElement>('[data-header]')
-  const catalogRoot = document.querySelector<HTMLElement>('.catalog')
-
-  if (siteHeader && catalogRoot) {
-    const syncOffset = (): void => {
-      catalogRoot.style.setProperty(
-        '--cside-top',
-        siteHeader.classList.contains('is-hidden') ? '0px' : 'var(--header-h)',
-      )
-    }
-
-    new MutationObserver(syncOffset).observe(siteHeader, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
-    syncOffset()
-  }
-
   // Вид списка: сетка или список. Выбор виден в адресе (?view=list)
   const syncView = (): void => {
     const view = viewInputs.find((input) => input.checked)?.value ?? 'grid'
@@ -794,12 +698,7 @@ export const initCatalog = (): void => {
     })
   }
 
-  // Плавающая плашка показывается, когда верхняя панель фильтров ушла с экрана
-  if (bar && dock) {
-    new IntersectionObserver(([entry]) => {
-      dock.classList.toggle('is-visible', entry !== undefined && !entry.isIntersecting)
-    }).observe(bar)
-  }
+  sortSelect?.addEventListener('change', refresh)
 
   if (sentinel) {
     const loadObserver = new IntersectionObserver(
@@ -867,6 +766,7 @@ export const initCatalog = (): void => {
 
       setTimeout(() => {
         sortUi?.refresh()
+        syncView()
         update()
       }, 0)
     })

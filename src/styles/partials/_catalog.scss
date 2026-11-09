@@ -1,8 +1,7 @@
 @use 'mixins' as *;
 
 // Каталог (переделан 2026-10-18). Светлая тема: белый фон, светло-серые плитки и серый для наведения, чёрный выбранный.
-// Сверху шапка, под ней горизонтальный фильтр, закреплённый под шапкой сайта (тип, назначение, наличие, вид списка, кнопка «Все
-// параметры», которая раскрывает остальные поля под панелью), ниже плитки моделей в стык: крупное горизонтальное фото ч/б под ровным
+// На широких экранах фильтры слева от моделей, на узких — сверху. Плитки моделей: крупное горизонтальное фото ч/б под ровным
 // затемнением; название, тип и характеристики на стеклянной плашке (стекло не меняется). Вариантов дизайна нет, цвета только из палитры.
 @layer sections {
   .catalog {
@@ -52,17 +51,13 @@
     text-transform: uppercase;
   }
 
-  // ---------- Фильтр: горизонтальная панель, закреплена под шапкой сайта
+  // ---------- Фильтр каталога
   .cside {
-    // Закреплена у верха окна; пока шапка сайта видна (прокрутка вверх), стоит под ней, чтобы не перекрываться (--cside-top задаёт catalog.ts)
-    position: sticky;
-    inset-block-start: var(--cside-top, 0);
-    z-index: 30;
-    max-block-size: calc(100svh - var(--cside-top, 0px));
-    overflow-y: auto;
-    scrollbar-width: none;
     background: var(--c-white);
-    transition: inset-block-start 0.35s var(--ease-out);
+  }
+
+  .cside__title {
+    display: none;
   }
 
   // Раскладка панели по областям: тип и инструменты в первой строке, быстрые группы во второй, раскрытые параметры ниже
@@ -72,8 +67,8 @@
       'types'
       'quick'
       'tools'
-      'status'
-      'extra';
+      'extra'
+      'status';
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem 1.5rem;
     align-items: start;
@@ -104,7 +99,7 @@
     grid-area: status;
   }
 
-  // Тип техники: две плитки с чертежом, выбранная чёрная; силуэт обрезан краем плитки
+  // Тип техники: две кнопки, выбранная выделена чёрным.
   .cside__types {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -160,27 +155,6 @@
   .ctype__count,
   .chip__n {
     display: none;
-  }
-
-  // Чертёж серым палитры: на светлой плитке тихий, на чёрной заметный
-  .ctype__drawing {
-    position: absolute;
-    inset-block-end: -0.5rem;
-    inset-inline-end: -1.5rem;
-    inline-size: 62%;
-    color: var(--c-gray);
-    transition: transform 0.9s var(--ease-out);
-  }
-
-  // Наведение: фон плитки не меняется, чертёж едет по X влево
-  .ctype:hover .ctype__drawing {
-    transform: translateX(-1.25rem);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ctype:hover .ctype__drawing {
-      transform: none;
-    }
   }
 
   // ---------- Параметры фильтра
@@ -326,57 +300,10 @@
     outline-offset: 2px;
   }
 
-  .cfilter__open {
-    display: inline-flex;
-    gap: 0.5rem;
-    align-items: center;
-    min-block-size: 2.75rem;
-    padding: 0.5rem 0.9rem;
-    font-size: var(--fs-s);
-    font-weight: 500;
-    color: var(--c-black);
-    cursor: pointer;
-    background: var(--c-light);
-    border: 0;
-    transition:
-      color 0.25s,
-      background-color 0.25s;
-  }
-
-  .cfilter__open:hover {
-    background: var(--c-gray);
-  }
-
-  .cfilter__open[aria-expanded='true'] {
-    color: var(--c-white);
-    background: var(--c-black);
-  }
-
-  .cfilter__badge {
-    display: inline-grid;
-    place-items: center;
-    min-inline-size: 1.25rem;
-    block-size: 1.25rem;
-    padding-inline: 0.3rem;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    color: var(--c-white);
-    background: var(--accent);
-  }
-
-  // Остальные параметры плавно раскрываются кнопкой
+  // Все группы параметров видны сразу.
   .cfilter__extra-wrap {
     display: grid;
     grid-template-rows: 1fr;
-    transition: grid-template-rows 0.45s var(--ease-out);
-  }
-
-  .cfilter--collapsed .cfilter__extra-wrap {
-    visibility: hidden;
-    grid-template-rows: 0fr;
-    transition:
-      grid-template-rows 0.45s var(--ease-out),
-      visibility 0s 0.45s;
   }
 
   .cfilter__range {
@@ -552,6 +479,27 @@
   }
 
   // ---------- Результаты: плитки в стык
+  .catalog__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0 var(--edge) 1rem;
+  }
+
+  .catalog__results-label {
+    margin-inline-end: auto;
+    font-family: var(--font-display);
+    font-size: var(--fs-xl);
+    font-weight: 300;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .catalog__toolbar .csort {
+    display: block;
+  }
+
   .catalog__list {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -737,7 +685,7 @@
     inset-inline-start: 8.5rem;
   }
 
-  // Плашка на стекле: тип и название модели, характеристики, запрос стоимости
+  // Компактная плашка: категория, название модели и запрос КП.
   .ccard__body {
     position: absolute;
     inset-block-end: clamp(0.6rem, 1.4svh, 1rem);
@@ -754,7 +702,7 @@
 
   .ccard__head {
     display: grid;
-    gap: 0.2rem;
+    gap: 0.25rem;
   }
 
   .ccard__type {
@@ -782,45 +730,26 @@
     content: '';
   }
 
-  .ccard__specs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 1.25rem;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-
-  .ccard__spec {
-    display: flex;
-    gap: 0.4rem;
-    align-items: baseline;
-    font-size: var(--fs-s);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .ccard__spec-label {
-    font-size: var(--fs-xs);
-    color: var(--paper-65);
-  }
-
   .ccard__actions {
     display: flex;
-    gap: 1rem;
+    gap: 0.6rem;
     align-items: center;
     justify-content: space-between;
   }
 
-  // Запрос стоимости: кнопка (акцент, белый текст, при наведении белая с чёрным) поверх растянутой ссылки карточки
+  // Кнопка запроса КП поверх растянутой ссылки карточки.
   .ccard__price {
     position: relative;
     z-index: 3;
+    min-block-size: 2.25rem;
+    padding-inline: 0.75rem;
+    font-size: var(--fs-xs);
   }
 
-  // В сетке плашка компактнее, чтобы не закрывать фото: меньше отступы, название и характеристики мельче, подписи характеристик у значений
+  // В сетке плашка компактнее, чтобы не закрывать фото.
   .catalog__list[data-view='grid'] .ccard__body {
-    gap: 0.3rem;
-    padding: clamp(0.5rem, 1.1svh, 0.75rem) clamp(0.65rem, 1vw, 0.95rem);
+    gap: 0.2rem;
+    padding: 0.55rem 0.7rem;
   }
 
   .catalog__list[data-view='grid'] .ccard__head {
@@ -829,19 +758,6 @@
 
   .catalog__list[data-view='grid'] .ccard__title {
     font-size: clamp(1.15rem, 0.9rem + 0.7vw, 1.65rem);
-  }
-
-  .catalog__list[data-view='grid'] .ccard__specs {
-    gap: 0.1rem 0.9rem;
-  }
-
-  .catalog__list[data-view='grid'] .ccard__spec {
-    gap: 0.3rem;
-    font-size: var(--fs-xs);
-  }
-
-  .catalog__list[data-view='grid'] .ccard__actions {
-    gap: 0.6rem;
   }
 
   // Без фото плашка с названием (в сетке) сплошная чёрная: стеклу не за чем размываться, на светлом фоне белый текст иначе не читается
@@ -865,13 +781,12 @@
     transform: translateX(0.3rem);
   }
 
-  // В сетке на мыши видно только название: характеристики и «Узнать стоимость» выезжают снизу при наведении на карточку (на сенсорных видны всегда)
+  // В сетке на мыши кнопка появляется при наведении; на сенсорных экранах видна всегда.
   @media (hover: hover) and (pointer: fine) {
     .catalog__list[data-view='grid'] .ccard__body {
       gap: 0;
     }
 
-    .catalog__list[data-view='grid'] .ccard__specs,
     .catalog__list[data-view='grid'] .ccard__actions {
       visibility: hidden;
       max-block-size: 0;
@@ -887,7 +802,6 @@
         visibility 0s 0.45s;
     }
 
-    .catalog__list[data-view='grid'] .ccard__inner:is(:hover, :focus-within) .ccard__specs,
     .catalog__list[data-view='grid'] .ccard__inner:is(:hover, :focus-within) .ccard__actions {
       visibility: visible;
       max-block-size: 6rem;
@@ -931,23 +845,11 @@
     backdrop-filter: none;
   }
 
-  // Список как таблица: название, ровные колонки характеристик, запрос стоимости справа
+  // В списке категория и название слева, запрос КП справа.
   .catalog__list[data-view='list'] .ccard__body {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     column-gap: var(--col-gap);
     align-items: center;
-  }
-
-  .catalog__list[data-view='list'] .ccard__specs {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem var(--col-gap);
-  }
-
-  .catalog__list[data-view='list'] .ccard__spec {
-    display: grid;
-    gap: 0.15rem;
-    align-content: start;
   }
 
   .catalog__list[data-view='list'] .ccard__drawing {
@@ -968,89 +870,110 @@
       grid-column: 9 / -1;
     }
 
+    .catalog__layout {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.25rem;
+      align-items: start;
+      padding-block: clamp(1.5rem, 3vw, 3rem) var(--section-y);
+    }
+
     .catalog__list[data-view='grid'] {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    // Фильтр на 12 колонках сетки сайта: типы в колонках 1–6 (каждая плитка по три), вид списка и «Все параметры» к правому краю;
-    // быстрые группы: назначение 1–8, наличие 9–12; раскрытые параметры по четыре в ряд (по три колонки)
-    .cfilter {
-      grid-template-areas: none;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 0.25rem var(--col-gap);
-      padding-block: 0.75rem;
-    }
-
-    .cside__types {
-      grid-area: auto;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-row: 1 / span 2;
-      grid-column: 1 / span 6;
-      gap: 0.25rem;
-      align-items: stretch;
-      align-self: stretch;
-    }
-
-    .cside__types .ctype {
-      display: grid;
-    }
-
-    .cside__types .ctype__body {
+    .catalog__results {
+      grid-column: 2 / -1;
       min-inline-size: 0;
     }
 
-    // Справа от плиток типа два ряда: сверху сортировка, вид списка и «Все параметры», под ними чипы; левые края рядов совпадают
-    .cfilter__tools {
-      grid-area: auto;
-      grid-row: 1;
-      grid-column: 7 / -1;
-      gap: 0.25rem;
-      place-self: start;
+    .catalog__toolbar {
+      padding-inline: 0 var(--gutter);
     }
 
-    .cfilter__status {
-      column-gap: 0.25rem;
-      padding-block-start: 0.5rem;
+    .cside {
+      position: sticky;
+      inset-block-start: var(--cside-top, var(--header-h));
+      grid-column: 1;
+      min-inline-size: 0;
+      padding-inline-start: 0.75rem;
     }
 
-    // Назначение и наличие чипами справа от плиток типа, подписи групп скрыты визуально (остаются для скринридеров)
-    .cfilter__quick {
-      grid-area: auto;
-      grid-row: 2;
-      grid-column: 7 / -1;
-      gap: 0.25rem;
-      align-items: start;
-      align-self: start;
-
-      // Место под две строки чипов резервируется: высота панели и плиток не зависит от типа, ряды не растягиваются
-      min-block-size: calc(2 * 2.75rem + 0.25rem);
-    }
-
-    // Чипы назначения и «Только в наличии» идут одним потоком: группы и обёртки не создают своих боксов
-    .cfilter__quick {
+    .cside__title {
       display: flex;
-      flex-wrap: wrap;
-      align-content: start;
+      align-items: center;
+      min-block-size: 2.75rem;
+      margin-block-end: 1rem;
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      font-weight: 300;
+      line-height: 1;
+      text-transform: uppercase;
     }
 
-    .cfilter__quick .cfilter__block:not([hidden]),
-    .cfilter__quick .cfilter__options,
-    .cfilter__tools .cfilter__block,
-    .cfilter__tools .cfilter__options {
-      display: contents;
+    .cfilter {
+      grid-template-areas:
+        'types'
+        'quick'
+        'tools'
+        'extra'
+        'status';
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.75rem;
+      padding: 0 0 0.65rem;
+    }
+
+    .cside__types {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ctype__body {
+      align-content: center;
+      min-inline-size: 0;
+      min-block-size: 3.75rem;
+      padding: 0.5rem 0.55rem;
+    }
+
+    .ctype__title {
+      font-size: clamp(1.05rem, 1.1vw, 1.4rem);
+      line-height: 1.1;
+    }
+
+    .cfilter__quick {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .cfilter__quick .cfilter__options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .cfilter__quick .chip__label {
-      padding-inline: 0.7rem;
+      inline-size: 100%;
+      block-size: 100%;
+      min-block-size: 2.25rem;
+      padding: 0.35rem 0.5rem;
+      font-size: var(--fs-xs);
+      line-height: 1.2;
     }
 
-    // Строка состояния слева: «Найдено», затем выбранные параметры и сброс, без разброса по краям
+    .cfilter__tools {
+      display: grid;
+      gap: 0.5rem;
+      justify-self: stretch;
+    }
+
     .cfilter__status {
-      align-self: center;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.35rem;
+      padding-block-start: 0.55rem;
+      border-block-start: 1px solid var(--c-light);
     }
 
-    .cfilter__status .cfilter__found {
-      order: -1;
+    .cfilter__found {
+      grid-column: 1 / -1;
       margin-inline-start: 0;
     }
 
@@ -1064,76 +987,80 @@
       clip-path: inset(50%);
     }
 
-    // Все параметры открываются панелью поверх карточек: страница не сдвигается, закрытая панель не занимает места
-    .cside {
-      max-block-size: none;
-      overflow: visible;
+    .cfilter__active {
+      flex: none;
+      grid-column: 1 / -1;
+      order: 1;
     }
 
-    .cfilter__extra-wrap {
-      position: absolute;
-      inset-block-start: 100%;
-      inset-inline: 0;
-      z-index: 2;
-      display: grid;
-      visibility: visible;
-      grid-template-rows: none;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      column-gap: var(--col-gap);
-      max-block-size: calc(100svh - var(--cside-top, 0px) - 12rem);
-      padding: 1rem var(--edge) 1.5rem;
-      overflow-y: auto;
-      background: var(--c-white);
-      clip-path: inset(0 0 0 0);
-      transition:
-        clip-path 0.45s var(--ease-out),
-        visibility 0s;
-    }
-
-    .cfilter--collapsed .cfilter__extra-wrap {
-      visibility: hidden;
-      grid-template-rows: none;
-      clip-path: inset(0 0 100% 0);
-      transition:
-        clip-path 0.35s var(--ease-out),
-        visibility 0s 0.35s;
+    .cfilter__reset {
+      justify-self: start;
+      order: 2;
+      min-block-size: 2.25rem;
+      padding: 0.35rem 0.2rem;
+      font-size: var(--fs-xs);
     }
 
     .cfilter__extra {
-      grid-template-columns: subgrid;
+      display: block;
+      column-count: 2;
+      column-gap: 0.65rem;
+      overflow: visible;
+    }
+
+    .cfilter__extra > .cfilter__block:not([hidden]) {
+      display: inline-grid;
+      inline-size: 100%;
+      margin-block-end: 0.65rem;
+      break-inside: avoid-column;
+    }
+
+    .cfilter__extra .cfilter__options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.2rem;
+    }
+
+    .cfilter__extra .chip:only-child {
       grid-column: 1 / -1;
-      gap: 1.25rem var(--col-gap);
     }
 
-    .cfilter__extra > .cfilter__block {
-      grid-column: span 3;
+    .cfilter__block {
+      gap: 0.25rem;
+      padding-block-end: 0.4rem;
+      border-block-end: 1px solid var(--c-light);
     }
 
-    // Заблокированные группы уходят в конец панели
-    .cfilter__extra > .cfilter__block.is-blocked {
-      order: 2;
+    .cfilter__label {
+      font-size: 0.72rem;
+      line-height: 1.2;
     }
 
-    .cfilter__status {
-      grid-area: auto;
-      grid-row: 3;
-      grid-column: 1 / -1;
+    .cfilter .chip__label {
+      justify-content: center;
+      inline-size: 100%;
+      block-size: 100%;
+      min-block-size: 1.9rem;
+      padding: 0.25rem 0.4rem;
+      font-size: 0.75rem;
+      line-height: 1.2;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .cfilter__quick .chip__label {
+      inline-size: 100%;
     }
   }
 
-  @media (width >= 1600px) {
+  @media (width >= 1200px) {
     .catalog__list[data-view='grid'] {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  // ---------- Узкие экраны: панель не закреплена (занимала бы пол-экрана), быстрые группы за кнопкой «Все параметры»
+  // ---------- Узкие экраны
   @media (width < 900px) {
-    .cside {
-      position: static;
-      max-block-size: none;
-    }
-
     .ctype__body {
       min-inline-size: 0;
       min-block-size: 4.5rem;
@@ -1142,10 +1069,6 @@
 
     .ctype__title {
       font-size: var(--fs-l);
-    }
-
-    .cfilter--collapsed .cfilter__quick {
-      display: none;
     }
 
     .catalog__list[data-view='list'] .ccard__inner {
@@ -1159,17 +1082,10 @@
     .catalog__list[data-view='list'] .ccard__body {
       grid-template-columns: minmax(0, 1fr) auto;
     }
-
-    .catalog__list[data-view='list'] .ccard__specs {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-row: 2;
-      grid-column: 1 / -1;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ccard__image,
-    .cside {
+    .ccard__image {
       transition: none;
     }
   }
