@@ -8,4 +8,8 @@ import { startApp } from './modules/app'
 startApp()
 
 import { initAssistant } from './modules/assistant'
+import { initPhotobank } from './modules/photobank'
+import { initBlogVideo } from './modules/blog-video'
 initAssistant()
+initPhotobank()
+initBlogVideo()

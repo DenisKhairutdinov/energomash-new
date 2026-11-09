@@ -12,67 +12,45 @@
   }
 }
 
-.intro__art {
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline-start: 50%;
-  transform-origin: 50% 50%;
-}
-
-.intro__photo,
-.intro__drawing {
-  position: absolute;
-  inset: 0;
-  inline-size: 100%;
-  block-size: 100%;
-}
-
-.intro__photo {
-  opacity: 0;
-}
-
-.intro__drawing {
-  overflow: visible;
-  stroke: var(--c-white);
-  stroke-width: 1.25;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.intro__details {
-  stroke-opacity: 0.62;
-  stroke-width: 0.8;
-}
-
 .intro__brand {
   position: absolute;
   inset-block-start: 50%;
   inset-inline-start: 50%;
-  display: flex;
-  gap: clamp(0.75rem, 2.2vw, 2rem);
-  align-items: center;
-  padding: 0.65rem 1.25rem;
-  white-space: nowrap;
-  background: var(--c-black);
+  inline-size: min(86vw, 60rem);
   transform: translate(-50%, -50%);
 }
 
-.intro__mark {
-  inline-size: clamp(3.5rem, 8vw, 8rem);
-  block-size: auto;
-}
-
-.intro__name-mask {
-  overflow: hidden;
-}
-
-.intro__name {
+.intro__logo {
   display: block;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 6.5vw, 6.5rem);
-  font-weight: 300;
-  line-height: 1.2;
-  letter-spacing: 0.025em;
+  inline-size: 100%;
+  overflow: visible;
+}
+
+.intro__mark-fill {
+  opacity: 0;
+  fill: var(--intro-gold);
+}
+
+.intro__mark-lines {
+  stroke: var(--intro-gold);
+  stroke-width: 0.16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.intro__letters {
+  fill: var(--c-white);
+  fill-opacity: 0;
+  stroke: var(--intro-gold);
+  stroke-width: 0.12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.intro__mark-lines path,
+.intro__letters path {
+  visibility: hidden;
+  opacity: 0;
 }
 
 .intro__skip {
@@ -97,30 +75,8 @@
   }
 }
 
-.intro__caption {
-  position: absolute;
-  inset-block-end: 2.5rem;
-  inset-inline-start: var(--gutter);
-  font-family: var(--font-text);
-  font-size: var(--fs-xs);
-  color: var(--c-gray);
-}
-
 html[data-intro-pending] {
   overflow: hidden;
-}
-
-@media (width <= 600px) {
-  .intro__brand {
-    gap: 0.75rem;
-    padding: 0.35rem 0.65rem;
-  }
-
-  .intro__caption {
-    inset-block-end: 6rem;
-    inset-inline: 1rem;
-    text-align: center;
-  }
 }
 
 html[data-intro-pending]:not([data-intro-revealing]) body > :not(.intro) {
@@ -131,12 +87,7 @@ html:not([data-intro-pending]) .intro {
   display: none;
 }
 
-.intro__brand {
-  inline-size: max-content;
-  max-inline-size: calc(100vw - 2rem);
-}
-
-.intro__drawing path,
-.intro__drawing circle {
-  vector-effect: non-scaling-stroke;
+.intro__sheen {
+  visibility: hidden;
+  opacity: 0;
 }

@@ -276,17 +276,40 @@ const initHeaderTone = (header: HTMLElement): void => {
       : 'dark'
   }
 
+  // Замер тона тяжёлый (elementsFromPoint, getComputedStyle, чтение пикселей фото), поэтому во время прокрутки
+  // он идёт не чаще раза в TONE_INTERVAL мс, а после остановки прокрутки делается ещё раз (точное итоговое значение)
+  const TONE_INTERVAL = 140
+  const TONE_SETTLE = 120
   let frame = 0
+  let throttle = 0
+  let settle = 0
+  let lastMeasure = 0
 
   function update(): void {
     frame = 0
+    lastMeasure = performance.now()
     header.dataset['tone'] = measure()
   }
 
   function schedule(): void {
-    if (frame === 0) {
-      frame = window.requestAnimationFrame(update)
+    window.clearTimeout(settle)
+    settle = window.setTimeout(() => {
+      if (frame === 0) {
+        frame = window.requestAnimationFrame(update)
+      }
+    }, TONE_SETTLE)
+
+    if (frame !== 0 || throttle !== 0) {
+      return
     }
+
+    throttle = window.setTimeout(
+      () => {
+        throttle = 0
+        frame = window.requestAnimationFrame(update)
+      },
+      Math.max(0, TONE_INTERVAL - (performance.now() - lastMeasure)),
+    )
   }
 
   window.addEventListener('scroll', schedule, { passive: true })

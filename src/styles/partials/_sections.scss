@@ -1006,9 +1006,11 @@
   }
 
   // ---------- Блог: как «Каталог по назначению»: сетка в стык, акцентный блок и свежая статья крупно, ниже три статьи
+  // Блог по ширине контейнера, как остальные сцены (те же боковые поля --edge), без фотографий
   .blog {
     display: grid;
-    min-block-size: min(100svh, 52rem);
+    padding-block: var(--sec-pad-y);
+    padding-inline: var(--edge);
     color: var(--paper);
     background: var(--ink);
   }
@@ -1024,7 +1026,7 @@
     flex-direction: column;
     gap: 2rem;
     justify-content: space-between;
-    padding: var(--sec-pad-y) var(--col-gap) var(--sec-pad-y) var(--edge);
+    padding: clamp(1.25rem, 2.4svh, 2rem) clamp(1.25rem, 2vw, 2rem);
     color: var(--c-white);
     background: var(--accent);
   }
@@ -1064,42 +1066,14 @@
     overflow: clip;
     color: var(--paper);
     text-decoration: none;
-    isolation: isolate;
+    background: color-mix(in oklch, var(--ink) 93%, var(--paper));
+    transition: background-color 0.4s var(--ease-out);
   }
 
-  .news__photo {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-  }
-
-  // Кадр масштабирован, чтобы не показывать края; за курсором не следует (убрано 2026-10-19), фото остаётся ч/б
-  .news__image {
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-    filter: grayscale(1);
-    transform: scale(1.06);
-    transition: transform 0.5s var(--ease-out);
-  }
-
-  .news::after {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    content: '';
-    background: color-mix(in oklch, var(--c-black) 40%, transparent);
-    transition: background-color 0.6s var(--ease-out);
-  }
-
-  .news:hover::after,
-  .news:focus-visible::after {
-    background: color-mix(in oklch, var(--c-black) 18%, transparent);
-  }
-
-  // Соседние карточки темнеют, пока курсор над одной (как в «Каталоге по назначению»)
-  .blog__grid:has(.news:is(:hover, :focus-visible)) .news:not(:hover, :focus-visible)::after {
-    background: color-mix(in oklch, var(--c-black) 62%, transparent);
+  // Карточки без фото: плоская заливка, при наведении лёгкий акцентный тон
+  .news:hover,
+  .news:focus-visible {
+    background: color-mix(in oklch, var(--accent) 14%, var(--ink));
   }
 
   // Композиция: сверху слева дата (число крупно акцентом, месяц белым), справа стрелка; внизу рубрика маленькой подписью и заголовок
@@ -1112,7 +1086,6 @@
     line-height: 0.9;
     color: var(--accent-text);
     text-transform: uppercase;
-    text-shadow: 0 1px 14px color-mix(in oklch, var(--c-black) 55%, transparent);
   }
 
   .news__day {
@@ -1456,7 +1429,7 @@
     }
 
     .blog__grid {
-      grid-template-columns: var(--side-x) minmax(0, 1fr);
+      grid-template-columns: minmax(16rem, 24rem) minmax(0, 1fr);
     }
 
     // Первая карточка вплотную к акцентному блоку: зазор слева убран, границы колонок совпадают с соседними секциями
@@ -1506,7 +1479,7 @@
   @media (prefers-reduced-motion: reduce) {
     .shipments__image,
     .docs__item::before,
-    .news__image,
+    .news,
     .faq__item::details-content {
       transition: none;
     }

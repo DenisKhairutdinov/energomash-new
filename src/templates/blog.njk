@@ -1,4 +1,4 @@
-{# Блог (редизайн с нуля, 2026-10-17): как «Каталог по назначению», сетка в стык на весь экран. Первая строка: тёмный блок с заголовком (до края четырёх колонок контейнера) и свежая статья крупно; вторая: четыре статьи. Фото чёрно-белые, цвет при наведении. #}
+{# Блог (редизайн с нуля, 2026-10-17; 2026-11-09 по просьбе владельца: по ширине контейнера, как фотобанк, без фотографий). Первая строка: акцентный блок с заголовком и свежая статья крупно; вторая: четыре статьи. Карточки с плоской заливкой. #}
 {% from "icons.njk" import icon %}
 {# Композиция карточки: сверху дата крупно акцентом и стрелка, снизу рубрика маленькой подписью и заголовок #}
 {% macro date(post) %}
@@ -17,9 +17,6 @@
     {% for post in blog.posts | sort(true, false, "datetime") %}
       {% if loop.first %}
         <a class="news news--lead" href="{{ post.url }}">
-          <span class="news__photo" aria-hidden="true">
-            <img class="news__image" src="/src/assets/models/thumbs/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
-          </span>
           {{ date(post) }}
           {{ icon("arrow", "news__arrow") }}
           <span class="news__bottom">
@@ -30,22 +27,25 @@
         </a>
       {% endif %}
     {% endfor %}
+    {# Нижний ряд: видео-ролики одной композиции (рубрика и длительность, заголовок, о чём ролик, кнопка воспроизведения). Плеер: scripts/modules/blog-video.ts #}
     <div class="blog__row">
-      {% for post in blog.posts | sort(true, false, "datetime") %}
-        {% if not loop.first and loop.index <= 5 %}
-          <a class="news" href="{{ post.url }}">
-            <span class="news__photo" aria-hidden="true">
-              <img class="news__image" src="/src/assets/models/thumbs/{{ post.cover }}" width="1024" height="768" alt="" loading="lazy" decoding="async" />
-            </span>
-            {{ date(post) }}
-            {{ icon("arrow", "news__arrow") }}
-            <span class="news__bottom">
-              <span class="news__rubric">{{ post.rubric }}</span>
-              <span class="news__title">{{ post.title }}</span>
-            </span>
-          </a>
-        {% endif %}
+      {% for video in blogVideos %}
+        <button class="news news--video" type="button" data-blog-video="{{ video.id }}" data-blog-video-title="{{ video.title }}" aria-haspopup="dialog">
+          <span class="news__top">
+            <span class="news__rubric">Видео · {{ video.duration }}</span>
+            <span class="news__play" aria-hidden="true"></span>
+          </span>
+          <span class="news__bottom">
+            <span class="news__title">{{ video.title }}</span>
+            <span class="news__excerpt">{{ video.lead }}</span>
+          </span>
+        </button>
       {% endfor %}
     </div>
   </div>
+  <dialog class="video-dialog" aria-label="Просмотр видео" data-video-dialog data-lenis-prevent>
+    <button class="video-dialog__close" type="button" aria-label="Закрыть" data-video-close>×</button>
+    <video class="video-dialog__player" controls playsinline preload="none" data-video-player></video>
+    <p class="video-dialog__caption" data-video-caption></p>
+  </dialog>
 </section>

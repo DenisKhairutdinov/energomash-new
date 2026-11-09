@@ -1,0 +1,131 @@
+// Видео в блоге: четыре карточки одной композиции (тёмная обложка с надписью о чём ролик) и окно-плеер.
+@layer sections {
+  .news--video {
+    inline-size: 100%;
+    min-block-size: 18rem;
+    font: inherit;
+    color: var(--ink);
+    text-align: start;
+    cursor: pointer;
+    background: var(--paper);
+    border: 0;
+    border-radius: 0;
+    transition: background-color 0.4s var(--ease-out);
+
+    &:hover,
+    &:focus-visible {
+      background: color-mix(in oklch, var(--accent) 28%, var(--paper));
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-hi);
+      outline-offset: -4px;
+    }
+
+    .news__rubric {
+      color: var(--accent-hi);
+    }
+
+    .news__title {
+      color: var(--ink);
+    }
+
+    .news__excerpt {
+      color: color-mix(in oklch, var(--ink) 80%, transparent);
+    }
+  }
+
+  .news__top {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  // Кнопка воспроизведения: акцентный круг с треугольником
+  .news__play {
+    position: relative;
+    display: block;
+    flex: none;
+    inline-size: 3rem;
+    block-size: 3rem;
+    background: var(--accent);
+    border-radius: 50%;
+
+    &::before {
+      position: absolute;
+      inset: 0;
+      inline-size: 0.9rem;
+      block-size: 1.1rem;
+      margin: auto;
+      content: '';
+      background: var(--c-white);
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+      translate: 0.1rem 0;
+    }
+  }
+
+  .video-dialog {
+    inline-size: fit-content;
+    max-inline-size: calc(100vw - 2rem);
+    max-block-size: calc(100svh - 2rem);
+    padding: 1rem;
+    margin: auto;
+    overflow: auto;
+    overscroll-behavior: contain;
+    color: var(--c-white);
+    background: var(--glass-dark-strong);
+    border: 1px solid var(--assistant-line);
+    backdrop-filter: var(--glass-blur-strong);
+
+    &::backdrop {
+      background: var(--assistant-backdrop);
+    }
+  }
+
+  .video-dialog__player {
+    display: block;
+    inline-size: auto;
+    max-inline-size: calc(100vw - 4rem);
+    block-size: min(78svh, 900px);
+    aspect-ratio: 9 / 16;
+    background: var(--c-black);
+  }
+
+  .video-dialog__caption {
+    margin-block: 0.75rem 0;
+    font-size: var(--fs-s);
+    line-height: 1.5;
+  }
+
+  .video-dialog__close {
+    position: absolute;
+    inset-block-start: 0.5rem;
+    inset-inline-end: 0.5rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: 44px;
+    block-size: 44px;
+    font-size: 1.75rem;
+    color: var(--c-white);
+    cursor: pointer;
+    background: var(--glass-dark);
+    border: 0;
+
+    &:hover {
+      color: var(--accent-hi);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-hi);
+      outline-offset: 2px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .news--video {
+      transition: none;
+    }
+  }
+}

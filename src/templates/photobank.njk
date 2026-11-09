@@ -1,0 +1,29 @@
+{# Фотобанк: мозаика в форме логотипа из фотографий нашей техники. Ячейки строит scripts/modules/photobank.ts по маске logo.svg; наведение показывает кадр, клик открывает его крупно (dialog). Фото берутся из каталога сайта. #}
+<section class="photobank" aria-labelledby="photobank-title" data-photobank data-chapter="Фотобанк">
+  <div class="photobank__head">
+    <h2 class="section-title photobank__title" id="photobank-title" data-split>Фотобанк</h2>
+    <p class="photobank__lead">
+      Фотографии нашей техники. Наведите на&nbsp;ячейку, чтобы увидеть кадр, нажмите, чтобы открыть его крупно.
+    </p>
+  </div>
+  <div class="photobank__stage" data-photobank-stage>
+    <div class="photobank__empty" aria-hidden="true" data-photobank-empty></div>
+    <div class="photobank__grid" role="group" aria-label="Мозаика из фотографий техники" data-photobank-grid></div>
+  </div>
+  <figure class="photobank__preview" hidden data-photobank-preview>
+    <img class="photobank__preview-image" alt="" width="360" height="240" data-photobank-preview-image />
+    <figcaption class="photobank__preview-title" data-photobank-preview-title></figcaption>
+  </figure>
+  <dialog class="photobank__dialog" aria-label="Просмотр фотографии" data-photobank-dialog data-lenis-prevent>
+    <button class="photobank__close" type="button" aria-label="Закрыть" data-photobank-close>×</button>
+    <figure class="photobank__figure">
+      <img class="photobank__full" alt="" width="2400" height="1600" data-photobank-image />
+      <figcaption class="photobank__caption" data-photobank-caption></figcaption>
+    </figure>
+    <div class="photobank__nav">
+      <button type="button" aria-label="Предыдущее фото" data-photobank-prev>←</button>
+      <span class="photobank__counter" data-photobank-counter></span>
+      <button type="button" aria-label="Следующее фото" data-photobank-next>→</button>
+    </div>
+  </dialog>
+</section>
