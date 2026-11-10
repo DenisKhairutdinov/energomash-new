@@ -3,27 +3,45 @@
   <div class="photobank__head">
     <h2 class="section-title photobank__title" id="photobank-title" data-split>Фотобанк</h2>
     <p class="photobank__lead">
-      Фотографии нашей техники. Наведите на&nbsp;ячейку, чтобы увидеть кадр, нажмите, чтобы открыть его крупно.
+      Техника «Энергомаш» в деталях.
+      <span class="photobank__hint-desktop">Наведите на логотип, чтобы рассмотреть мозаику. Нажмите на фото, чтобы открыть его крупно.</span>
+      <span class="photobank__hint-touch">Коснитесь фотографии в логотипе — выбранный кадр появится ниже.</span>
     </p>
   </div>
   <div class="photobank__stage" data-photobank-stage>
     <div class="photobank__empty" aria-hidden="true" data-photobank-empty></div>
     <div class="photobank__grid" role="group" aria-label="Мозаика из фотографий техники" data-photobank-grid></div>
+    <div class="photobank__lens" aria-hidden="true" hidden data-photobank-lens>
+      <div class="photobank__lens-content" inert data-photobank-lens-content></div>
+    </div>
   </div>
   <figure class="photobank__preview" hidden data-photobank-preview>
-    <img class="photobank__preview-image" alt="" width="360" height="240" data-photobank-preview-image />
+    <button class="photobank__preview-open" type="button" aria-label="Открыть выбранную фотографию крупно" data-photobank-preview-open>
+      <img class="photobank__preview-image" alt="" width="360" height="240" data-photobank-preview-image />
+      <span class="photobank__preview-action">Открыть фото ↗</span>
+    </button>
     <figcaption class="photobank__preview-title" data-photobank-preview-title></figcaption>
   </figure>
   <dialog class="photobank__dialog" aria-label="Просмотр фотографии" data-photobank-dialog data-lenis-prevent>
-    <button class="photobank__close" type="button" aria-label="Закрыть" data-photobank-close>×</button>
+    <div class="photobank__toolbar">
+      <span class="photobank__counter" data-photobank-counter></span>
+      <button class="photobank__close" type="button" aria-label="Закрыть" data-photobank-close>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+      </button>
+    </div>
     <figure class="photobank__figure">
       <img class="photobank__full" alt="" width="2400" height="1600" data-photobank-image />
-      <figcaption class="photobank__caption" data-photobank-caption></figcaption>
+      <figcaption class="photobank__footer">
+        <span class="photobank__caption" data-photobank-caption></span>
+        <span class="photobank__nav">
+          <button type="button" aria-label="Предыдущее фото" data-photobank-prev>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m10 5-7 7 7 7M3 12h18" /></svg>
+          </button>
+          <button type="button" aria-label="Следующее фото" data-photobank-next>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m14 5 7 7-7 7M21 12H3" /></svg>
+          </button>
+        </span>
+      </figcaption>
     </figure>
-    <div class="photobank__nav">
-      <button type="button" aria-label="Предыдущее фото" data-photobank-prev>←</button>
-      <span class="photobank__counter" data-photobank-counter></span>
-      <button type="button" aria-label="Следующее фото" data-photobank-next>→</button>
-    </div>
   </dialog>
 </section>

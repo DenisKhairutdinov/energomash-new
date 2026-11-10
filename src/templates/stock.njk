@@ -1,46 +1,43 @@
-{% from "icons.njk" import icon %}
+﻿{% from "icons.njk" import icon %}
 {% from "plural.njk" import plural %}
-<section class="stock" id="stock" aria-labelledby="stock-title" data-showcase data-autoplay="6" data-chapter="Наличие">
+<section class="stock" id="stock" aria-labelledby="stock-title" data-showcase data-chapter="Наличие">
   <div class="stock__top container">
-    <div class="stock__intro">
-      <h2 class="section-title stock__title" id="stock-title" data-split>Техника<br />в&nbsp;наличии</h2>
-      <p class="stock__lead"><strong class="stock__count">{{ home.catalogTotals.inStock }}</strong> {{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} на складе. Готовые полуприцепы-цистерны и автоцистерны отгружаем в течение нескольких дней.</p>
-      <a class="button stock__catalog" href="/catalog.html?in-stock=1">Смотреть всё наличие</a>
-    </div>
-
-    <div class="stock__aside">
-      <div class="stock__info-stack">
-        {% for item in home.stock %}
-          <div class="stock__info{{ ' is-active' if loop.first }}" data-slide-info {% if not loop.first %}inert aria-hidden="true"{% endif %}>
-            <div class="stock__info-heading">
-              <span class="stock__type">{{ item.type }}</span>
-              <span class="stock__badge">{{ item.badge }}</span>
-            </div>
-            <h3 class="stock__model"><a href="/product.html?id={{ item.id }}">{{ item.model }}</a></h3>
+    <h2 class="section-title stock__title" id="stock-title" data-split>Техника<br />в&nbsp;наличии</h2>
+    <p class="stock__lead"><strong>{{ home.catalogTotals.inStock }}</strong> {{ plural(home.catalogTotals.inStock, "единица", "единицы", "единиц") }} на складе.<br />Готовы к отгрузке с завода.</p>
+  </div>
+  <div class="stock__viewport container">
+    <div class="stock__accordion" aria-label="Техника на складе">
+      {% for item in home.stock %}
+        <article class="stock__panel{{ ' is-active' if loop.first }}" data-stock-panel>
+          <img class="stock__image" src="/src/assets/models/{{ item.photo }}" width="2400" height="1600" alt="{{ item.type }} {{ item.model }}" loading="lazy" decoding="async" />
+          <a class="stock__trigger" data-stock-trigger href="/product.html?id={{ item.id }}" aria-label="{{ item.type }}, {{ item.model }} — открыть модель">
+            <span class="stock__number">0{{ loop.index }}</span>
+            <span class="stock__spine">{{ item.model }}</span>
+            <span class="stock__expand" aria-hidden="true">+</span>
+          </a>
+          <div class="stock__content" id="stock-content-{{ loop.index }}" data-stock-content {% if not loop.first %}inert aria-hidden="true"{% endif %}>
+            <span class="stock__type">{{ item.type }}</span>
+            <h3 class="stock__model">{{ item.model }}</h3>
             <dl class="stock__specs">
               {% for spec in item.specs %}
                 <div class="stock__spec"><dt>{{ spec[0] }}</dt><dd>{{ spec[1] }}</dd></div>
               {% endfor %}
             </dl>
-            <a class="stock__details" href="/product.html?id={{ item.id }}">Подробнее о модели {{ icon("arrow", "stock__details-icon") }}</a>
           </div>
-        {% endfor %}
-      </div>
-
-      <div class="stock__controls" aria-label="Управление слайдером">
-        <span class="stock__counter" aria-live="polite"><span data-slide-current>01</span><span class="stock__counter-divider">/</span><span>0{{ home.stock.length }}</span></span>
-        <button class="stock__control stock__control--prev" type="button" data-slide-prev aria-label="Предыдущая модель">{{ icon("arrow", "stock__control-icon") }}</button>
-        <button class="stock__control" type="button" data-slide-next aria-label="Следующая модель">{{ icon("arrow", "stock__control-icon") }}</button>
-      </div>
+        </article>
+      {% endfor %}
+      <article class="stock__panel stock__panel--all" data-stock-panel>
+        <a class="stock__trigger" data-stock-trigger href="/catalog.html?in-stock=1" aria-label="Смотреть всё наличие: {{ home.catalogTotals.inStock }} единицы техники">
+          <span class="stock__number">06</span>
+          <span class="stock__spine">Смотреть всё наличие</span>
+          {{ icon("arrow", "stock__expand") }}
+        </a>
+        <div class="stock__all-content" aria-hidden="true">
+          <span class="stock__total">{{ home.catalogTotals.inStock }}</span>
+          <span class="stock__all-note">{{ plural(home.catalogTotals.inStock, "единица техники", "единицы техники", "единиц техники") }} на складе</span>
+          <span class="stock__all-title"><span>Смотреть всё наличие</span>{{ icon("arrow", "stock__all-arrow") }}</span>
+        </div>
+      </article>
     </div>
-  </div>
-
-  <div class="stock__stage container" aria-label="Фотографии техники в наличии">
-    {% for item in home.stock %}
-      <a class="stock__slide{{ ' is-active' if loop.first }}" data-slide href="/product.html?id={{ item.id }}" aria-label="Подробнее: {{ item.model }}" {% if not loop.first %}inert aria-hidden="true"{% endif %}>
-        <img class="stock__image" src="/src/assets/models/{{ item.photo }}" width="2400" height="1600" alt="{{ item.type }} {{ item.model }}" {% if not loop.first %}loading="lazy"{% endif %} decoding="async" />
-      </a>
-    {% endfor %}
-    <div class="stock__progress" aria-hidden="true"><span class="stock__progress-fill"></span></div>
   </div>
 </section>

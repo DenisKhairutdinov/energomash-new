@@ -1,19 +1,16 @@
-{# Блог (редизайн с нуля, 2026-10-17; 2026-11-09 по просьбе владельца: по ширине контейнера, как фотобанк, без фотографий). Первая строка: акцентный блок с заголовком и свежая статья крупно; вторая: четыре статьи. Карточки с плоской заливкой. #}
+{# Блог: заголовок и подпись над сеткой, затем свежая статья и плитка «Все статьи», ниже видео. #}
 {% from "icons.njk" import icon %}
 {# Композиция карточки: сверху дата крупно акцентом и стрелка, снизу рубрика маленькой подписью и заголовок #}
 {% macro date(post) %}
   {% set parts = post.dateShort.split(' ') %}
   <time class="news__date" datetime="{{ post.datetime }}"><span class="news__day">{{ parts[0] }}</span><span class="news__month">{{ parts[1] }}</span></time>
 {% endmacro %}
-<section data-v="2" class="blog" aria-labelledby="blog-title" data-chapter="Блог">
+<section class="blog" aria-labelledby="blog-title" data-chapter="Блог">
+  <div class="blog__head">
+    <h2 class="section-title blog__title" id="blog-title" data-split>Блог</h2>
+    <p class="blog__lead">Статьи завода о цистернах, сервисе и эксплуатации техники.</p>
+  </div>
   <div class="blog__grid">
-    <div class="blog__intro">
-      <h2 class="section-title blog__title" id="blog-title" data-split>Блог</h2>
-      <div class="blog__foot">
-        <p class="blog__lead">Статьи завода о цистернах, сервисе и эксплуатации техники.</p>
-        <a class="button blog__button" href="/blog.html">Все статьи</a>
-      </div>
-    </div>
     {% for post in blog.posts | sort(true, false, "datetime") %}
       {% if loop.first %}
         <a class="news news--lead" href="{{ post.url }}">
@@ -27,6 +24,12 @@
         </a>
       {% endif %}
     {% endfor %}
+    <a class="news blog__all" href="/blog.html">
+      {{ icon("arrow", "news__arrow") }}
+      <span class="news__bottom">
+        <span class="news__title">Все статьи</span>
+      </span>
+    </a>
     {# Нижний ряд: видео-ролики одной композиции (рубрика и длительность, заголовок, о чём ролик, кнопка воспроизведения). Плеер: scripts/modules/blog-video.ts #}
     <div class="blog__row">
       {% for video in blogVideos %}

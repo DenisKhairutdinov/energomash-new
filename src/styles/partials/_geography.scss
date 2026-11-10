@@ -12,7 +12,7 @@
 
     position: relative;
     display: grid;
-    padding-block: calc(var(--sec-pad-y) * 3) var(--sec-pad-y);
+    padding-block: calc(var(--sec-pad-y) * 3) calc(var(--sec-pad-y) * 2.5);
     color: var(--paper);
     background: var(--ink);
   }
@@ -20,7 +20,7 @@
   // Композиция без колонок: карта крупно по центру, текст лежит поверх свободных углов карты (север и юго-запад пусты)
   .geography__head {
     position: absolute;
-    inset-block: calc(var(--sec-pad-y) * 2);
+    inset-block: calc(var(--sec-pad-y) * 2.5);
     inset-inline-start: var(--edge);
     z-index: 2;
     display: flex;
@@ -209,7 +209,7 @@
 
   // Карточка региона: стеклянная плашка у курсора, положение задаёт geography.ts через translate
   .geography__tooltip {
-    @include dark-surface;
+    @include glass('strong');
 
     position: absolute;
     inset-block-start: 0;
@@ -221,10 +221,7 @@
     min-inline-size: 16rem;
     max-inline-size: 21rem;
     padding: 1.25rem 1.5rem;
-    color: var(--paper);
     pointer-events: none;
-    background: var(--glass-dark-strong);
-    backdrop-filter: var(--glass-blur-strong);
   }
 
   .geography__tooltip[hidden] {

@@ -9,7 +9,7 @@
     position: relative;
     display: grid;
     gap: clamp(1.5rem, 4svh, 3rem);
-    padding-block: var(--sec-pad-y);
+    padding-block: calc(var(--sec-pad-y) * 1.75);
     padding-inline: var(--edge);
     color: var(--paper);
     background: var(--ink);
@@ -33,11 +33,62 @@
     color: var(--paper-85);
   }
 
+  .photobank__hint-desktop,
+  .photobank__hint-touch {
+    display: block;
+    margin-block-start: 0.5rem;
+    font-size: var(--fs-s);
+    color: var(--c-gray);
+  }
+
+  .photobank__hint-touch {
+    display: none;
+  }
+
   // Мозаика по ширине контейнера, как остальные сцены главной (те же боковые поля --edge)
   .photobank__stage {
     position: relative;
     inline-size: 100%;
     aspect-ratio: 176 / 27;
+  }
+
+  .photobank__lens {
+    position: absolute;
+    z-index: 2;
+    inline-size: clamp(15rem, 24vw, 22rem);
+    block-size: clamp(11rem, 17vw, 15rem);
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--ink);
+    transform: translate(-50%, -50%);
+    animation: photobank-lens-reveal 180ms ease-out;
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  .photobank__lens-content {
+    position: absolute;
+    inset: 0 auto auto 0;
+    transform-origin: top left;
+    will-change: transform;
+
+    .photobank__grid {
+      filter: none;
+    }
+  }
+
+  @keyframes photobank-lens-reveal {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.94);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
   }
 
   // Свободные места мозаики: бледная сетка в форме логотипа, на которую «наливаются» фото
@@ -131,6 +182,32 @@
     object-fit: cover;
   }
 
+  .photobank__preview-open {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    padding: 0;
+    color: inherit;
+    cursor: zoom-in;
+    background: transparent;
+    border: 0;
+
+    &:focus-visible {
+      outline: 2px solid var(--accent-hi);
+      outline-offset: 3px;
+    }
+  }
+
+  .photobank__preview-action {
+    position: absolute;
+    inset: auto 0 0;
+    display: none;
+    padding: 0.75rem 1rem;
+    font-size: var(--fs-s);
+    text-align: start;
+    background: var(--glass-dark-strong);
+  }
+
   .photobank__preview-title {
     padding: 0.6rem 0.25rem 0.1rem;
     font-size: var(--fs-s);
@@ -140,34 +217,50 @@
   .photobank__dialog {
     inline-size: min(1100px, calc(100vw - 2rem));
     max-block-size: calc(100svh - 2rem);
-    padding: 1rem;
+    padding: 0.5rem;
     margin: auto;
     overflow: auto;
     overscroll-behavior: contain;
     color: var(--c-white);
-    background: var(--glass-dark-strong);
-    border: 1px solid var(--assistant-line);
-    backdrop-filter: var(--glass-blur-strong);
+    background: transparent;
+    border: 0;
+
+    &[open] {
+      animation: photobank-viewer-reveal 160ms ease-out;
+    }
 
     &::backdrop {
-      background: var(--assistant-backdrop);
+      background: oklch(0% 0 0deg / 78%);
     }
   }
 
+  @keyframes photobank-viewer-reveal {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  .photobank__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: 0.75rem;
+  }
+
   .photobank__close {
-    position: absolute;
-    inset-block-start: 0.5rem;
-    inset-inline-end: 0.5rem;
-    z-index: 1;
     display: grid;
     place-items: center;
     inline-size: 44px;
     block-size: 44px;
-    font-size: 1.75rem;
     color: var(--c-white);
     cursor: pointer;
-    background: var(--glass-dark);
+    background: transparent;
     border: 0;
+    transition: color 160ms ease-out;
 
     &:hover {
       color: var(--accent-hi);
@@ -176,41 +269,51 @@
 
   .photobank__figure {
     display: grid;
-    gap: 0.75rem;
+    gap: 1rem;
     margin: 0;
   }
 
   .photobank__full {
+    display: block;
     inline-size: 100%;
     block-size: auto;
-    max-block-size: 68svh;
+    max-block-size: max(8rem, calc(100svh - 13rem));
     object-fit: contain;
   }
 
+  .photobank__footer {
+    display: flex;
+    gap: 1rem 2rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   .photobank__caption {
+    max-inline-size: 42rem;
     font-size: var(--fs-s);
     line-height: 1.5;
+    color: var(--c-gray);
   }
 
   .photobank__nav {
     display: flex;
-    gap: 1rem;
+    flex-shrink: 0;
+    gap: 0.5rem;
     align-items: center;
-    justify-content: center;
-    margin-block-start: 0.75rem;
 
     button {
+      display: grid;
+      place-items: center;
       min-inline-size: 48px;
       min-block-size: 48px;
-      font-size: 1.5rem;
       color: var(--c-white);
       cursor: pointer;
-      background: var(--accent);
+      background: transparent;
       border: 0;
-      transition: background-color 160ms ease-out;
+      transition: color 160ms ease-out;
 
       &:hover {
-        background: var(--accent-lo);
+        color: var(--accent-hi);
       }
     }
   }
@@ -219,7 +322,8 @@
     min-inline-size: 5rem;
     font-size: var(--fs-s);
     font-variant-numeric: tabular-nums;
-    text-align: center;
+    letter-spacing: 0.08em;
+    color: var(--c-gray);
   }
 
   .photobank__dialog :focus-visible {
@@ -227,8 +331,60 @@
     outline-offset: 3px;
   }
 
+  @media (width < 480px) {
+    .photobank__footer {
+      flex-wrap: wrap;
+    }
+
+    .photobank__nav {
+      margin-inline-start: auto;
+    }
+  }
+
+  @media (hover: none), (pointer: coarse), (width < 768px) {
+    .photobank__hint-desktop,
+    .photobank__lens {
+      display: none;
+    }
+
+    .photobank__hint-touch {
+      display: block;
+    }
+
+    .photobank__preview {
+      position: relative;
+      inset: auto;
+      z-index: auto;
+      justify-self: center;
+      inline-size: min(100%, 44rem);
+      padding: 0;
+      pointer-events: auto;
+      background: transparent;
+      border: 0;
+      backdrop-filter: none;
+    }
+
+    .photobank__preview-image {
+      aspect-ratio: 3 / 2;
+    }
+
+    .photobank__preview-action {
+      display: block;
+    }
+
+    .photobank__preview-title {
+      padding: 0.75rem 0 0;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    .photobank__lens,
+    .photobank__dialog[open] {
+      animation: none;
+    }
+
     .photobank__tile::after,
+    .photobank__close,
     .photobank__nav button {
       transition: none;
     }

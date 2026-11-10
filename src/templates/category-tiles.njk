@@ -25,18 +25,26 @@
 {% endmacro %}
 
 <section class="category-tiles" aria-labelledby="category-tiles-title" data-chapter="Каталог">
-  <div class="category-tiles__grid container">
+  <div class="category-tiles__layout container">
     <header class="category-tiles__intro">
       <h2 class="section-title category-tiles__title" id="category-tiles-title">Каталог<br />техники</h2>
       <p class="category-tiles__lead">Полуприцепы и автоцистерны для топлива, нефти, воды, пищевых жидкостей и коммунальных задач.</p>
     </header>
 
-    {% for group in nav.catalog %}
-      {% set groupIndex = loop.index0 %}
-      {% for item in group.children %}
-        {{ categoryTile(item, childImages[groupIndex][loop.index0], group.title) }}
+    <div class="category-tiles__grid">
+      {% for group in nav.catalog %}
+        {% set groupIndex = loop.index0 %}
+        {% for item in group.children %}
+          {{ categoryTile(item, childImages[groupIndex][loop.index0], group.title) }}
+        {% endfor %}
       {% endfor %}
-    {% endfor %}
 
+      <a class="category-tiles__card category-tiles__card--catalog" href="/catalog.html">
+        <span class="category-tiles__content">
+          <span class="category-tiles__name">Перейти в каталог</span>
+        </span>
+        {{ icon("arrow", "category-tiles__arrow") }}
+      </a>
+    </div>
   </div>
 </section>

@@ -4,7 +4,7 @@ import { runWhenIdle } from './preload'
 
 /**
  * Фотобанк: мозаика из фотографий техники в форме логотипа «Энергомаш».
- * Наведение показывает кадр, клик открывает его крупно (dialog со стрелками и клавиатурой).
+ * Наведение увеличивает мозаику, касание выбирает кадр под ней; dialog открывает фото крупно.
  * Фото берутся из каталога сайта (src/assets/models), подписи из данных главной.
  */
 interface Photo {
@@ -51,6 +51,7 @@ const thumbOf = (file: string): string => thumbUrls[`../../assets/models/thumbs/
 
 // Размер ячейки мозаики: чем шире окно, тем больше ячеек; мелкая ячейка нужна, чтобы читались тонкие буквы логотипа
 const CELL = 20
+const LENS_ZOOM = 8
 const LOGO_WIDTH = 176
 const LOGO_RATIO = 27 / LOGO_WIDTH
 // Знак занимает первые 30 единиц логотипа, дальше девять букв; границы букв в долях ширины надписи
@@ -87,6 +88,8 @@ export function initPhotobank(): void {
   const dialogImage = q<HTMLImageElement>(root, '[data-photobank-image]')
   const caption = q<HTMLElement>(root, '[data-photobank-caption]')
   const counter = q<HTMLElement>(root, '[data-photobank-counter]')
+  const lens = q<HTMLElement>(root, '[data-photobank-lens]')
+  const lensContent = q<HTMLElement>(root, '[data-photobank-lens-content]')
   if (
     !stage ||
     !grid ||
@@ -97,7 +100,9 @@ export function initPhotobank(): void {
     !dialog ||
     !dialogImage ||
     !caption ||
-    !counter
+    !counter ||
+    !lens ||
+    !lensContent
   )
     return
 
@@ -105,6 +110,38 @@ export function initPhotobank(): void {
   let selected = 0
   let opener: HTMLElement | null = null
   let built = 0
+  let previewSelected = 0
+  let pointerType = ''
+  const touchLayout = matchMedia('(hover: none), (pointer: coarse), (max-width: 767px)')
+
+  const hideInspection = (): void => {
+    lens.hidden = true
+    if (!touchLayout.matches) preview.hidden = true
+  }
+
+  const selectPreview = (index: number): void => {
+    const photo = PHOTOS[index]
+    if (!photo) return
+    previewSelected = index
+    previewImage.src = fullOf(photo.file)
+    previewImage.alt = photo.title
+    previewTitle.textContent = photo.title
+    const previewButton = q<HTMLButtonElement>(preview, '[data-photobank-preview-open]')
+    if (previewButton) previewButton.tabIndex = touchLayout.matches ? 0 : -1
+    preview.hidden = false
+  }
+
+  const moveLens = (x: number, y: number): void => {
+    const box = stage.getBoundingClientRect()
+    const localX = Math.max(0, Math.min(x - box.left, box.width))
+    const localY = Math.max(0, Math.min(y - box.top, box.height))
+    lens.hidden = false
+    // Край лупы остаётся в секции, увеличенный участок следует точно за курсором.
+    const left = Math.max(lens.offsetWidth / 2, Math.min(localX, box.width - lens.offsetWidth / 2))
+    lens.style.left = `${String(left)}px`
+    lens.style.top = `${String(localY)}px`
+    lensContent.style.transform = `translate(${String(lens.clientWidth / 2 - localX * LENS_ZOOM)}px, ${String(lens.clientHeight / 2 - localY * LENS_ZOOM)}px) scale(${String(LENS_ZOOM)})`
+  }
 
   const showPhoto = (index: number): void => {
     selected = (index + PHOTOS.length) % PHOTOS.length
@@ -119,7 +156,8 @@ export function initPhotobank(): void {
   const openPhoto = (index: number, from: HTMLElement | null): void => {
     opener = from
     showPhoto(index)
-    preview.hidden = true
+    if (!touchLayout.matches) preview.hidden = true
+    lens.hidden = true
     if (!dialog.open) dialog.showModal()
     q<HTMLButtonElement>(dialog, '[data-photobank-close]')?.focus()
   }
@@ -137,13 +175,8 @@ export function initPhotobank(): void {
   }
 
   const showPreview = (tile: HTMLButtonElement, x: number, y: number): void => {
-    const photo = PHOTOS[Number(tile.dataset['photo'])]
-    if (!photo) return
-    previewImage.src = thumbOf(photo.file)
-    previewImage.alt = ''
-    previewTitle.textContent = photo.title
-    preview.hidden = false
-    movePreview(x, y)
+    selectPreview(Number(tile.dataset['photo']))
+    if (!touchLayout.matches) movePreview(x, y)
   }
 
   const build = async (): Promise<void> => {
@@ -249,21 +282,31 @@ export function initPhotobank(): void {
     stage.style.setProperty('--columns', String(columns))
     stage.style.setProperty('--rows', String(rows))
     grid.replaceChildren(fragment)
+    // Только визуальная копия: inert исключает повторные кнопки из фокуса и кликов.
+    const magnified = grid.cloneNode(true) as HTMLElement
+    magnified.removeAttribute('data-photobank-grid')
+    magnified.removeAttribute('role')
+    magnified.removeAttribute('aria-label')
+    lensContent.style.width = `${String(stage.clientWidth)}px`
+    lensContent.style.height = `${String(stage.clientHeight)}px`
+    const magnifiedEmpty = empty.cloneNode(true) as HTMLElement
+    magnifiedEmpty.removeAttribute('data-photobank-empty')
+    lensContent.replaceChildren(magnifiedEmpty, magnified)
+    hideInspection()
+    if (touchLayout.matches) selectPreview(previewSelected)
     tiles = next
     root.dataset['ready'] = ''
   }
 
-  // Наведение (только мышь): кадр у курсора; клик и Enter открывают крупно
-  grid.addEventListener('pointerover', (event) => {
-    if (event.pointerType !== 'mouse') return
-    const tile = (event.target as HTMLElement).closest<HTMLButtonElement>('.photobank__tile')
-    if (tile) showPreview(tile, event.clientX, event.clientY)
-  })
-  grid.addEventListener('pointermove', (event) => {
-    if (event.pointerType === 'mouse' && !preview.hidden) movePreview(event.clientX, event.clientY)
-  })
-  grid.addEventListener('pointerleave', () => {
+  // Мышь исследует увеличенную мозаику; касание выбирает кадр под логотипом.
+  stage.addEventListener('pointermove', (event) => {
+    if (event.pointerType !== 'mouse' || touchLayout.matches || dialog.open) return
     preview.hidden = true
+    moveLens(event.clientX, event.clientY)
+  })
+  stage.addEventListener('pointerleave', hideInspection)
+  grid.addEventListener('pointerdown', (event) => {
+    pointerType = event.pointerType
   })
   grid.addEventListener('focusin', (event) => {
     const tile = (event.target as HTMLElement).closest<HTMLButtonElement>('.photobank__tile')
@@ -272,11 +315,27 @@ export function initPhotobank(): void {
     showPreview(tile, box.left, box.top)
   })
   grid.addEventListener('focusout', () => {
-    preview.hidden = true
+    if (!touchLayout.matches) preview.hidden = true
   })
   grid.addEventListener('click', (event) => {
     const tile = (event.target as HTMLElement).closest<HTMLButtonElement>('.photobank__tile')
-    if (tile) openPhoto(Number(tile.dataset['photo']), tile)
+    if (!tile) return
+    if (event.detail !== 0 && (touchLayout.matches || pointerType === 'touch')) {
+      selectPreview(Number(tile.dataset['photo']))
+    } else {
+      openPhoto(Number(tile.dataset['photo']), tile)
+    }
+  })
+  q<HTMLButtonElement>(root, '[data-photobank-preview-open]')?.addEventListener(
+    'click',
+    (event) => {
+      openPhoto(previewSelected, event.currentTarget as HTMLButtonElement)
+    },
+  )
+  touchLayout.addEventListener('change', () => {
+    hideInspection()
+    preview.hidden = !touchLayout.matches
+    if (touchLayout.matches) selectPreview(previewSelected)
   })
   // Стрелки двигают фокус по ячейкам (в мозаике один tab-stop)
   grid.addEventListener('keydown', (event) => {
@@ -309,15 +368,9 @@ export function initPhotobank(): void {
     target.focus({ preventScroll: true })
   })
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') preview.hidden = true
+    if (event.key === 'Escape') hideInspection()
   })
-  addEventListener(
-    'scroll',
-    () => {
-      preview.hidden = true
-    },
-    { passive: true },
-  )
+  addEventListener('scroll', hideInspection, { passive: true })
 
   // Окно крупного просмотра
   q<HTMLButtonElement>(dialog, '[data-photobank-close]')?.addEventListener('click', () => {
@@ -348,16 +401,17 @@ export function initPhotobank(): void {
   })
   dialog.addEventListener('close', () => {
     opener?.focus({ preventScroll: true })
+    if (touchLayout.matches) selectPreview(previewSelected)
   })
 
-  // Перестройка при смене ширины: только если изменилось число колонок
+  // Перестройка при смене ширины сохраняет точное совпадение мозаики и её увеличенной копии.
   let lastWidth = stage.clientWidth
   let timer = 0
   new ResizeObserver(() => {
     window.clearTimeout(timer)
     timer = window.setTimeout(() => {
       const width = stage.clientWidth
-      if (Math.abs(width - lastWidth) < 40) return
+      if (Math.abs(width - lastWidth) < 1) return
       lastWidth = width
       void build()
     }, 200)

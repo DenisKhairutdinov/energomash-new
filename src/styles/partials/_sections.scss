@@ -18,6 +18,10 @@
 }
 
 @layer sections {
+  .page--home main > section {
+    margin-block-start: clamp(2rem, 4vw, 5rem);
+  }
+
   // ---------- Отгрузки: слева тёмная колонка, справа лента крупных горизонтальных фото, едет при прокрутке (cinema.ts)
   .shipments {
     color: var(--paper);
@@ -1005,11 +1009,12 @@
     color: var(--paper-85);
   }
 
-  // ---------- Блог: как «Каталог по назначению»: сетка в стык, акцентный блок и свежая статья крупно, ниже три статьи
+  // ---------- Блог: заголовок над сеткой, свежая статья слева, все статьи справа, ниже видео
   // Блог по ширине контейнера, как остальные сцены (те же боковые поля --edge), без фотографий
   .blog {
     display: grid;
-    padding-block: var(--sec-pad-y);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    padding-block: calc(var(--sec-pad-y) * 2.5);
     padding-inline: var(--edge);
     color: var(--paper);
     background: var(--ink);
@@ -1017,18 +1022,12 @@
 
   .blog__grid {
     display: grid;
-    grid-template-rows: repeat(2, minmax(0, 1fr));
     gap: 0.25rem;
   }
 
-  .blog__intro {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    justify-content: space-between;
-    padding: clamp(1.25rem, 2.4svh, 2rem) clamp(1.25rem, 2vw, 2rem);
-    color: var(--c-white);
-    background: var(--accent);
+  .blog__head {
+    display: grid;
+    gap: 1.25rem;
   }
 
   .blog__title {
@@ -1036,20 +1035,10 @@
     text-box: trim-start cap alphabetic;
   }
 
-  .blog__foot {
-    display: grid;
-    gap: 1.25rem;
-    justify-items: start;
-  }
-
   .blog__lead {
     max-inline-size: 26rem;
     font-size: var(--fs-m);
     line-height: 1.55;
-  }
-
-  .blog__button {
-    @include accent-button;
   }
 
   .blog__row {
@@ -1114,7 +1103,6 @@
     color: var(--paper);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    text-shadow: 0 1px 12px color-mix(in oklch, var(--c-black) 60%, transparent);
   }
 
   .news__arrow {
@@ -1164,6 +1152,20 @@
     font-size: clamp(1.6rem, 1rem + 1.6vw, 3rem);
   }
 
+  .blog__all {
+    align-content: end;
+    color: var(--c-white);
+    background: var(--accent);
+  }
+
+  .blog__all:is(:hover, :focus-visible) {
+    background: color-mix(in oklch, var(--accent) 85%, var(--ink));
+  }
+
+  .blog__all:is(:hover, :focus-visible) .news__arrow {
+    color: var(--c-white);
+  }
+
   // ---------- Заявка: белая тема без фото, слева заголовок и контакты, справа компактная светлая панель с формой.
   // Высота по содержимому, без экрана на секцию
   .request {
@@ -1173,6 +1175,10 @@
     padding-block: calc(var(--sec-pad-y) * 1.5);
     overflow: clip;
     background: var(--ink);
+  }
+
+  .page--home .request {
+    padding-block: calc(var(--sec-pad-y) * 2.5);
   }
 
   // Серая тема (на внутренних страницах, если секция над формой белая, ставит request-tone.ts): серое поле, белая панель, светло-серые поля
@@ -1429,12 +1435,11 @@
     }
 
     .blog__grid {
-      grid-template-columns: minmax(16rem, 24rem) minmax(0, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
-    // Первая карточка вплотную к акцентному блоку: зазор слева убран, границы колонок совпадают с соседними секциями
-    .blog__intro + .news {
-      margin-inline-start: -0.25rem;
+    .blog__grid > .news--lead {
+      grid-column: span 3;
     }
 
     .blog__row {
