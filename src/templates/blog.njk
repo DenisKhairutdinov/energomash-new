@@ -33,11 +33,18 @@
     {# Нижний ряд: видео-ролики одной композиции (рубрика и длительность, заголовок, о чём ролик, кнопка воспроизведения). Плеер: scripts/modules/blog-video.ts #}
     <div class="blog__row">
       {% for video in blogVideos %}
-        {% set crop = '197 498 428 154' %}
-        {% if video.id == 'tank-blender' %}{% set crop = '642 498 428 154' %}{% endif %}
-        {% if video.id == 'oil-braking' %}{% set crop = '1085 498 432 154' %}{% endif %}
+        {% set crop = '370 498 255 112' %}
+        {% if video.id == 'tank-blender' %}{% set crop = '826 498 244 112' %}{% endif %}
+        {% if video.id == 'oil-braking' %}{% set crop = '1243 498 275 112' %}{% endif %}
         <button class="news news--video news--brand-cover" type="button" data-blog-video="{{ video.id }}" data-blog-video-title="{{ video.title }}" aria-label="Смотреть видео: {{ video.title }} · {{ video.duration }}" aria-haspopup="dialog">
-          <svg class="news__cover" viewBox="{{ crop }}" aria-hidden="true" focusable="false"><image href="/src/assets/videos/brand-covers-board.png" width="1536" height="1024"/></svg>
+          <span class="news__video-copy">
+            <span class="news__video-brand">Энергомаш</span>
+            <span class="news__video-title">{% if video.id == 'oil-braking' %}А нефть внутри?{% else %}{{ video.title }}{% endif %}</span>
+          </span>
+          <span class="news__video-image">
+            <svg class="news__cover" viewBox="{{ crop }}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><image href="/src/assets/videos/brand-covers-board.png" width="1536" height="1024"/></svg>
+          </span>
+          <span class="news__play" aria-hidden="true"></span>
         </button>
       {% endfor %}
     </div>
