@@ -67,4 +67,39 @@
     border-start-start-radius: 0;
     border-start-end-radius: 0;
   }
+
+  // Каталог: шапка, фильтр и результаты образуют отдельные белые блоки.
+  .catalog {
+    display: grid;
+    gap: var(--section-gap);
+    background: transparent;
+  }
+
+  .catalog__layout {
+    display: grid;
+    gap: var(--section-gap);
+    align-items: start;
+    padding-block: 0;
+  }
+
+  .catalog__head,
+  .cside,
+  .catalog__results {
+    min-inline-size: 0;
+    background: var(--c-white);
+    border-radius: var(--section-radius);
+  }
+
+  .cside,
+  .catalog__results {
+    padding: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .catalog .cfilter {
+    padding: 0;
+  }
+
+  .catalog .catalog__toolbar {
+    padding: 0 0 1rem;
+  }
 }

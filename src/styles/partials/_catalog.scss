@@ -19,11 +19,11 @@
     display: grid;
     gap: 1.25rem 3rem;
     align-items: end;
-    padding-inline: var(--edge);
+    padding-inline: clamp(1rem, 2vw, 1.5rem);
   }
 
   .catalog__title {
-    font-size: var(--fs-hero);
+    font-size: var(--fs-title-s);
     font-weight: 200;
     line-height: 0.88;
     text-transform: uppercase;
@@ -37,7 +37,7 @@
   }
 
   .catalog__lead {
-    max-inline-size: 28rem;
+    max-inline-size: 44rem;
     font-size: var(--fs-m);
     line-height: 1.55;
   }
@@ -808,18 +808,6 @@
 
   // ---------- Широкие экраны
   @media (width >= 900px) {
-    .catalog__head-in {
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-    }
-
-    .catalog__head-in > .catalog__title {
-      grid-column: 1 / 9;
-    }
-
-    .catalog__head-in > .catalog__head-side {
-      grid-column: 9 / -1;
-    }
-
     .catalog__layout {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -847,6 +835,7 @@
       grid-column: 1;
       min-inline-size: 0;
       padding-inline-start: 0.75rem;
+      transition: inset-block-start 0.5s var(--hdr-ease);
     }
 
     .cside__title {
@@ -1226,6 +1215,10 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .cside {
+      transition: none;
+    }
+
     .cfilter__chevron {
       transition: none;
     }

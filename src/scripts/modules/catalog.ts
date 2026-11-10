@@ -248,7 +248,9 @@ export const initCatalog = (): void => {
   const syncSidebar = (): void => {
     sidebar?.style.setProperty(
       '--cside-top',
-      siteHeader?.classList.contains('is-hidden') ? '0.75rem' : 'calc(var(--header-h) + 0.75rem)',
+      siteHeader?.classList.contains('is-hidden')
+        ? 'var(--section-gap)'
+        : 'calc(var(--header-h) + var(--section-gap))',
     )
   }
 
