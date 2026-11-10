@@ -5,10 +5,6 @@
     border-end-end-radius: 1.5rem;
   }
 
-  .header__bar::before,
-  .header__panel,
-  .header__search,
-  .menu__inner,
   .category-tiles__card,
   .stock__accordion,
   .purposes__tile,
@@ -48,6 +44,10 @@
   }
 
   .button,
+  .header__bar::before,
+  .header__panel,
+  .header__search,
+  .menu__inner,
   .field__control,
   .opt__label,
   .switch,
@@ -162,8 +162,8 @@
 
   @media (width >= 1280px) {
     .header__cta {
-      border-start-end-radius: var(--radius-card);
-      border-end-end-radius: var(--radius-card);
+      border-start-end-radius: var(--radius-control);
+      border-end-end-radius: var(--radius-control);
     }
   }
 }
