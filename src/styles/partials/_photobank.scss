@@ -55,8 +55,8 @@
   .photobank__lens {
     position: absolute;
     z-index: 2;
-    inline-size: clamp(15rem, 24vw, 22rem);
-    block-size: clamp(11rem, 17vw, 15rem);
+    inline-size: clamp(12rem, 19vw, 17.5rem);
+    block-size: clamp(8.75rem, 13.5vw, 12rem);
     overflow: hidden;
     pointer-events: none;
     background: var(--ink);

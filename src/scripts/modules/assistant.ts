@@ -21,7 +21,9 @@ export function initAssistant(): void {
   const base = import.meta.env.BASE_URL
   root.innerHTML = `
     <button class="assistant__launcher" type="button" aria-haspopup="dialog" aria-controls="assistant-dialog" aria-label="Открыть помощника завода">
-      <canvas class="assistant__model" aria-hidden="true"></canvas>    </button>
+      <span class="assistant__hint" aria-hidden="true">Нужна помощь?<br />Нажмите, подскажу</span>
+      <canvas class="assistant__model" aria-hidden="true"></canvas>
+    </button>
     <dialog id="assistant-dialog" class="assistant__dialog" aria-labelledby="assistant-title" data-lenis-prevent>
       <button type="button" class="assistant__close" aria-label="Закрыть помощника">×</button>
       <div class="assistant__intro">
