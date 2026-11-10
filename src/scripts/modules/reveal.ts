@@ -3,9 +3,18 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const NO_PREFERENCE = '(prefers-reduced-motion: no-preference)'
 
-// Одно семейство движений на всю главную: фото открываются мягкой шторкой снизу вверх, текстовые плитки по очереди
-// поднимаются и проявляются; кривая и длительность общие (power3.out, около секунды), каждый блок один раз.
+// Короткий подъём и мягкое проявление один раз; заголовки отдельно открываются построчно в text.ts.
 const BLOCKS = [
+  '.page--home .category-tiles__lead',
+  '.page--home .blog__lead',
+  '.page--home .blog .news',
+  '.page--home .stock__lead',
+  '.page--home .stock__viewport',
+  '.page--home .photobank__lead',
+  '.page--home .photobank__stage',
+  '.page--home .geography__info',
+  '.page--home .geography__total',
+  '.page--home .request__contact',
   '.footer__col',
   '.catalog__head-side',
   '.process__item',
@@ -34,13 +43,15 @@ const BLOCKS = [
 // Заранее скрываются только блоки страницы: меню шапки работает по-старому
 const HIDDEN_WIPE = '.geography__svg, .purposes__photo, .news__photo'
 
-// Вызывает действие для блоков, которые вошли в окно (каждый один раз, пачкой в порядке появления). Наблюдение идёт за
-// родителем блока: у закрытого шторкой блока (clip-path) наблюдатель видит нулевую площадь и не срабатывает. Блоки, оставшиеся
-// выше окна (страница открыта посреди прокрутки), показываются сразу без движения
+// Карточки наблюдаем по отдельности, чтобы длинная сетка не раскрывалась целиком при появлении первого ряда.
+// Только для clip-path наблюдаем родителя: у закрытого шторкой блока нулевая площадь пересечения.
+// Блоки выше окна (восстановление прокрутки, переход по якорю) показываем сразу без движения.
 const revealOnView = (
+  context: gsap.Context,
   selector: string,
   action: (batch: HTMLElement[]) => void,
   show: (batch: HTMLElement[]) => void,
+  observeParent = false,
 ): (() => void) => {
   const owners = new Map<Element, HTMLElement[]>()
 
@@ -64,18 +75,23 @@ const revealOnView = (
       }
 
       if (passed.length > 0) {
-        show(passed)
+        context.add(() => {
+          show(passed)
+        })
       }
 
       if (batch.length > 0) {
-        action(batch)
+        // Анимации из асинхронного observer тоже откатываются при смене reduced-motion.
+        context.add(() => {
+          action(batch)
+        })
       }
     },
     { rootMargin: '0px 0px -6% 0px' },
   )
 
   for (const element of document.querySelectorAll<HTMLElement>(selector)) {
-    const owner = element.parentElement ?? element
+    const owner = observeParent ? (element.parentElement ?? element) : element
 
     owners.set(owner, [...(owners.get(owner) ?? []), element])
   }
@@ -96,7 +112,7 @@ const revealOnView = (
 export const initReveal = (): void => {
   gsap.registerPlugin(ScrollTrigger)
 
-  gsap.matchMedia().add(NO_PREFERENCE, () => {
+  gsap.matchMedia().add(NO_PREFERENCE, (context) => {
     // Начальное состояние выставляется сразу, чтобы блок не мигал перед появлением; при «уменьшить движение» этот код не запускается
     // Только для блоков, которые есть на странице: на внутренних страницах GSAP иначе пишет в консоль «target not found»
     if (document.querySelector(HIDDEN_WIPE)) {
@@ -104,7 +120,7 @@ export const initReveal = (): void => {
     }
 
     if (document.querySelector(BLOCKS)) {
-      gsap.set(BLOCKS, { y: 28, autoAlpha: 0 })
+      gsap.set(BLOCKS, { y: 20, autoAlpha: 0 })
     }
 
     // Меню шапки открывается по-старому (триггер ScrollTrigger)
@@ -131,6 +147,7 @@ export const initReveal = (): void => {
     // раньше времени. Блоки, вошедшие вместе, идут по очереди (stagger)
     const stop = [
       revealOnView(
+        context,
         HIDDEN_WIPE,
         (batch) => {
           gsap.fromTo(
@@ -148,20 +165,22 @@ export const initReveal = (): void => {
         (batch) => {
           gsap.set(batch, { clearProps: 'clipPath' })
         },
+        true,
       ),
       revealOnView(
+        context,
         BLOCKS,
         (batch) => {
           gsap.fromTo(
             batch,
-            { y: 28, autoAlpha: 0 },
+            { y: 20, autoAlpha: 0 },
             {
               y: 0,
               autoAlpha: 1,
-              duration: 0.9,
-              stagger: Math.min(0.07, 0.7 / batch.length),
+              duration: 0.8,
+              stagger: Math.min(0.065, 0.24 / Math.max(1, batch.length - 1)),
               ease: 'power3.out',
-              clearProps: 'transform',
+              clearProps: 'transform,opacity,visibility',
             },
           )
         },

@@ -19,7 +19,12 @@
 
 @layer sections {
   .page--home main > section {
-    margin-block-start: clamp(2rem, 4vw, 5rem);
+    padding-block-end: 0;
+    margin-block-start: clamp(1.5rem, 3vw, 3.75rem);
+  }
+
+  .page--home main > .geography:last-child {
+    padding-block-end: calc(var(--sec-pad-y) * 2.5);
   }
 
   // ---------- Отгрузки: слева тёмная колонка, справа лента крупных горизонтальных фото, едет при прокрутке (cinema.ts)
@@ -1178,7 +1183,7 @@
   }
 
   .page--home .request {
-    padding-block: calc(var(--sec-pad-y) * 2.5);
+    padding-block-start: calc(var(--sec-pad-y) * 2.5);
   }
 
   // Серая тема (на внутренних страницах, если секция над формой белая, ставит request-tone.ts): серое поле, белая панель, светло-серые поля

@@ -38,6 +38,8 @@
   white-space: nowrap;
   pointer-events: none;
   background: var(--accent);
+  border-radius: var(--radius-control);
+  box-shadow: 0 4px 12px color-mix(in oklch, var(--c-black) 15%, transparent);
   opacity: 0;
   translate: 0.5rem 0;
   animation: assistant-hint-in 0.6s var(--ease-out, ease-out) 3s forwards;
@@ -76,7 +78,7 @@
   }
 }
 
-/* Окно помощника: тёмное стекло, прямые углы и акцент сайта */
+/* Окно помощника: тёмное стекло, скругления и акцент сайта */
 .assistant__dialog {
   position: fixed;
   inset-block: auto 1rem;
@@ -90,7 +92,7 @@
   color: var(--c-white);
   background: var(--glass-dark-strong);
   border: 1px solid var(--assistant-line);
-  border-radius: 0;
+  border-radius: var(--radius-card);
   backdrop-filter: var(--glass-blur-strong);
 
   &::backdrop {
@@ -169,6 +171,7 @@
   font-size: var(--fs-s);
   line-height: 1.5;
   overflow-wrap: anywhere;
+  border-radius: var(--radius-control);
 
   a {
     color: var(--accent-hi);
@@ -206,6 +209,7 @@
     cursor: pointer;
     background: none;
     border: 1px solid var(--assistant-line);
+    border-radius: var(--radius-control);
     transition:
       background-color 160ms ease-out,
       border-color 160ms ease-out;
@@ -231,6 +235,8 @@
     background: var(--glass-clear);
     border: 1px solid var(--assistant-line);
     border-inline-end: 0;
+    border-start-start-radius: var(--radius-control);
+    border-end-start-radius: var(--radius-control);
 
     &::placeholder {
       color: var(--c-gray);
@@ -249,6 +255,8 @@
     cursor: pointer;
     background: var(--accent);
     border: 0;
+    border-start-end-radius: var(--radius-control);
+    border-end-end-radius: var(--radius-control);
     transition: background-color 160ms ease-out;
 
     &:hover {

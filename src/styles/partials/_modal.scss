@@ -1,16 +1,19 @@
 @use 'mixins' as *;
 
 @layer components {
-  // Окно заявки по центру экрана: слева затемнённое фото с текстом, справа форма на стекле
+  // Окно заявки: затемнённое фото и светлая контрастная форма в любой теме сайта.
   .modal {
+    --ink: var(--c-black);
+    --paper: var(--c-white);
+
     inset: 0;
     inline-size: min(100% - 2rem, 64rem);
     max-block-size: calc(100svh - 2rem);
     padding: 0;
     margin: auto;
     overflow: auto;
-    color: var(--paper);
-    background: transparent;
+    color: var(--c-white);
+    background: var(--c-black);
     border: 0;
   }
 
@@ -63,15 +66,16 @@
     place-items: center;
     inline-size: 2.75rem;
     block-size: 2.75rem;
-    color: var(--paper);
-    background: var(--glass-dark-strong);
-    border: 1px solid var(--line-dark);
-    backdrop-filter: var(--glass-blur);
+    color: var(--c-white);
+    cursor: pointer;
+    background: var(--c-black);
+    border: 0;
     transition: background-color 0.2s;
   }
 
   .modal__close:hover,
   .modal__close:focus-visible {
+    outline: none;
     background: var(--accent-deep);
   }
 
@@ -84,7 +88,7 @@
   .modal__aside {
     position: relative;
     display: grid;
-    align-content: end;
+    align-content: start;
     min-block-size: 16rem;
     padding: clamp(1.5rem, 4vw, 3rem);
     overflow: clip;
@@ -137,32 +141,29 @@
     text-decoration: none;
   }
 
-  // Форма на стекле (как плашки в шапке и наличии), внутри прежние белые прозрачности для полей; рамок у полей нет
+  // Локальные тона не зависят от темы страницы и фона под диалогом.
   .modal__form {
-    @include glass-tones;
+    @include light-surface;
+
+    --fg: var(--c-black);
+    --field: var(--c-light);
+    --field-hover: var(--c-white);
+    --btn-hover-bg: var(--c-black);
+    --btn-hover-fg: var(--c-white);
 
     display: grid;
     gap: 1.25rem;
     align-content: center;
-    padding: clamp(1.5rem, 4vw, 3rem);
-    background: var(--glass-dark-strong);
-    backdrop-filter: var(--glass-blur-strong);
+    padding: 4.5rem clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3rem);
   }
 
-  .modal__form .field__control,
-  .modal__form .opt__label,
-  .modal__form .check__box,
-  .modal__form .select__button {
-    border-color: transparent;
-  }
-
-  .modal__form .field__control[aria-invalid='true'] {
-    border-color: var(--err);
+  .modal__form .field__control {
+    border: 0;
   }
 
   .modal__done {
     padding: 1rem;
-    background: var(--field-hover);
+    background: var(--c-light);
   }
 
   @media (width >= 800px) {

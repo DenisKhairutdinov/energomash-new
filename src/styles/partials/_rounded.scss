@@ -1,0 +1,170 @@
+// Единые скругления поверх стилей секций на всех страницах.
+@layer sections {
+  .hero {
+    border-end-start-radius: 1.5rem;
+    border-end-end-radius: 1.5rem;
+  }
+
+  .header__bar::before,
+  .header__panel,
+  .header__search,
+  .menu__inner,
+  .category-tiles__card,
+  .stock__accordion,
+  .purposes__tile,
+  .shipments__link,
+  .leasing__result,
+  .process__item,
+  .docs__item,
+  .faq__item,
+  .news,
+  .request__panel,
+  .geography__tooltip,
+  .photobank__lens,
+  .photobank__preview,
+  .photobank__full,
+  .modal,
+  .video-dialog,
+  .ccard__inner,
+  .pdp__card-link,
+  .pdp__thumbs,
+  .ip__tile,
+  .ip__fact,
+  .ip__dl > div,
+  .ip__photo,
+  .ip__head-photo,
+  .ap__cover,
+  .ip__band-cap,
+  .ip__head--photo .ip__head-in,
+  .ip__cta-in,
+  .ip__map,
+  .callout,
+  .prose blockquote,
+  .bl__card,
+  .ct__map,
+  .mf__shot,
+  .mf__step {
+    border-radius: var(--radius-card);
+  }
+
+  .button,
+  .field__control,
+  .opt__label,
+  .switch,
+  .switch__track,
+  .chip__label,
+  .range__value--input,
+  .select__button,
+  .select__list,
+  .select__option,
+  .segmented,
+  .header__tool,
+  .header__burger,
+  .header__call,
+  .header__tool::after,
+  .header__phone,
+  .menu__marker,
+  .menu__tile,
+  .search__item,
+  .search__all,
+  .stock__panel,
+  .shipments__button,
+  .shipments__all,
+  .purposes__button,
+  .faq__button,
+  .statement__button,
+  .shipments__where,
+  .shipments__info,
+  .docs__mark,
+  .slider__number,
+  .modal__close,
+  .video-dialog__close,
+  .video-dialog__player,
+  .photobank__preview-open,
+  .photobank__preview-image,
+  .photobank__close,
+  .photobank__nav button,
+  .ctype__body,
+  .cfilter__block,
+  .cfilter__range-field,
+  .cfilter__reset,
+  .cfilter__tag,
+  .cfilter__trigger,
+  .cfilter__clear,
+  .cfilter__dropdown,
+  .cview,
+  .catalog__about-links a,
+  .ccard__body,
+  .pdp__spec,
+  .pdp__thumb,
+  .pdp__thumb img,
+  .pdp__features li,
+  .ip__photo figcaption,
+  .ap__share a,
+  .bl__chip,
+  .bl__text,
+  .ct__place {
+    border-radius: var(--radius-control);
+  }
+
+  .check__box,
+  .switch__track::after,
+  .button__badge,
+  .ccard__badge,
+  .ccard__code,
+  .pdp__status,
+  .pdp__card-badge,
+  .bl__meta {
+    border-radius: var(--radius-small);
+  }
+
+  // Фото и заливки дочерних элементов повторяют контур карточки.
+  // Панели со вложенным стеклом не обрезаем: это мешает backdrop-filter.
+  .pdp__card-link,
+  .ct__map,
+  .photobank__preview-open {
+    overflow: clip;
+  }
+
+  .ccard__link::after {
+    border-radius: var(--radius-card);
+  }
+
+  /* stylelint-disable selector-no-vendor-prefix */
+  .range__slider::-webkit-slider-thumb {
+    border-radius: var(--radius-small);
+  }
+
+  .range__slider::-moz-range-thumb {
+    border-radius: var(--radius-small);
+  }
+
+  .slider__range::-webkit-slider-thumb {
+    border-radius: var(--radius-small);
+  }
+
+  .slider__range::-moz-range-thumb {
+    border-radius: var(--radius-small);
+  }
+  /* stylelint-enable selector-no-vendor-prefix */
+
+  // У составных переключателей скруглены только внешние края.
+  .segmented__item:first-child .segmented__label,
+  .cview__item:first-of-type .cview__label {
+    border-start-start-radius: var(--radius-control);
+    border-end-start-radius: var(--radius-control);
+  }
+
+  .segmented__item:last-child .segmented__label,
+  .cview__item:last-child .cview__label {
+    border-start-end-radius: var(--radius-control);
+    border-end-end-radius: var(--radius-control);
+  }
+
+  @media (width >= 1280px) {
+    .header__cta {
+      border-start-end-radius: var(--radius-card);
+      border-end-end-radius: var(--radius-card);
+    }
+  }
+}

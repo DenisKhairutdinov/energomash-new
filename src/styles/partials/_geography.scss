@@ -168,7 +168,7 @@
 
   .geography__region.is-delivered:hover,
   .geography__region.is-delivered.is-active {
-    fill: var(--accent);
+    fill: var(--accent-hi);
   }
 
   .geography__region:focus-visible {
@@ -219,6 +219,12 @@
     content: '';
     border: 1px solid var(--fg);
     animation: geography-pulse 2.4s ease-out infinite;
+  }
+
+  .geography__legend-item::before,
+  .geography__hub-dot,
+  .geography__hub-dot::before {
+    border-radius: 0.125rem;
   }
 
   // Офис: золотой квадрат с тёмной рамкой, чтобы отличался от завода и читался на залитых регионах

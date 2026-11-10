@@ -1,16 +1,15 @@
-{# Hero: фоновое фото, огромный тонкий h1, кнопки и короткий лид. Нижняя полоса с плитками категорий и панелью «Подбор по параметрам» убрана по просьбе владельца 2026-11-09: категории остаются в секции ниже и в меню. #}
-{# Слои фото: .hero__media двигается и приближается при прокрутке, .hero__zoom отвечает за появление (два разных слоя, чтобы анимации не конфликтовали). #}
+{# Hero: крупный заголовок слева, под ним кнопки и описание поверх фотографии. #}
 <section class="hero" id="top" aria-labelledby="hero-title" data-hero data-chapter="Главная">
   <div class="hero__media" data-hero-media>
     <div class="hero__zoom" data-hero-zoom>
+      <div class="hero__clouds" aria-hidden="true"></div>
       <img
         class="hero__bg"
-        src="/src/assets/images/color.webp"
-        width="3548"
-        height="1774"
+        src="/src/assets/hero/industrial_tanker_transparent_2k_upscayl_2x_high-fidelity-4x 1.png"
+        width="4096"
+        height="2048"
         alt=""
         fetchpriority="high"
-        data-animated-background
       />
     </div>
   </div>

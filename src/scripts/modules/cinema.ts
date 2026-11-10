@@ -57,6 +57,10 @@ const buildChapters = (): void => {
   const toneOf = (x: number, y: number): boolean => {
     const probe = document.elementsFromPoint(x, y).find((element) => !nav.contains(element))
 
+    if (probe?.closest('[data-hero]')) {
+      return false
+    }
+
     if (
       probe instanceof HTMLImageElement ||
       probe instanceof HTMLVideoElement ||

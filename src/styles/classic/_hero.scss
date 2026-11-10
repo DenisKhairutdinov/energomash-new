@@ -3,8 +3,8 @@
 .hero {
   position: relative;
   display: grid;
-  grid-template-rows: 1fr auto auto;
-  min-block-size: max(100svh, 54rem);
+  grid-template-rows: 1fr;
+  min-block-size: 100svh;
   overflow: clip;
   isolation: isolate;
 
@@ -21,7 +21,7 @@
   --ink-soft: var(--c-black);
 }
 
-// Два слоя фото: .hero__media двигается при прокрутке, .hero__zoom отвечает за появление
+// Общая сцена: техника внизу, небо вверху. Масштаб фотографии остаётся постоянным.
 .hero__media,
 .hero__zoom {
   position: absolute;
@@ -34,11 +34,39 @@
   overflow: hidden;
 }
 
+.hero__zoom {
+  background: #8daec6;
+}
+
+// Три плитки перекрывают окно даже после сдвига на одну: цикл остаётся бесшовным.
+// Каждая плитка занимает 50% ширины окна, сохраняя пропорции и привязку к верху.
+.hero__clouds {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 150vw;
+  block-size: 20.975vw;
+  background: url('../../assets/hero/sky_tile_natural 3.png') repeat-x 0 0 / 50vw auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero__clouds {
+    animation: hero-clouds-drift 300s linear infinite reverse;
+  }
+}
+
+@keyframes hero-clouds-drift {
+  to {
+    transform: translateX(-50vw);
+  }
+}
+
 .hero__bg {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
   inline-size: 100%;
-  block-size: 100%;
-  object-fit: cover;
-  object-position: 50% 100%;
+  block-size: auto;
 }
 
 .hero__shade {
@@ -71,17 +99,18 @@
 
 .hero__inner {
   display: grid;
-  gap: 2rem;
-  align-self: end;
+  gap: clamp(3rem, 6svh, 4.5rem);
+  align-content: center;
+  align-self: stretch;
 
-  // Снизу запас как у убранной полосы подбора: кнопки и лид не прижаты к краю экрана
-  padding-block: calc(var(--header-h) + 3rem) clamp(2rem, 5svh, 3.5rem);
+  // Единый блок поверх фотографии: заголовок, действия, затем описание.
+  padding-block: max(8rem, 16svh) clamp(3rem, 8svh, 6rem);
 }
 
 .hero__title {
-  font-size: var(--fs-hero);
+  font-size: clamp(2.875rem, 6vw, 8rem);
   font-weight: 200;
-  line-height: 0.9;
+  line-height: 0.94;
   text-transform: uppercase;
   letter-spacing: -0.02em;
 }
@@ -109,18 +138,20 @@
   }
 }
 
-// Лид и кнопки лежат полосой под заголовком
+// Описание и действия образуют один компактный блок.
 .hero__side {
   display: grid;
   gap: 1.5rem;
-  align-items: center;
+  align-content: start;
+  align-items: start;
+  max-inline-size: 40rem;
   pointer-events: auto;
 }
 
 .hero__lead {
-  max-inline-size: 32rem;
-  font-size: var(--fs-m);
-  line-height: 1.6;
+  max-inline-size: 40rem;
+  font-size: clamp(1rem, 1.1vw, 1.125rem);
+  line-height: 1.5;
   color: var(--c-white);
 }
 
@@ -128,6 +159,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.hero__actions .button:not(.button--glass) {
+  --btn-hover-fg: var(--c-black);
 }
 
 // «Заказать звонок» в hero без рамки: плашка стекла сама отделяет кнопку от фона
@@ -421,14 +456,6 @@
   }
 }
 
-@media (width >= 900px) {
-  .hero__side {
-    grid-template-columns: auto minmax(0, 32rem);
-    gap: 3rem;
-    justify-content: start;
-  }
-}
-
 // Широкий экран: левая колонка (кнопки, плитки) и правая (текст, подбор) стоят на одной сетке: ширину и зазор задают переменные.
 // Подбор в двенадцать колонок: название и тип, назначение (место под две строки чипов резервируется, высота панели не прыгает
 // при смене типа), затем объём, наличие и кнопка
@@ -436,15 +463,6 @@
   .hero {
     --hero-col: 31rem;
     --hero-gap: 0.75rem;
-  }
-
-  .hero__side {
-    grid-template-columns: var(--hero-col) minmax(0, 32rem);
-    gap: var(--hero-gap);
-  }
-
-  .hero__lead {
-    padding-inline-start: 1.25rem;
   }
 
   .hero__bottom {

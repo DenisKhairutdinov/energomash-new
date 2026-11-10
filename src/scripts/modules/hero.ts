@@ -4,9 +4,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 const NO_PREFERENCE = '(prefers-reduced-motion: no-preference)'
 
 /**
- * Hero. Вход: фото «отъезжает» (слой .hero__zoom), строки h1 выезжают из-под маски, блоки поднимаются.
- * При прокрутке (слой .hero__media): кадр плавно приближается, строки заголовка расходятся в стороны.
- * Слои разные, поэтому вход и прокрутка не конфликтуют, а на нулевой позиции кадр всегда в исходном масштабе.
+ * Hero: строки h1 выезжают из-под маски, описание и кнопки поднимаются.
+ * При прокрутке заголовок затухает; фото сохраняет масштаб и положение.
  */
 export const initHero = (ready: Promise<void>): void => {
   const hero = document.querySelector<HTMLElement>('[data-hero]')
@@ -19,8 +18,6 @@ export const initHero = (ready: Promise<void>): void => {
 
   gsap.registerPlugin(ScrollTrigger)
 
-  const media = hero.querySelector<HTMLElement>('[data-hero-media]')
-  const zoom = hero.querySelector<HTMLElement>('[data-hero-zoom]')
   const title = hero.querySelector<HTMLElement>('[data-hero-title]')
   const lines = gsap.utils.toArray<HTMLElement>('[data-hero-line]', hero)
   const sides = gsap.utils.toArray<HTMLElement>('[data-hero-side]', hero)
@@ -33,12 +30,6 @@ export const initHero = (ready: Promise<void>): void => {
     const intro = gsap.timeline({ paused: true, defaults: { ease: 'power4.out' } })
 
     intro
-      .fromTo(
-        zoom,
-        { scale: hasIntro ? 1 : 1.2 },
-        { scale: 1, duration: 2.6, ease: 'power3.out' },
-        0,
-      )
       .fromTo(
         lines,
         { yPercent: 118, autoAlpha: 1 },
@@ -76,13 +67,6 @@ export const initHero = (ready: Promise<void>): void => {
       return
     }
 
-    gsap.fromTo(
-      media,
-      { scale: 1, yPercent: 0 },
-      { scale: 1.22, yPercent: 6, ease: 'none', scrollTrigger },
-    )
-    gsap.fromTo(lines[0] ?? [], { xPercent: 0 }, { xPercent: -12, ease: 'none', scrollTrigger })
-    gsap.fromTo(lines[2] ?? [], { xPercent: 0 }, { xPercent: 12, ease: 'none', scrollTrigger })
     gsap.fromTo(title, { opacity: 1 }, { opacity: 0.1, ease: 'none', scrollTrigger })
     // Сдвиг на контейнере (transform размытию не мешает), затухание на самих плашках
     gsap.fromTo(bottom ?? [], { yPercent: 0 }, { yPercent: 18, ease: 'none', scrollTrigger })

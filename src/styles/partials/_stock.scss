@@ -109,6 +109,11 @@
     font-weight: 300;
   }
 
+  .stock__panel:not(.is-active) .stock__number {
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+  }
+
   .stock__spine {
     position: absolute;
     inset: 50% auto auto 50%;

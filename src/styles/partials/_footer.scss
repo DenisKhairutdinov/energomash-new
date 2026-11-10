@@ -18,7 +18,7 @@
 
   .footer__top {
     gap: 0.5rem var(--col-gap);
-    padding-block: clamp(1.5rem, 2.6vw, 2.75rem);
+    padding-block: clamp(3rem, 5.2vw, 5.5rem) clamp(1.5rem, 2.6vw, 2.75rem);
   }
 
   // Логотип над утверждением, по левой линии сетки; белый (маска по тому же svg, что в шапке, цвет токена --paper)
