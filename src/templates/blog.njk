@@ -33,15 +33,11 @@
     {# Нижний ряд: видео-ролики одной композиции (рубрика и длительность, заголовок, о чём ролик, кнопка воспроизведения). Плеер: scripts/modules/blog-video.ts #}
     <div class="blog__row">
       {% for video in blogVideos %}
-        <button class="news news--video" type="button" data-blog-video="{{ video.id }}" data-blog-video-title="{{ video.title }}" aria-haspopup="dialog">
-          <span class="news__top">
-            <span class="news__rubric">Видео · {{ video.duration }}</span>
-            <span class="news__play" aria-hidden="true"></span>
-          </span>
-          <span class="news__bottom">
-            <span class="news__title">{{ video.title }}</span>
-            <span class="news__excerpt">{{ video.lead }}</span>
-          </span>
+        {% set crop = '197 498 428 154' %}
+        {% if video.id == 'tank-blender' %}{% set crop = '642 498 428 154' %}{% endif %}
+        {% if video.id == 'oil-braking' %}{% set crop = '1085 498 432 154' %}{% endif %}
+        <button class="news news--video news--brand-cover" type="button" data-blog-video="{{ video.id }}" data-blog-video-title="{{ video.title }}" aria-label="Смотреть видео: {{ video.title }} · {{ video.duration }}" aria-haspopup="dialog">
+          <svg class="news__cover" viewBox="{{ crop }}" aria-hidden="true" focusable="false"><image href="/src/assets/videos/brand-covers-board.png" width="1536" height="1024"/></svg>
         </button>
       {% endfor %}
     </div>

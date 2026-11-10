@@ -133,3 +133,20 @@
     }
   }
 }
+
+@layer sections {
+  .news.news--brand-cover {
+    display: block;
+    min-block-size: 0;
+    aspect-ratio: 428 / 154;
+    padding: 0;
+    overflow: hidden;
+    background: var(--accent);
+  }
+
+  .news__cover {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}
