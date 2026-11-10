@@ -1,6 +1,6 @@
 /**
  * Видео-карточки блога: по клику ролик открывается в окне-плеере (dialog).
- * Без автозапуска со звуком в карточке; Escape и клик мимо закрывают окно, фокус возвращается на карточку.
+ * Ролик стартует сразу после клика (автозапуска в самой карточке нет); Escape и клик мимо закрывают окно, фокус возвращается на карточку.
  */
 const videoUrls = import.meta.glob<string>('../../assets/videos/*.mp4', {
   eager: true,
@@ -33,6 +33,8 @@ export function initBlogVideo(): void {
     caption.textContent = card.dataset['blogVideoTitle'] ?? ''
     dialog.showModal()
     close.focus()
+    // Запуск идёт из клика пользователя, поэтому браузер разрешает воспроизведение сразу (со звуком)
+    void player.play().catch(() => undefined)
   }
 
   document.querySelectorAll<HTMLElement>('[data-blog-video]').forEach((card) => {
