@@ -189,8 +189,8 @@
   display: grid;
   gap: 0.5rem;
   align-content: start;
-  min-block-size: 140px;
-  max-block-size: min(38svh, 320px);
+  min-block-size: min(220px, 35svh);
+  max-block-size: min(48svh, 420px);
   padding-inline-end: 0.25rem;
   margin-block: 1rem 0.75rem;
   overflow-y: auto;
