@@ -84,6 +84,38 @@
     }
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    .video-dialog[open] {
+      animation: video-dialog-open 360ms var(--ease-out) both;
+
+      &::backdrop {
+        animation: video-dialog-backdrop-in 280ms ease-out both;
+      }
+    }
+  }
+
+  @keyframes video-dialog-open {
+    from {
+      opacity: 0;
+      transform: translateY(1rem) scale(0.96);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes video-dialog-backdrop-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
   .video-dialog__player {
     display: block;
     inline-size: auto;
