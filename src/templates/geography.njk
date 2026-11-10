@@ -11,8 +11,15 @@
       <ul class="geography__legend">
         <li class="geography__legend-item geography__legend-item--delivered">Были поставки</li>
         <li class="geography__legend-item">Пока без поставок</li>
+        <li class="geography__legend-item geography__legend-item--plant">Завод</li>
+        <li class="geography__legend-item geography__legend-item--office">Офис</li>
       </ul>
     </div>
+  <ul class="geography__places">
+      <li><strong>Производство:</strong> Челябинская область, Мисяш, 5 км автодороги Чебаркуль-Архангельское</li>
+      <li><strong>Офис в г. Челябинск:</strong> ул. Кирова, 159, офис 1709</li>
+      <li><strong>Офис в г. Набережные Челны:</strong> проспект Хасана Туфана, 12, офис 1910</li>
+    </ul>
   <dl class="geography__totals">
     <div class="geography__total">
       <dd data-geography-regions>—</dd>
@@ -23,8 +30,7 @@
       <dt>Единиц техники</dt>
     </div>
   </dl>
-  </div>
-  <div class="geography__stage" data-geography-stage>
+  </div><div class="geography__stage" data-geography-stage>
     {% include "geography-map.njk" %}
     <div class="geography__tooltip" role="status" hidden data-geography-tooltip>
       <span class="geography__tooltip-label mono" data-geography-tooltip-label></span>

@@ -10,6 +10,11 @@ import type {
 const NECK_Y = -0.22
 const HEAD_FROM = -0.06
 const PIVOT = { x: 0, y: -0.14, z: 0.03 }
+// Центры глаз в пикселях атласа 1024x1024 (правый глаз модели, левый глаз модели)
+const EYES: readonly (readonly [number, number])[] = [
+  [395, 62],
+  [898.5, 77],
+]
 
 /**
  * Статичная 3D-модель помощника: голова поворачивается за курсором.
@@ -59,6 +64,44 @@ export async function mountAssistantModel(
         emissiveIntensity?: number
         metalness?: number
         roughness?: number
+      }
+      // В атласе модели у глаз нет тёмного зрачка (особенно левый выглядит «пустым»): дорисовываем радужку, зрачок и блик
+      const source = lit.map as
+        | { image?: { width: number; height: number } & CanvasImageSource }
+        | undefined
+      if (source?.image) {
+        const paint = document.createElement('canvas')
+        paint.width = source.image.width
+        paint.height = source.image.height
+        const ctx = paint.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(source.image, 0, 0)
+          const k = paint.width / 1024
+          for (const [ex, ey] of EYES) {
+            const x = ex * k
+            const y = ey * k
+            const iris = ctx.createRadialGradient(x, y, 0, x, y, 5.4 * k)
+            iris.addColorStop(0, 'rgba(40, 46, 54, 0.95)')
+            iris.addColorStop(0.55, 'rgba(76, 88, 100, 0.85)')
+            iris.addColorStop(1, 'rgba(76, 88, 100, 0)')
+            ctx.fillStyle = iris
+            ctx.beginPath()
+            ctx.arc(x, y, 5.4 * k, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.fillStyle = '#08090b'
+            ctx.beginPath()
+            ctx.arc(x, y, 2.5 * k, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
+            ctx.beginPath()
+            ctx.arc(x - 1.3 * k, y - 1.3 * k, 0.9 * k, 0, Math.PI * 2)
+            ctx.fill()
+          }
+          const painted = new THREE.CanvasTexture(paint)
+          painted.flipY = false
+          painted.colorSpace = THREE.SRGBColorSpace
+          lit.map = painted
+        }
       }
       if (lit.metalness !== undefined) lit.metalness = 0
       if (lit.roughness !== undefined) lit.roughness = 0.85

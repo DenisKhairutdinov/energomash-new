@@ -76,12 +76,35 @@
     background: var(--accent);
   }
 
+  .geography__legend-item--plant::before {
+    background: var(--fg);
+  }
+
+  .geography__legend-item--office::before {
+    background: var(--gold);
+    border: 1px solid var(--fg);
+  }
+
+  // Адреса завода и офисов под легендой
+  .geography__places {
+    display: grid;
+    gap: 0.5rem;
+    margin-block-start: auto;
+    font-size: var(--fs-s);
+    line-height: 1.45;
+    color: var(--paper-85);
+  }
+
+  .geography__places strong {
+    font-weight: 600;
+    color: var(--fg);
+  }
+
   // Итоги: крупные цифры в той же колонке
   .geography__totals {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem 3rem;
-    margin-block-start: auto;
   }
 
   .geography__total {
@@ -171,14 +194,14 @@
     vector-effect: non-scaling-stroke;
   }
 
-  // Завод: прямоугольная метка с пульсирующей рамкой и подписью
+  // Завод и офисы: квадратная метка с пульсирующей рамкой
   .geography__hub {
     position: absolute;
     inset-block-start: var(--y);
     inset-inline-start: var(--x);
     display: flex;
     align-items: center;
-    pointer-events: none;
+    cursor: pointer;
     translate: -50% -50%;
   }
 
@@ -192,19 +215,20 @@
   .geography__hub-dot::before {
     position: absolute;
     inset: -50%;
+    pointer-events: none;
     content: '';
     border: 1px solid var(--fg);
     animation: geography-pulse 2.4s ease-out infinite;
   }
 
-  .geography__hub-name {
-    position: absolute;
-    inset-inline-start: calc(100% + 0.5rem);
-    padding: 0.25rem 0.5rem;
-    font-size: var(--fs-xs);
-    color: var(--bg);
-    white-space: nowrap;
-    background: var(--fg);
+  // Офис: золотой квадрат с тёмной рамкой, чтобы отличался от завода и читался на залитых регионах
+  .geography__hub--office .geography__hub-dot {
+    background: var(--gold);
+    border: 1px solid var(--fg);
+  }
+
+  .geography__hub--office .geography__hub-dot::before {
+    border-color: var(--gold);
   }
 
   // Карточка региона: стеклянная плашка у курсора, положение задаёт geography.ts через translate

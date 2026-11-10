@@ -173,6 +173,31 @@ export const initGeography = (): void => {
     }
   }
 
+  // Завод и офисы: при наведении (и с клавиатуры) та же карточка с названием и адресом
+  for (const place_ of root.querySelectorAll<HTMLElement>('[data-geography-place]')) {
+    const showPlace = (clientX: number, clientY: number): void => {
+      if (fields.label) fields.label.textContent = place_.dataset['label'] ?? ''
+      if (fields.name) fields.name.textContent = place_.dataset['name'] ?? ''
+      if (fields.units) fields.units.textContent = ''
+      if (fields.cities) fields.cities.textContent = place_.dataset['address'] ?? ''
+      tooltip.hidden = false
+      place(clientX, clientY)
+      for (const item of regions) item.classList.remove('is-active')
+    }
+    place_.addEventListener('pointerenter', (event) => {
+      showPlace(event.clientX, event.clientY)
+    })
+    place_.addEventListener('pointermove', (event) => {
+      place(event.clientX, event.clientY)
+    })
+    place_.addEventListener('pointerleave', hide)
+    place_.addEventListener('focus', () => {
+      const box = place_.getBoundingClientRect()
+      showPlace(box.left + box.width / 2, box.top + box.height / 2)
+    })
+    place_.addEventListener('blur', hide)
+  }
+
   for (const region of regions) {
     region.addEventListener('pointerenter', (event) => {
       show(region, event.clientX, event.clientY)
