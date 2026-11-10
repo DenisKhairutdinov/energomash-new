@@ -142,6 +142,87 @@ export const initCatalog = (): void => {
   }
 
   const groups = [...form.querySelectorAll<HTMLFieldSetElement>(GROUP_SELECTOR)]
+  const dropdownAnimations = new WeakMap<HTMLElement, Animation>()
+  const setDropdownOpen = (group: HTMLFieldSetElement, open: boolean): void => {
+    const trigger = group.querySelector<HTMLButtonElement>('[data-filter-trigger]')
+    const dropdown = group.querySelector<HTMLElement>('.cfilter__dropdown')
+
+    if (!trigger || !dropdown || trigger.getAttribute('aria-expanded') === String(open)) return
+    dropdownAnimations.get(dropdown)?.cancel()
+    trigger.setAttribute('aria-expanded', String(open))
+    group.classList.toggle('is-open', open)
+    dropdown.inert = !open
+
+    if (matchMedia(REDUCED_MOTION_QUERY).matches) {
+      dropdown.hidden = !open
+      return
+    }
+
+    dropdown.hidden = false
+    const frames = [
+      { opacity: 0, transform: 'translateY(-6px) scale(0.98)' },
+      { opacity: 1, transform: 'translateY(0) scale(1)' },
+    ]
+    const animation = dropdown.animate(open ? frames : [...frames].reverse(), {
+      duration: open ? 180 : 120,
+      easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)',
+    })
+    dropdownAnimations.set(dropdown, animation)
+    animation.onfinish = (): void => {
+      dropdown.hidden = trigger.getAttribute('aria-expanded') !== 'true'
+    }
+  }
+
+  for (const group of groups) {
+    const trigger = group.querySelector<HTMLButtonElement>('[data-filter-trigger]')
+    if (!trigger) continue
+    const open = (): void => {
+      for (const other of groups) setDropdownOpen(other, other === group)
+    }
+
+    trigger.addEventListener('click', () => {
+      if (trigger.getAttribute('aria-expanded') === 'true') setDropdownOpen(group, false)
+      else open()
+    })
+    group.addEventListener('change', (event) => {
+      if (event.target instanceof HTMLInputElement && event.target.type === 'checkbox') {
+        trigger.focus()
+        setDropdownOpen(group, false)
+      }
+    })
+    group.querySelector<HTMLButtonElement>('[data-filter-clear]')?.addEventListener('click', () => {
+      const checked = [...group.querySelectorAll<HTMLInputElement>('input:checked')]
+      for (const input of checked) input.checked = false
+      trigger.focus()
+      setDropdownOpen(group, false)
+      checked[0]?.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    group.addEventListener('focusout', (event) => {
+      // Clicking a label can briefly move focus to the document before its checkbox receives it.
+      // Keep the list interactive until the checkbox change or an actual move outside the group.
+      if (event.relatedTarget instanceof Node && !group.contains(event.relatedTarget)) {
+        setDropdownOpen(group, false)
+      }
+    })
+    group.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        trigger.focus()
+        setDropdownOpen(group, false)
+      }
+      if (event.key === 'ArrowDown' && event.target === trigger) {
+        event.preventDefault()
+        open()
+        group.querySelector<HTMLInputElement>('.chip:not([hidden]) input:not(:disabled)')?.focus()
+      }
+    })
+  }
+  document.addEventListener('pointerdown', (event) => {
+    for (const group of groups) {
+      if (event.target instanceof Node && !group.contains(event.target)) {
+        setDropdownOpen(group, false)
+      }
+    }
+  })
   const optionInputs = [...form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')]
   const volumeFromInput = form.querySelector<HTMLInputElement>('[name="volume-from"]')
   const volumeToInput = form.querySelector<HTMLInputElement>('[name="volume-to"]')
@@ -402,6 +483,25 @@ export const initCatalog = (): void => {
         })
 
       group.classList.toggle('is-blocked', isBlocked)
+      const selected = group.querySelector<HTMLElement>('[data-filter-selected]')
+      const selectedInputs = [...group.querySelectorAll<HTMLInputElement>('input:checked')]
+      const selectedCount = selectedInputs.length
+
+      if (selected) {
+        selected.textContent = selectedInputs
+          .map(
+            (input) =>
+              input
+                .closest('label')
+                ?.querySelector('[data-filter-option-label]')
+                ?.textContent.trim() ?? input.value,
+          )
+          .join(', ')
+      }
+      const clear = group.querySelector<HTMLButtonElement>('[data-filter-clear]')
+      if (clear) clear.hidden = selectedCount === 0
+      group.classList.toggle('has-selection', selectedCount > 0)
+      if (group.hidden) setDropdownOpen(group, false)
     }
 
     // Подсказка в полях объёма: доступные сейчас крайние значения

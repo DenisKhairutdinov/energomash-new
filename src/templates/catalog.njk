@@ -11,7 +11,7 @@
     {% for option in group.options %}
       <label class="chip" data-catalog-option>
         <input class="chip__input" type="checkbox" name="{{ group.name }}" value="{{ option.value }}" />
-        <span class="chip__label">{{ option.label }}<span class="chip__n" data-chip-count></span></span>
+        <span class="chip__label"><span data-filter-option-label>{{ option.label }}</span><span class="chip__n" data-chip-count></span></span>
       </label>
     {% endfor %}
   </div>
@@ -21,7 +21,7 @@
 {% macro group(group) %}
   {% set groupTypes = group.types | join(" ") %}
   {% if group.kind == "range" %}
-    <fieldset class="cfilter__block">
+    <fieldset class="cfilter__block cfilter__block--volume">
       <legend class="cfilter__label">{{ group.label }}</legend>
       <div class="cfilter__range">
         <label class="cfilter__range-field">
@@ -53,14 +53,31 @@
         </label>
       </div>
     </fieldset>
+  {% elif group.name == "purpose" or group.name == "stock" %}
+    <fieldset class="cfilter__block" data-catalog-group>
+      <legend class="cfilter__label">{{ group.label }}</legend>
+      {{ chips(group) }}
+    </fieldset>
   {% else %}
     <fieldset
-      class="cfilter__block"
+      class="cfilter__block cfilter__block--dropdown"
       data-catalog-group
       {% if groupTypes %}data-catalog-types="{{ groupTypes }}" hidden disabled{% endif %}
     >
-      <legend class="cfilter__label">{{ group.label }}</legend>
-      {{ chips(group) }}
+      <legend class="visually-hidden">{{ group.label }}</legend>
+      <button class="cfilter__trigger" type="button" aria-expanded="false" aria-controls="filter-options-{{ group.name }}" data-filter-trigger>
+        <span class="cfilter__trigger-text">
+          <span>{{ group.label }}</span>
+          <span class="cfilter__selected" data-filter-selected></span>
+        </span>
+        <svg class="cfilter__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </button>
+      <button class="cfilter__clear" type="button" aria-label="Очистить: {{ group.label }}" data-filter-clear hidden>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+      </button>
+      <div class="cfilter__dropdown" id="filter-options-{{ group.name }}" hidden>
+        {{ chips(group) }}
+      </div>
     </fieldset>
   {% endif %}
 {% endmacro %}
