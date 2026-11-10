@@ -12,7 +12,7 @@
 
     position: relative;
     display: grid;
-    padding-block: calc(var(--sec-pad-y) * 3) calc(var(--sec-pad-y) * 2.5);
+    padding-block: calc(var(--sec-pad-y) * 2.5);
     color: var(--paper);
     background: var(--ink);
   }

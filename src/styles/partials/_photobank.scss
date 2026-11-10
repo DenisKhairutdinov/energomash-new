@@ -9,7 +9,7 @@
     position: relative;
     display: grid;
     gap: clamp(1.5rem, 4svh, 3rem);
-    padding-block: calc(var(--sec-pad-y) * 1.75);
+    padding-block: calc(var(--sec-pad-y) * 2.5);
     padding-inline: var(--edge);
     color: var(--paper);
     background: var(--ink);

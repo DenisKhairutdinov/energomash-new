@@ -1,7 +1,7 @@
 @layer sections {
   .category-tiles {
     position: relative;
-    padding-block: var(--sec-pad-y) calc(var(--sec-pad-y) * 2.5);
+    padding-block: calc(var(--sec-pad-y) * 2.5);
     color: var(--site-fg);
     background: var(--site-bg);
   }

@@ -1,0 +1,70 @@
+@use 'mixins' as *;
+
+// Белые секции на общей серой подложке.
+@layer sections {
+  :root {
+    --section-gap: 4px;
+    --section-radius: 1.5rem;
+  }
+
+  html,
+  body {
+    background: var(--c-gray);
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    min-inline-size: 0;
+  }
+
+  main > :is(section, article),
+  main > .classic-scope,
+  .page > :is(.request, .footer) {
+    min-inline-size: 0;
+    overflow: clip;
+    border-radius: var(--section-radius);
+  }
+
+  main > :is(section, article, .classic-scope) {
+    margin-block: 0;
+  }
+
+  main > :is(section, article),
+  .page > .request {
+    --site-bg: var(--c-white);
+    --site-bg-2: var(--c-light);
+    --site-bg-3: var(--c-gray);
+    --site-fg: var(--c-black);
+    --site-fg-2: var(--c-black);
+    --site-line: var(--c-gray);
+    --site-field: var(--c-white);
+    --site-field-hover: var(--c-light);
+    --site-accent-text: var(--accent-lo);
+    --site-btn-line: var(--c-black);
+    --site-hover-fill: var(--c-white);
+    --site-focus-fill: var(--c-white);
+
+    @include theme-site-vars;
+    @include light-surface;
+  }
+
+  .page > :is(.request, .footer) {
+    margin-block: var(--section-gap) 0;
+  }
+
+  .page > .footer {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  .classic-scope .hero {
+    border-radius: 0 0 var(--section-radius) var(--section-radius);
+  }
+
+  main > .classic-scope {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+}

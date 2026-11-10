@@ -18,15 +18,6 @@
 }
 
 @layer sections {
-  .page--home main > section {
-    padding-block-end: 0;
-    margin-block-start: clamp(1.5rem, 3vw, 3.75rem);
-  }
-
-  .page--home main > .geography:last-child {
-    padding-block-end: calc(var(--sec-pad-y) * 2.5);
-  }
-
   // ---------- Отгрузки: слева тёмная колонка, справа лента крупных горизонтальных фото, едет при прокрутке (cinema.ts)
   .shipments {
     color: var(--paper);
