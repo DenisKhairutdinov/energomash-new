@@ -1,6 +1,6 @@
 @layer sections {
   .category-tiles {
-    padding-block: calc(var(--sec-pad-y) * 2.5);
+    padding-block: var(--sec-pad-y) calc(var(--sec-pad-y) * 2.5);
     color: var(--site-fg);
     background: var(--site-bg);
   }
@@ -49,10 +49,7 @@
     text-decoration: none;
     background: var(--site-bg-3);
     isolation: isolate;
-    transition:
-      background-color 0.35s var(--ease-out),
-      box-shadow 0.35s var(--ease-out),
-      transform 0.35s var(--ease-out);
+    transition: background-color 0.35s var(--ease-out);
   }
 
   .category-tiles__image,
@@ -112,19 +109,19 @@
 
   .category-tiles__arrow {
     position: absolute;
-    z-index: 2;
     inset-block-start: clamp(0.85rem, 1.4vw, 1.35rem);
     inset-inline-end: clamp(0.85rem, 1.4vw, 1.35rem);
+    z-index: 2;
     inline-size: 1.5rem;
     block-size: 1.5rem;
-    transition: transform 0.35s var(--ease-out);
+    transition:
+      color 0.35s var(--ease-out),
+      transform 0.35s var(--ease-out);
   }
 
   .category-tiles__card:hover,
   .category-tiles__card:focus-visible {
     z-index: 1;
-    box-shadow: 0 0.7rem 1.8rem color-mix(in oklch, var(--c-black) 18%, transparent);
-    transform: translateY(-0.2rem);
   }
 
   .category-tiles__card:hover .category-tiles__image,
@@ -134,11 +131,13 @@
 
   .category-tiles__card:hover .category-tiles__arrow,
   .category-tiles__card:focus-visible .category-tiles__arrow {
+    color: var(--accent);
     transform: translateX(0.4rem);
   }
 
   .category-tiles__card--catalog {
     background: var(--accent);
+    transition: background-color 0.4s var(--ease-out);
 
     .category-tiles__name {
       text-shadow: none;
@@ -147,11 +146,18 @@
     .category-tiles__arrow {
       inline-size: 2.25rem;
       block-size: 2.25rem;
+      transition:
+        transform 0.5s var(--ease-out),
+        color 0.3s;
     }
 
     &:hover,
     &:focus-visible {
-      background: var(--accent-lo);
+      background: color-mix(in oklch, var(--accent) 85%, var(--ink));
+    }
+
+    &:is(:hover, :focus-visible) .category-tiles__arrow {
+      color: var(--c-white);
     }
   }
 

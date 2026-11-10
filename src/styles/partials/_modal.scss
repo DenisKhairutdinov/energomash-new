@@ -88,7 +88,6 @@
   .modal__aside {
     position: relative;
     display: grid;
-    align-content: start;
     min-block-size: 16rem;
     padding: clamp(1.5rem, 4vw, 3rem);
     overflow: clip;
@@ -113,7 +112,8 @@
   }
 
   .modal__aside-in {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 1.25rem;
   }
 
@@ -125,6 +125,7 @@
   }
 
   .modal__text {
+    margin-block-start: auto;
     color: var(--c-white);
   }
 
@@ -134,8 +135,8 @@
 
   .modal__phone {
     font-family: var(--font-display);
-    font-size: var(--fs-xl);
-    font-weight: 400;
+    font-size: clamp(1.375rem, 1rem + 0.8vw, 2rem);
+    font-weight: 300;
     font-variant-numeric: tabular-nums;
     color: var(--paper);
     text-decoration: none;
@@ -147,7 +148,7 @@
 
     --fg: var(--c-black);
     --field: var(--c-light);
-    --field-hover: var(--c-white);
+    --field-hover: var(--c-gray);
     --btn-hover-bg: var(--c-black);
     --btn-hover-fg: var(--c-white);
 
