@@ -70,13 +70,13 @@
     inline-size: fit-content;
     max-inline-size: calc(100vw - 2rem);
     max-block-size: calc(100svh - 2rem);
-    padding: 1rem;
+    padding: 0;
     margin: auto;
     overflow: auto;
     overscroll-behavior: contain;
     color: var(--c-white);
     background: var(--glass-dark-strong);
-    border: 1px solid var(--assistant-line);
+    border: 0;
     backdrop-filter: var(--glass-blur-strong);
 
     &::backdrop {
@@ -119,7 +119,7 @@
   .video-dialog__player {
     display: block;
     inline-size: auto;
-    max-inline-size: calc(100vw - 4rem);
+    max-inline-size: calc(100vw - 2rem);
     block-size: min(78svh, 900px);
     aspect-ratio: 9 / 16;
     background: var(--c-black);
@@ -127,8 +127,8 @@
 
   // Тонкая золотая метка у подписи ролика
   .video-dialog__caption {
-    padding-inline-start: 0.75rem;
-    margin-block: 0.75rem 0;
+    padding-inline: 0.75rem;
+    margin: 0.75rem 0 0.75rem 0.75rem;
     font-size: var(--fs-s);
     line-height: 1.5;
     border-inline-start: 2px solid var(--gold);
