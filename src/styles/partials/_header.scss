@@ -429,6 +429,10 @@
     max-block-size: min(26rem, 60svh);
     padding: 0 0.75rem 0.75rem;
     overflow-y: auto;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+    scrollbar-color: var(--accent) var(--hdr-plate);
+    scrollbar-width: thin;
   }
 
   .search__item,

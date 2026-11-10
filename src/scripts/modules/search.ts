@@ -59,6 +59,7 @@ export const initSearch = (): void => {
 
     // Пустое значение: ни один вариант не выбран
     input.setAttribute('aria-activedescendant', links[index]?.id ?? '')
+    links[index]?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   }
 
   const close = (): void => {
