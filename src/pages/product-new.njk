@@ -1,0 +1,80 @@
+{% extends "layout.njk" %}
+{% set pageTitle = "Модель полуприцепа-цистерны" %}
+{% set pageDescription = "Характеристики полуприцепов-цистерн для нефтепродуктов, технической воды и вакуумных моделей." %}
+{% set pageRobots = "noindex, follow" %}
+{% set currentPage = "catalog" %}
+{% set pageClass = "product" %}
+{% set hideRequest = true %}
+{% block content %}
+  {% for category in semitrailerCards.categories %}
+  {% for card in category.cards %}
+    {% set modelName = category.modelPrefix + "-" + card.designation %}
+    {% set configurable = category.purpose == "fuel" %}
+    <article class="pdp new-product{% if configurable %} new-product--configurable{% endif %}{% if card.fullCharacteristics %} new-product--full-specifications{% endif %}" data-new-product="{{ card.id }}" hidden>
+      <section class="pdp__hero" aria-labelledby="product-title-{{ card.id }}">
+        <div class="pdp__gallery"><div class="pdp__stage">
+          {% if card.photos.length %}<img class="pdp__photo" src="/src/assets/catalog-cards/{{ card.id }}/{{ card.photos[0] }}" alt="{{ category.typeLabel }} {{ modelName }}" width="1600" height="1000" loading="lazy" />{% else %}<span class="drawing drawing--ppc"></span><span>Фото скоро появится</span>{% endif %}
+        </div></div>
+        <div class="pdp__side">
+          <a class="pdp__back" href="/catalog-new.html?purpose={{ category.purpose }}">← Каталог</a>
+          <div class="pdp__intro"><p class="pdp__type">{{ category.label }}</p><h1 class="pdp__title" id="product-title-{{ card.id }}">{{ modelName }}</h1></div>
+          <dl class="pdp__specs"><div class="pdp__spec"><dt>Объём</dt><dd>{{ card.volume }} м³</dd></div><div class="pdp__spec"><dt>Секций</dt><dd>{{ card.sections }}</dd></div></dl>
+          {% if configurable %}
+          <form class="cfilter new-product__config" id="config-{{ card.id }}" data-product-config aria-label="Выбор комплектации">
+            <input type="hidden" data-config-fixed data-config-label="Объём" value="{{ card.volume }} м³" />
+            <input type="hidden" data-config-fixed data-config-label="Количество секций" value="{{ card.sections }}" />
+            {% for characteristic in card.briefCharacteristics.items %}
+              {% set choices = characteristic.values %}
+              {% set unit = "" %}
+              {% if characteristic.id == "ssuHeight" %}{% set choices = card.availableSsuMm %}{% set unit = " мм" %}{% endif %}
+              <div class="cfilter__block new-product__config-group{% if loop.last %} new-product__config-group--wide{% endif %}" role="group" aria-labelledby="label-{{ card.id }}-{{ characteristic.id }}" data-config-group data-config-label="{{ characteristic.label }}"{% if choices.length == 1 %} data-config-value="{{ choices[0] }}{{ unit }}"{% endif %}>
+                <p class="cfilter__label" id="label-{{ card.id }}-{{ characteristic.id }}">{{ characteristic.label }}</p>
+                <div class="cfilter__options new-product__config-options new-product__config-options--switch{% if choices.length == 1 %} new-product__config-options--single{% endif %}" style="--switch-count: {{ choices.length }}">
+                {% if choices.length == 1 %}
+                  <span class="chip chip--fixed" title="Фиксированная характеристика"><span class="chip__label">{{ choices[0] }}{{ unit }}</span></span>
+                {% else %}
+                    {% for value in choices %}
+                      <label class="chip">
+                        <input class="chip__input" type="radio" name="{{ characteristic.id }}" value="{{ value }}{{ unit }}"{% if loop.first %} checked{% endif %} />
+                        <span class="chip__label">{{ value }}{{ unit }}</span>
+                      </label>
+                    {% endfor %}
+                {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+            {% if card.optionalEquipment.items.length %}
+              <p class="cfilter__label new-product__options-label" id="options-label-{{ card.id }}">Опции</p>
+              <div class="new-product__optional-filter" role="group" aria-labelledby="options-label-{{ card.id }}">
+                {% set optionLabels = ["Насос СВН-80А", "Узел выдачи топлива", "Алюминиевые крылья", "Передняя подъёмная ось"] %}
+                {% for option in card.optionalEquipment.items %}
+                  <label class="chip" title="{{ option }}"><input class="chip__input" type="checkbox" name="options" value="{{ option }}" aria-label="{{ option }}" data-config-option /><span class="chip__label">{{ optionLabels[loop.index0] or option }}</span></label>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <button class="new-product__config-reset" type="reset">Сбросить выбор</button>
+          </form>
+          {% endif %}
+          <div class="pdp__actions">
+            <button class="button pdp__price" type="button" data-modal-open="quote" data-modal-model="{{ modelName }} — {{ category.label | lower }}">Получить КП</button>
+          </div>
+        </div>
+      </section>
+      {% if card.fullCharacteristics %}
+        {% include "product-full-characteristics.njk" %}
+      {% endif %}
+      {% if not configurable %}
+      <section class="new-product__characteristics">
+        <h2 class="section-title pdp__h2">{{ card.briefCharacteristics.title }}</h2>
+        <dl>{% for characteristic in card.briefCharacteristics.items %}<div class="pdp__spec"><dt>{{ characteristic.label }}</dt><dd>{{ characteristic.values | join("; ") }}</dd></div>{% endfor %}</dl>
+        {% if card.optionalEquipment.items.length %}
+        <h2 class="section-title pdp__h2">{{ card.optionalEquipment.title }}</h2>
+        <ul class="pdp__features">{% for option in card.optionalEquipment.items %}<li>{{ option }}</li>{% endfor %}</ul>
+        {% endif %}
+      </section>
+      {% endif %}
+    </article>
+  {% endfor %}
+  {% endfor %}
+  <p class="pdp__missing" data-new-product-missing>Модель не найдена. <a href="/catalog-new.html">Вернуться в каталог</a></p>
+{% endblock %}

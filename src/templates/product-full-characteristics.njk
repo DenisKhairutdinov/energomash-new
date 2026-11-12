@@ -1,0 +1,30 @@
+<section class="product-specifications" aria-labelledby="specifications-{{ card.id }}">
+  <header class="product-specifications__head">
+    <div>
+      <p class="product-specifications__model">{{ modelName }}</p>
+      <h2 class="section-title pdp__h2" id="specifications-{{ card.id }}">{{ card.fullCharacteristics.title }}</h2>
+    </div>
+    <a class="button product-specifications__download" href="{{ card.fullCharacteristics.documentHref }}" download="{{ card.id }}-specifications.docx">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <span>Скачать характеристики <span class="product-specifications__format">Word · .docx</span></span>
+    </a>
+  </header>
+  <div class="product-specifications__groups">
+    {% for group in card.fullCharacteristics.groups %}
+      <section class="product-specifications__group" aria-labelledby="specifications-{{ card.id }}-{{ group.id }}">
+        <h3 class="product-specifications__title" id="specifications-{{ card.id }}-{{ group.id }}">{{ group.title }}</h3>
+        <dl class="product-specifications__grid">
+          {% for item in group.items %}
+            <div class="product-specifications__item"><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
+          {% endfor %}
+        </dl>
+      </section>
+    {% endfor %}
+  </div>
+  {% if card.optionalEquipment.items.length %}
+    <section class="product-specifications__options" aria-labelledby="specifications-{{ card.id }}-options">
+      <h3 class="product-specifications__title" id="specifications-{{ card.id }}-options">{{ card.optionalEquipment.title }}</h3>
+      <ul class="product-specifications__grid">{% for option in card.optionalEquipment.items %}<li class="product-specifications__item">{{ option }}</li>{% endfor %}</ul>
+    </section>
+  {% endif %}
+</section>

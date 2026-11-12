@@ -49,10 +49,6 @@
   }
 
   .button,
-  .header__bar::before,
-  .header__panel,
-  .header__search,
-  .menu__inner,
   .field__control,
   .opt__label,
   .switch,
@@ -165,10 +161,17 @@
     border-end-end-radius: var(--radius-control);
   }
 
+  .header__bar::before,
+  .header__panel,
+  .header__search,
+  .menu__inner {
+    border-radius: 1rem;
+  }
+
   @media (width >= 1280px) {
     .header__cta {
-      border-start-end-radius: var(--radius-control);
-      border-end-end-radius: var(--radius-control);
+      border-start-end-radius: 1rem;
+      border-end-end-radius: 1rem;
     }
   }
 }

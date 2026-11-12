@@ -3,7 +3,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 
 const { site } = JSON.parse(readFileSync('src/data/site.json', 'utf8'))
-const SKIP = new Set(['index', '403', '404', '500', '503', 'product'])
+const SKIP = new Set(['index', '403', '404', '500', '503', 'product', 'catalog-new', 'product-new'])
 
 const pages = readdirSync('src/pages')
   .filter((file) => file.endsWith('.njk'))

@@ -2,6 +2,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import { initBlog } from './blog'
 import { initCatalog } from './catalog'
+import { initNewCatalog, initNewProduct } from './catalog-new'
 import { initCinema } from './cinema'
 import { initContactsMap } from './contacts-map'
 import { initGeography } from './geography'
@@ -36,6 +37,8 @@ export const startApp = (): Promise<void> => {
   initModal()
   initPicker()
   initCatalog()
+  initNewCatalog()
+  initNewProduct()
   initBlog()
   void initProduct()
   initSearch()

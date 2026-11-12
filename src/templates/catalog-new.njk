@@ -1,0 +1,80 @@
+{% from "icons.njk" import icon %}
+<div class="new-catalog" data-new-catalog>
+  <header class="catalog__head new-catalog__head">
+    <div class="catalog__head-in">
+      <h1 class="catalog__title">Каталог</h1>
+      <p class="catalog__lead">Полуприцепы-цистерны и автоцистерны завода</p>
+    </div>
+  </header>
+  <aside class="new-catalog__sidebar is-open" aria-label="Подбор моделей" data-new-sidebar>
+    <button class="new-catalog__toggle" type="button" aria-expanded="true" aria-controls="new-catalog-filter" data-new-sidebar-toggle>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 17h16M8 4v6m8 4v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+      <span>Фильтр</span>
+    </button>
+    <form class="cfilter new-catalog__filters" id="new-catalog-filter" action="/catalog-new.html" aria-label="Фильтры каталога" data-new-filter data-lenis-prevent>
+      <fieldset class="cfilter__block new-catalog__types">
+        <legend class="cfilter__label">Подкатегории</legend>
+        <div class="cfilter__options new-product__config-options--switch" style="--switch-count: {{ catalog.types.length }}">
+          {% for type in catalog.types %}
+            <label class="chip"><input class="chip__input" type="radio" name="type" value="{{ type.id }}"{% if loop.first %} checked{% endif %} /><span class="chip__label">{{ type.label }}</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <fieldset class="cfilter__block new-catalog__purposes">
+        <legend class="cfilter__label">Назначение</legend>
+        <div class="cfilter__options new-catalog__option-tabs">
+          {% for purpose in catalog.purposes %}
+            <label class="chip" data-new-purpose="{{ purpose.value }}"{% if purpose.value not in ["fuel", "oil", "tech-water", "vacuum"] %} hidden{% endif %}><input class="chip__input" type="checkbox" name="purpose" value="{{ purpose.value }}" /><span class="chip__label">{{ purpose.label }}</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <fieldset class="cfilter__block cfilter__block--volume new-catalog__volume">
+        <legend class="cfilter__label">Объём, м³</legend>
+        <div class="cfilter__range">
+          <label class="cfilter__range-field"><span class="cfilter__range-prefix">от</span><input class="cfilter__range-input" type="text" name="volume-from" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="16" aria-label="Объём, от" /></label>
+          <label class="cfilter__range-field"><span class="cfilter__range-prefix">до</span><input class="cfilter__range-input" type="text" name="volume-to" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="40" aria-label="Объём, до" /><span class="cfilter__range-unit">м³</span></label>
+        </div>
+      </fieldset>
+      <fieldset class="cfilter__block new-catalog__sections">
+        <legend class="cfilter__label">Количество секций</legend>
+        <div class="cfilter__options new-catalog__option-tabs">
+          {% for sections in [1, 2, 3, 4] %}<label class="chip"><input class="chip__input" type="checkbox" name="sections" value="{{ sections }}" /><span class="chip__label">{{ sections }}</span></label>{% endfor %}
+        </div>
+      </fieldset>
+      <div class="cfilter__status">
+        <p class="cfilter__found" role="status" aria-live="polite" aria-atomic="true">Найдено: <strong data-new-count>{{ semitrailerCards.total }} моделей</strong></p>
+        <button class="cfilter__reset" type="reset" data-new-reset disabled>Сбросить всё</button>
+      </div>
+    </form>
+  </aside>
+  <div class="new-catalog__results">
+    <ul class="catalog__list new-catalog__grid" data-view="grid" aria-label="Модели полуприцепов-цистерн">
+      {% for category in semitrailerCards.categories %}
+      {% for card in category.cards %}
+        {% set modelName = category.modelPrefix + "-" + card.designation %}
+        {% set modelHref = "/product-new.html?id=" + card.id %}
+        <li class="ccard" data-new-card data-type="semitrailer" data-purpose="{{ category.purpose }}" data-volume="{{ card.volume }}" data-sections="{{ card.sections }}" id="{{ card.id }}">
+          <article class="ccard__inner" aria-labelledby="title-{{ card.id }}">
+            <a class="ccard__media" href="{{ modelHref }}" tabindex="-1" aria-hidden="true">
+              {% if card.photos.length %}<img class="ccard__image is-loaded" src="/src/assets/models/thumbs/{{ card.photos[0] }}" alt="Полуприцеп-цистерна {{ modelName }}" width="800" height="520" loading="lazy" decoding="async" />{% else %}<span class="drawing drawing--ppc ccard__drawing"></span><span class="ccard__soon">Фото скоро появится</span>{% endif %}
+            </a>
+            <div class="ccard__body">
+              <div class="ccard__head"><p class="ccard__type">{{ category.typeLabel }}</p><h2 class="ccard__title" id="title-{{ card.id }}"><a class="ccard__link" href="{{ modelHref }}">{{ modelName }}</a></h2></div>
+              <div class="new-catalog__card-reveal">
+                <div class="new-catalog__card-details">
+                  <dl class="new-catalog__card-specs">
+                    <div><dt>Объём</dt><dd>{{ card.volume }} м³</dd></div>
+                    <div><dt>Количество секций</dt><dd>{{ card.sections }}</dd></div>
+                  </dl>
+                  <div class="ccard__actions"><button class="button button--compact ccard__price" type="button" data-modal-open="quote" data-modal-model="{{ modelName }} — {{ category.label | lower }}">Получить КП</button><span class="ccard__arrow" aria-hidden="true">{{ icon("arrow") }}</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </li>
+      {% endfor %}
+      {% endfor %}
+    </ul>
+    <div class="new-catalog__empty" data-new-empty hidden><h2 data-new-empty-title>Моделей с такими параметрами нет</h2><p data-new-empty-text>Измените условия или сбросьте фильтры.</p><button class="cfilter__reset" type="reset" form="new-catalog-filter">Сбросить всё</button></div>
+  </div>
+</div>

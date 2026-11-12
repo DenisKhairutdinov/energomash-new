@@ -1,0 +1,918 @@
+{
+  "source": "src/assets/models",
+  "catalog": "public/data/catalog.json",
+  "cardsSource": "src/data/catalog-cards/semitrailers.json",
+  "totalCards": 60,
+  "totalPhotos": 262,
+  "cards": [
+    {
+      "id": "semitrailer-fuel-16-1",
+      "purpose": "fuel",
+      "designation": "16/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "91605 IMG_0531.webp", "sourceItemIds": ["model-331"] },
+        { "file": "91606 IMG_0532.webp", "sourceItemIds": ["model-332"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-16-2",
+      "purpose": "fuel",
+      "designation": "16/2",
+      "photoCount": 2,
+      "photos": [
+        { "file": "IMG_8924.webp", "sourceItemIds": ["model-333"] },
+        { "file": "IMG_8921.webp", "sourceItemIds": ["model-334"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-17-1",
+      "purpose": "fuel",
+      "designation": "17/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "91705 IMG_9842.webp", "sourceItemIds": ["model-335"] },
+        { "file": "91706 IMG_0533.webp", "sourceItemIds": ["model-336"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-17-2",
+      "purpose": "fuel",
+      "designation": "17/2",
+      "photoCount": 2,
+      "photos": [
+        { "file": "IMG_8926.webp", "sourceItemIds": ["model-337"] },
+        { "file": "IMG_8925.webp", "sourceItemIds": ["model-338"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-18-1",
+      "purpose": "fuel",
+      "designation": "18/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "ППЦ-18_1-Р -код 91805-.webp", "sourceItemIds": ["model-339"] },
+        { "file": "91806 IMG_0514.webp", "sourceItemIds": ["model-340"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-18-2",
+      "purpose": "fuel",
+      "designation": "18/2",
+      "photoCount": 6,
+      "photos": [
+        { "file": "IMG_0515.webp", "sourceItemIds": ["model-341"] },
+        { "file": "IMG_0517.webp", "sourceItemIds": ["model-342"] },
+        { "file": "IMG_2119.webp", "sourceItemIds": ["stock-798"] },
+        { "file": "IMG_2134.webp", "sourceItemIds": ["stock-994"] },
+        { "file": "IMG_2128.webp", "sourceItemIds": ["stock-995"] },
+        { "file": "IMG_2134_0.webp", "sourceItemIds": ["stock-996"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-20-1",
+      "purpose": "fuel",
+      "designation": "20/1",
+      "photoCount": 2,
+      "photos": [
+        {
+          "file": "ППЦ-20_1-Р -код 92005-.webp",
+          "sourceItemIds": [
+            "model-343",
+            "model-727",
+            "model-728",
+            "model-729",
+            "model-730",
+            "model-731"
+          ]
+        },
+        {
+          "file": "92006 IMG_1720.webp",
+          "sourceItemIds": [
+            "model-344",
+            "model-732",
+            "model-733",
+            "model-745",
+            "model-751",
+            "model-754"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-20-2",
+      "purpose": "fuel",
+      "designation": "20/2",
+      "photoCount": 8,
+      "photos": [
+        { "file": "92008 ППЦ-20-2_1.webp", "sourceItemIds": ["model-346"] },
+        { "file": "IMG_2135.webp", "sourceItemIds": ["model-346"] },
+        {
+          "file": "92006 IMG_1720.webp",
+          "sourceItemIds": ["model-734", "model-738", "model-746", "model-752", "model-757"]
+        },
+        {
+          "file": "ППЦ-20_1-Р -код 92005-.webp",
+          "sourceItemIds": ["model-737", "model-741", "model-744", "model-749", "model-755"]
+        },
+        { "file": "92007 ППЦ-23-2-Н.webp", "sourceItemIds": ["model-759"] },
+        { "file": "IMG_2107.webp", "sourceItemIds": ["model-759"] },
+        { "file": "IMG_2108.webp", "sourceItemIds": ["stock-1002"] },
+        { "file": "IMG_2117_0.webp", "sourceItemIds": ["stock-1003"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-20-3",
+      "purpose": "fuel",
+      "designation": "20/3",
+      "photoCount": 4,
+      "photos": [
+        { "file": "92007 ППЦ-23-2-Н.webp", "sourceItemIds": ["model-345"] },
+        { "file": "92008 ППЦ-20-2_1.webp", "sourceItemIds": ["model-736"] },
+        {
+          "file": "92006 IMG_1720.webp",
+          "sourceItemIds": ["model-739", "model-743", "model-747", "model-753", "model-758"]
+        },
+        {
+          "file": "ППЦ-20_1-Р -код 92005-.webp",
+          "sourceItemIds": ["model-740", "model-742", "model-748", "model-750", "model-756"]
+        }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-22-1",
+      "purpose": "fuel",
+      "designation": "22/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "92205 IMG_1594.webp", "sourceItemIds": ["model-347"] },
+        { "file": "92206 IMG_1639.webp", "sourceItemIds": ["model-348"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-22-2",
+      "purpose": "fuel",
+      "designation": "22/2",
+      "photoCount": 2,
+      "photos": [
+        { "file": "92207 IMG_3896.webp", "sourceItemIds": ["model-349"] },
+        { "file": "IMG_9723.webp", "sourceItemIds": ["model-350"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-22-3",
+      "purpose": "fuel",
+      "designation": "22/3",
+      "photoCount": 2,
+      "photos": [
+        { "file": "ППЦ-20 без тягача зима -7-.webp", "sourceItemIds": ["model-351"] },
+        { "file": "ППЦ-20 без тягача зима -4-.webp", "sourceItemIds": ["model-352"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-23-1",
+      "purpose": "fuel",
+      "designation": "23/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "IMG_1590.webp", "sourceItemIds": ["model-353"] },
+        { "file": "IMG_1543.webp", "sourceItemIds": ["model-354"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-23-2",
+      "purpose": "fuel",
+      "designation": "23/2",
+      "photoCount": 2,
+      "photos": [
+        { "file": "92307 IMG_9905_0.webp", "sourceItemIds": ["model-355"] },
+        { "file": "92308 ППЦ-22-2-Н -ППЦ-20-Н-.webp", "sourceItemIds": ["model-356"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-23-3",
+      "purpose": "fuel",
+      "designation": "23/3",
+      "photoCount": 1,
+      "photos": [{ "file": "IMG_4555.webp", "sourceItemIds": ["model-357"] }]
+    },
+    {
+      "id": "semitrailer-fuel-24-1",
+      "purpose": "fuel",
+      "designation": "24/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "IMG_3349.webp", "sourceItemIds": ["model-360"] },
+        { "file": "IMG_3347_0.webp", "sourceItemIds": ["model-363"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-24-2",
+      "purpose": "fuel",
+      "designation": "24/2",
+      "photoCount": 4,
+      "photos": [
+        { "file": "92405 IMG_0025.webp", "sourceItemIds": ["model-364"] },
+        { "file": "IMG_9667.webp", "sourceItemIds": ["model-364"] },
+        { "file": "92406 ППЦ-23-Н -ППЦ-24-2-.webp", "sourceItemIds": ["model-365"] },
+        { "file": "IMG_9904_0.webp", "sourceItemIds": ["stock-1008"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-24-3",
+      "purpose": "fuel",
+      "designation": "24/3",
+      "photoCount": 2,
+      "photos": [
+        { "file": "IMG_4492.webp", "sourceItemIds": ["model-366"] },
+        { "file": "IMG_4493.webp", "sourceItemIds": ["model-367"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-26-1",
+      "purpose": "fuel",
+      "designation": "26/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "IMG_0367_0.webp", "sourceItemIds": ["model-368"] },
+        { "file": "IMG_4262.webp", "sourceItemIds": ["model-369"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-26-2",
+      "purpose": "fuel",
+      "designation": "26/2",
+      "photoCount": 2,
+      "photos": [
+        { "file": "92605 IMG_4556_0.webp", "sourceItemIds": ["model-370"] },
+        { "file": "92606 IMG_0550.webp", "sourceItemIds": ["model-371"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-26-3",
+      "purpose": "fuel",
+      "designation": "26/3",
+      "photoCount": 4,
+      "photos": [
+        { "file": "92607 IMG_4579.webp", "sourceItemIds": ["model-372"] },
+        { "file": "92608 IMG_4494.webp", "sourceItemIds": ["model-373"] },
+        { "file": "IMG_3516.webp", "sourceItemIds": ["model-373"] },
+        { "file": "IMG_3996.webp", "sourceItemIds": ["stock-1011"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-28-1",
+      "purpose": "fuel",
+      "designation": "28/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "IMG_0371.webp", "sourceItemIds": ["model-374"] },
+        { "file": "IMG_0370.webp", "sourceItemIds": ["model-375"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-28-2",
+      "purpose": "fuel",
+      "designation": "28/2",
+      "photoCount": 2,
+      "photos": [
+        { "file": "92803 IMG_9301.webp", "sourceItemIds": ["model-376"] },
+        { "file": "92804 IMG_9312.webp", "sourceItemIds": ["model-377"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-28-3",
+      "purpose": "fuel",
+      "designation": "28/3",
+      "photoCount": 5,
+      "photos": [
+        { "file": "ППЦ-28-3_1.webp", "sourceItemIds": ["model-378"] },
+        { "file": "92806 ППЦ-28-3_2.webp", "sourceItemIds": ["model-379"] },
+        { "file": "IMG_0550.webp", "sourceItemIds": ["stock-722"] },
+        { "file": "IMG_2141.webp", "sourceItemIds": ["stock-792"] },
+        { "file": "IMG_2140.webp", "sourceItemIds": ["stock-1027"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-28-4",
+      "purpose": "fuel",
+      "designation": "28/4",
+      "photoCount": 1,
+      "photos": [{ "file": "IMG_2765.webp", "sourceItemIds": ["stock-766"] }]
+    },
+    {
+      "id": "semitrailer-fuel-30-1",
+      "purpose": "fuel",
+      "designation": "30/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "WhatsApp Image 2022-06-17 at 14-57-27.webp", "sourceItemIds": ["model-380"] },
+        { "file": "WhatsApp Image 2022-06-17 at 14-57-26 -1-.webp", "sourceItemIds": ["model-381"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-30-2",
+      "purpose": "fuel",
+      "designation": "30/2",
+      "photoCount": 2,
+      "photos": [
+        { "file": "93003 IMG_9285.webp", "sourceItemIds": ["model-382"] },
+        { "file": "93004 IMG_9281.webp", "sourceItemIds": ["model-383"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-30-3",
+      "purpose": "fuel",
+      "designation": "30/3",
+      "photoCount": 5,
+      "photos": [
+        { "file": "93005 IMG_9738.webp", "sourceItemIds": ["model-384"] },
+        { "file": "93006 IMG_0521.webp", "sourceItemIds": ["model-385"] },
+        { "file": "IMG_0543.webp", "sourceItemIds": ["stock-719"] },
+        { "file": "IMG_2798.webp", "sourceItemIds": ["stock-793"] },
+        { "file": "IMG_4133.webp", "sourceItemIds": ["stock-1017"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-35-3",
+      "purpose": "fuel",
+      "designation": "35/3",
+      "photoCount": 4,
+      "photos": [
+        { "file": "93501 IMG_4422.webp", "sourceItemIds": ["model-386"] },
+        { "file": "93502 IMG_4411.webp", "sourceItemIds": ["model-387"] },
+        { "file": "IMG_3644.webp", "sourceItemIds": ["stock-767"] },
+        { "file": "IMG_4625.webp", "sourceItemIds": ["stock-1026"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-37-3",
+      "purpose": "fuel",
+      "designation": "37/3",
+      "photoCount": 2,
+      "photos": [
+        { "file": "93701 IMG_4410.webp", "sourceItemIds": ["model-388"] },
+        { "file": "93702 IMG_4404.webp", "sourceItemIds": ["model-389"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-37-4",
+      "purpose": "fuel",
+      "designation": "37/4",
+      "photoCount": 2,
+      "photos": [
+        { "file": "93703 IMG_4334.webp", "sourceItemIds": ["model-390"] },
+        { "file": "93704 IMG_4340.webp", "sourceItemIds": ["model-391"] }
+      ]
+    },
+    {
+      "id": "semitrailer-fuel-40-4",
+      "purpose": "fuel",
+      "designation": "40/4",
+      "photoCount": 2,
+      "photos": [
+        { "file": "94001 ППЦ-40 с тягачом зима -17-.webp", "sourceItemIds": ["model-392"] },
+        { "file": "94002 ППЦ-40 с тягачом зима -2-.webp", "sourceItemIds": ["model-393"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-16-1",
+      "purpose": "oil",
+      "designation": "16/1",
+      "photoCount": 2,
+      "photos": [
+        {
+          "file": "91604 ППЦ-18-Н_1 -ППЦ-18-Н-.webp",
+          "sourceItemIds": ["model-305", "model-1208", "model-1211", "model-1213"]
+        },
+        {
+          "file": "ППЦ-18-Н_2 -ППЦ-16-Н-.webp",
+          "sourceItemIds": ["model-306", "model-1209", "model-1210", "model-1212"]
+        }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-17-1",
+      "purpose": "oil",
+      "designation": "17/1",
+      "photoCount": 2,
+      "photos": [
+        {
+          "file": "91704 IMG_0513.webp",
+          "sourceItemIds": ["model-303", "model-1223", "model-1225", "model-1227"]
+        },
+        {
+          "file": "91703 IMG_0525.webp",
+          "sourceItemIds": ["model-304", "model-1222", "model-1224", "model-1226"]
+        }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-18-1",
+      "purpose": "oil",
+      "designation": "18/1",
+      "photoCount": 3,
+      "photos": [
+        {
+          "file": "91804 IMG_0524.webp",
+          "sourceItemIds": ["model-301", "model-1237", "model-1239", "model-1241"]
+        },
+        { "file": "IMG_0517_0.webp", "sourceItemIds": ["model-301"] },
+        {
+          "file": "91803 IMG_0324.webp",
+          "sourceItemIds": ["model-302", "model-1236", "model-1238", "model-1240"]
+        }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-20-1",
+      "purpose": "oil",
+      "designation": "20/1",
+      "photoCount": 23,
+      "photos": [
+        {
+          "file": "ППЦ-20-Н -ППЦ-20-Н-п-.webp",
+          "sourceItemIds": ["model-299", "model-726", "model-1253", "model-1255"]
+        },
+        { "file": "IMG_1723.webp", "sourceItemIds": ["model-299"] },
+        {
+          "file": "ППЦ-20-Н -ППЦ-20-Н-р-.webp",
+          "sourceItemIds": ["model-300", "model-725", "model-1252", "model-1254"]
+        },
+        { "file": "IMG_2696.webp", "sourceItemIds": ["model-690"] },
+        { "file": "IMG_2536.webp", "sourceItemIds": ["model-691"] },
+        { "file": "IMG_4541.webp", "sourceItemIds": ["model-1386", "model-1390"] },
+        { "file": "IMG_4576.webp", "sourceItemIds": ["model-1386"] },
+        { "file": "IMG_4548.webp", "sourceItemIds": ["model-1387", "model-1391"] },
+        { "file": "IMG_4547.webp", "sourceItemIds": ["model-1387"] },
+        { "file": "IMG_4550.webp", "sourceItemIds": ["model-1388", "model-1392"] },
+        { "file": "IMG_4557.webp", "sourceItemIds": ["model-1388"] },
+        { "file": "IMG_4568.webp", "sourceItemIds": ["model-1389", "model-1393"] },
+        { "file": "IMG_4566.webp", "sourceItemIds": ["model-1389"] },
+        { "file": "IMG_4514.webp", "sourceItemIds": ["model-1394"] },
+        { "file": "IMG_4528.webp", "sourceItemIds": ["model-1394"] },
+        { "file": "IMG_4521.webp", "sourceItemIds": ["model-1395"] },
+        { "file": "IMG_4523.webp", "sourceItemIds": ["model-1395"] },
+        { "file": "IMG_4517.webp", "sourceItemIds": ["model-1396"] },
+        { "file": "IMG_4530.webp", "sourceItemIds": ["model-1397"] },
+        { "file": "IMG_4528_0.webp", "sourceItemIds": ["model-1398"] },
+        { "file": "IMG_4535.webp", "sourceItemIds": ["model-1399"] },
+        { "file": "IMG_4523_0.webp", "sourceItemIds": ["model-1400"] },
+        { "file": "IMG_4540_0.webp", "sourceItemIds": ["model-1401"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-22-1",
+      "purpose": "oil",
+      "designation": "22/1",
+      "photoCount": 13,
+      "photos": [
+        {
+          "file": "ППЦ-22-2-Н -ППЦ-22-Н-п-.webp",
+          "sourceItemIds": ["model-297", "model-1265", "model-1268", "model-1269"]
+        },
+        {
+          "file": "ППЦ-22-2-Н -ППЦ-22-Н-р-.webp",
+          "sourceItemIds": ["model-298", "model-1264", "model-1266", "model-1267"]
+        },
+        { "file": "IMG_4548.webp", "sourceItemIds": ["model-1402", "model-1407"] },
+        { "file": "IMG_4550.webp", "sourceItemIds": ["model-1403", "model-1408"] },
+        { "file": "IMG_4568.webp", "sourceItemIds": ["model-1405", "model-1409"] },
+        { "file": "IMG_4541.webp", "sourceItemIds": ["model-1406", "model-1418"] },
+        { "file": "IMG_4514.webp", "sourceItemIds": ["model-1410"] },
+        { "file": "IMG_4521.webp", "sourceItemIds": ["model-1411"] },
+        { "file": "IMG_4517.webp", "sourceItemIds": ["model-1413"] },
+        { "file": "IMG_4528_0.webp", "sourceItemIds": ["model-1414"] },
+        { "file": "IMG_4535.webp", "sourceItemIds": ["model-1415"] },
+        { "file": "IMG_4523_0.webp", "sourceItemIds": ["model-1416"] },
+        { "file": "IMG_4540_0.webp", "sourceItemIds": ["model-1417"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-23-1",
+      "purpose": "oil",
+      "designation": "23/1",
+      "photoCount": 4,
+      "photos": [
+        {
+          "file": "ППЦ-22-2-Н -ППЦ-23-Н-п-.webp",
+          "sourceItemIds": ["model-295", "model-1279", "model-1282", "model-1284"]
+        },
+        {
+          "file": "ППЦ-22-2-Н -ППЦ-23-Н-.webp",
+          "sourceItemIds": ["model-296", "model-1278", "model-1280", "model-1283"]
+        },
+        { "file": "IMG_3873_0.webp", "sourceItemIds": ["model-296"] },
+        { "file": "IMG_3873_1.webp", "sourceItemIds": ["model-1278"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-24-1",
+      "purpose": "oil",
+      "designation": "24/1",
+      "photoCount": 13,
+      "photos": [
+        {
+          "file": "ППЦ-23-2-Н -ППЦ-24-Н-П-.webp",
+          "sourceItemIds": ["model-293", "model-1295", "model-1297", "model-1299"]
+        },
+        {
+          "file": "92401 IMG_9904.webp",
+          "sourceItemIds": ["model-294", "model-1294", "model-1296", "model-1298"]
+        },
+        { "file": "IMG_4541.webp", "sourceItemIds": ["model-1420", "model-1424"] },
+        { "file": "IMG_4548.webp", "sourceItemIds": ["model-1421", "model-1425"] },
+        { "file": "IMG_4550.webp", "sourceItemIds": ["model-1422", "model-1426"] },
+        { "file": "IMG_4568.webp", "sourceItemIds": ["model-1423", "model-1427"] },
+        { "file": "IMG_4514.webp", "sourceItemIds": ["model-1428"] },
+        { "file": "IMG_4521.webp", "sourceItemIds": ["model-1429"] },
+        { "file": "IMG_4517.webp", "sourceItemIds": ["model-1430"] },
+        { "file": "IMG_4528_0.webp", "sourceItemIds": ["model-1432"] },
+        { "file": "IMG_4535.webp", "sourceItemIds": ["model-1433"] },
+        { "file": "IMG_4523_0.webp", "sourceItemIds": ["model-1434"] },
+        { "file": "IMG_4540_0.webp", "sourceItemIds": ["model-1435"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-25-1",
+      "purpose": "oil",
+      "designation": "25/1",
+      "photoCount": 3,
+      "photos": [
+        { "file": "DSC_0092.webp", "sourceItemIds": ["model-646", "model-694"] },
+        { "file": "DSC_0126.webp", "sourceItemIds": ["model-646", "model-694"] },
+        { "file": "DSC_0096.webp", "sourceItemIds": ["model-646", "model-694"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-26-1",
+      "purpose": "oil",
+      "designation": "26/1",
+      "photoCount": 2,
+      "photos": [
+        {
+          "file": "92602 IMG_0367.webp",
+          "sourceItemIds": [
+            "model-291",
+            "model-1326",
+            "model-1327",
+            "model-1329",
+            "model-1331",
+            "model-1333",
+            "model-1335",
+            "model-1337"
+          ]
+        },
+        {
+          "file": "92601 IMG_0369.webp",
+          "sourceItemIds": [
+            "model-292",
+            "model-1324",
+            "model-1325",
+            "model-1328",
+            "model-1330",
+            "model-1332",
+            "model-1334",
+            "model-1336"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-28-1",
+      "purpose": "oil",
+      "designation": "28/1",
+      "photoCount": 2,
+      "photos": [
+        {
+          "file": "92601 IMG_0369.webp",
+          "sourceItemIds": [
+            "model-1338",
+            "model-1340",
+            "model-1342",
+            "model-1344",
+            "model-1346",
+            "model-1348",
+            "model-1350",
+            "model-1352"
+          ]
+        },
+        {
+          "file": "92602 IMG_0367.webp",
+          "sourceItemIds": [
+            "model-1339",
+            "model-1341",
+            "model-1343",
+            "model-1345",
+            "model-1347",
+            "model-1349",
+            "model-1351",
+            "model-1353"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-30-1",
+      "purpose": "oil",
+      "designation": "30/1",
+      "photoCount": 9,
+      "photos": [
+        { "file": "IMG_2496.webp", "sourceItemIds": ["model-692"] },
+        { "file": "IMG_2509.webp", "sourceItemIds": ["model-693", "model-1471"] },
+        {
+          "file": "92601 IMG_0369.webp",
+          "sourceItemIds": [
+            "model-1354",
+            "model-1356",
+            "model-1358",
+            "model-1360",
+            "model-1362",
+            "model-1364",
+            "model-1366",
+            "model-1368"
+          ]
+        },
+        { "file": "IMG_3421.webp", "sourceItemIds": ["model-1354"] },
+        {
+          "file": "92602 IMG_0367.webp",
+          "sourceItemIds": [
+            "model-1355",
+            "model-1357",
+            "model-1359",
+            "model-1361",
+            "model-1363",
+            "model-1365",
+            "model-1367",
+            "model-1369"
+          ]
+        },
+        { "file": "IMG_2478.webp", "sourceItemIds": ["model-1468"] },
+        { "file": "IMG_2499.webp", "sourceItemIds": ["model-1469", "model-1473"] },
+        { "file": "IMG_2494.webp", "sourceItemIds": ["model-1470"] },
+        { "file": "IMG_2487.webp", "sourceItemIds": ["model-1472"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-32-1",
+      "purpose": "oil",
+      "designation": "32/1",
+      "photoCount": 4,
+      "photos": [
+        { "file": "ППЦТ-38 термос нефть -1-.webp", "sourceItemIds": ["model-1474"] },
+        { "file": "ППЦТ-38 термос нефть -7-.webp", "sourceItemIds": ["model-1475"] },
+        { "file": "IMG_2925.webp", "sourceItemIds": ["stock-762"] },
+        { "file": "IMG_2961_0.webp", "sourceItemIds": ["stock-941"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-35-1",
+      "purpose": "oil",
+      "designation": "35/1",
+      "photoCount": 2,
+      "photos": [
+        {
+          "file": "92601 IMG_0369.webp",
+          "sourceItemIds": [
+            "model-1370",
+            "model-1372",
+            "model-1374",
+            "model-1376",
+            "model-1378",
+            "model-1380",
+            "model-1382",
+            "model-1384"
+          ]
+        },
+        {
+          "file": "92602 IMG_0367.webp",
+          "sourceItemIds": [
+            "model-1371",
+            "model-1373",
+            "model-1375",
+            "model-1377",
+            "model-1379",
+            "model-1381",
+            "model-1383",
+            "model-1385"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-36-1",
+      "purpose": "oil",
+      "designation": "36/1",
+      "photoCount": 3,
+      "photos": [
+        { "file": "ППЦТ-38 термос нефть -4-.webp", "sourceItemIds": ["model-696"] },
+        { "file": "ППЦТ-38 термос нефть -8-.webp", "sourceItemIds": ["model-697"] },
+        { "file": "ППЦТ-38 термос нефть -7-.webp", "sourceItemIds": ["model-697"] }
+      ]
+    },
+    {
+      "id": "semitrailer-oil-38-1",
+      "purpose": "oil",
+      "designation": "38/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "IMG_2922.webp", "sourceItemIds": ["model-681"] },
+        { "file": "IMG_2961.webp", "sourceItemIds": ["model-695"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-16-1",
+      "purpose": "tech-water",
+      "designation": "16/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "91602 IMG_1060.webp", "sourceItemIds": ["model-289", "model-801"] },
+        { "file": "91601 IMG_1072.webp", "sourceItemIds": ["model-290", "model-800"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-17-1",
+      "purpose": "tech-water",
+      "designation": "17/1",
+      "photoCount": 4,
+      "photos": [
+        { "file": "91702 IMG_1073.webp", "sourceItemIds": ["model-287", "model-815"] },
+        { "file": "IMG_3754.webp", "sourceItemIds": ["model-287"] },
+        { "file": "91701 IMG_1105.webp", "sourceItemIds": ["model-288", "model-814"] },
+        { "file": "IMG_3786.webp", "sourceItemIds": ["model-815"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-18-1",
+      "purpose": "tech-water",
+      "designation": "18/1",
+      "photoCount": 2,
+      "photos": [
+        {
+          "file": "91802 IMG_1113.webp",
+          "sourceItemIds": ["model-285", "model-829", "model-835", "model-837"]
+        },
+        { "file": "91801 IMG_1082.webp", "sourceItemIds": ["model-286", "model-828", "model-834"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-20-1",
+      "purpose": "tech-water",
+      "designation": "20/1",
+      "photoCount": 29,
+      "photos": [
+        { "file": "92002 IMG_1393.webp", "sourceItemIds": ["model-283", "model-843"] },
+        { "file": "IMG_3607.webp", "sourceItemIds": ["model-283"] },
+        { "file": "92001 IMG_1533.webp", "sourceItemIds": ["model-284", "model-842"] },
+        { "file": "IMG_3629.webp", "sourceItemIds": ["model-284"] },
+        { "file": "IMG_4509.webp", "sourceItemIds": ["model-920", "model-1114"] },
+        { "file": "IMG_4496_0.webp", "sourceItemIds": ["model-920"] },
+        { "file": "IMG_4494.webp", "sourceItemIds": ["model-921", "model-1112"] },
+        { "file": "IMG_4495.webp", "sourceItemIds": ["model-921"] },
+        { "file": "IMG_4509_1.webp", "sourceItemIds": ["model-1104"] },
+        { "file": "IMG_4490.webp", "sourceItemIds": ["model-1105"] },
+        { "file": "IMG_4513.webp", "sourceItemIds": ["model-1106"] },
+        { "file": "IMG_4496.webp", "sourceItemIds": ["model-1107"] },
+        { "file": "IMG_4509_0.webp", "sourceItemIds": ["model-1108"] },
+        { "file": "IMG_4504.webp", "sourceItemIds": ["model-1109"] },
+        { "file": "IMG_4229_0.webp", "sourceItemIds": ["model-1480"] },
+        { "file": "IMG_4230.webp", "sourceItemIds": ["model-1480"] },
+        { "file": "IMG_4216.webp", "sourceItemIds": ["model-1481"] },
+        { "file": "IMG_4216_0.webp", "sourceItemIds": ["model-1481"] },
+        { "file": "IMG_4236.webp", "sourceItemIds": ["model-1482"] },
+        { "file": "IMG_4236_0.webp", "sourceItemIds": ["model-1482"] },
+        { "file": "IMG_4212_0.webp", "sourceItemIds": ["model-1483"] },
+        { "file": "IMG_5378.webp", "sourceItemIds": ["model-1488"] },
+        { "file": "IMG_5377.webp", "sourceItemIds": ["model-1489"] },
+        { "file": "IMG_5381.webp", "sourceItemIds": ["model-1490"] },
+        { "file": "IMG_5376.webp", "sourceItemIds": ["model-1491"] },
+        { "file": "IMG_5416.webp", "sourceItemIds": ["model-1492"] },
+        { "file": "IMG_5476.webp", "sourceItemIds": ["model-1493"] },
+        { "file": "IMG_5527.webp", "sourceItemIds": ["model-1494"] },
+        { "file": "IMG_5490.webp", "sourceItemIds": ["model-1495"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-22-1",
+      "purpose": "tech-water",
+      "designation": "22/1",
+      "photoCount": 4,
+      "photos": [
+        { "file": "92202 IMG_1232.webp", "sourceItemIds": ["model-281", "model-859"] },
+        { "file": "92201 IMG_1321.webp", "sourceItemIds": ["model-282", "model-858"] },
+        { "file": "IMG_4494.webp", "sourceItemIds": ["model-1121", "model-1129"] },
+        { "file": "IMG_4509.webp", "sourceItemIds": ["model-1122", "model-1130"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-23-1",
+      "purpose": "tech-water",
+      "designation": "23/1",
+      "photoCount": 2,
+      "photos": [
+        { "file": "92302 IMG_1316.webp", "sourceItemIds": ["model-279", "model-873"] },
+        { "file": "92301 IMG_1291.webp", "sourceItemIds": ["model-280", "model-872"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-24-1",
+      "purpose": "tech-water",
+      "designation": "24/1",
+      "photoCount": 4,
+      "photos": [
+        { "file": "92301 IMG_1291.webp", "sourceItemIds": ["model-886", "model-888"] },
+        { "file": "92302 IMG_1316.webp", "sourceItemIds": ["model-887", "model-889"] },
+        { "file": "IMG_4494.webp", "sourceItemIds": ["model-1137", "model-1145"] },
+        { "file": "IMG_4509.webp", "sourceItemIds": ["model-1138", "model-1146"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-26-1",
+      "purpose": "tech-water",
+      "designation": "26/1",
+      "photoCount": 10,
+      "photos": [
+        { "file": "IMG_4427.webp", "sourceItemIds": ["model-903"] },
+        { "file": "IMG_4439_0.webp", "sourceItemIds": ["model-904"] },
+        { "file": "IMG_4443.webp", "sourceItemIds": ["model-904"] },
+        { "file": "IMG_4432.webp", "sourceItemIds": ["model-905"] },
+        { "file": "IMG_4431.webp", "sourceItemIds": ["model-906"] },
+        { "file": "IMG_4440.webp", "sourceItemIds": ["model-906"] },
+        { "file": "IMG_4428.webp", "sourceItemIds": ["model-1152"] },
+        { "file": "IMG_4443_0.webp", "sourceItemIds": ["model-1153"] },
+        { "file": "IMG_4441.webp", "sourceItemIds": ["model-1154"] },
+        { "file": "IMG_4439.webp", "sourceItemIds": ["model-1166"] }
+      ]
+    },
+    {
+      "id": "semitrailer-tech-water-30-1",
+      "purpose": "tech-water",
+      "designation": "30/1",
+      "photoCount": 0,
+      "photos": []
+    },
+    {
+      "id": "semitrailer-tech-water-32-1",
+      "purpose": "tech-water",
+      "designation": "32/1",
+      "photoCount": 0,
+      "photos": []
+    },
+    {
+      "id": "semitrailer-vacuum-20-1",
+      "purpose": "vacuum",
+      "designation": "20/1",
+      "photoCount": 14,
+      "photos": [
+        { "file": "IMG_4382_0.webp", "sourceItemIds": ["model-315"] },
+        { "file": "IMG_0065_0.webp", "sourceItemIds": ["model-316"] },
+        { "file": "IMG_0048.webp", "sourceItemIds": ["model-317"] },
+        { "file": "ППЦВ-20ОД -1-.webp", "sourceItemIds": ["model-318"] },
+        { "file": "20200818_161431.webp", "sourceItemIds": ["model-319"] },
+        { "file": "20200818_162217.webp", "sourceItemIds": ["model-321"] },
+        { "file": "IMG_9779.webp", "sourceItemIds": ["model-322"] },
+        { "file": "IMG_0065.webp", "sourceItemIds": ["model-323"] },
+        { "file": "ППЦВ-20ОД -2-.webp", "sourceItemIds": ["model-325"] },
+        { "file": "IMG_0229.webp", "sourceItemIds": ["model-326"] },
+        { "file": "20200817_172529.webp", "sourceItemIds": ["model-327"] },
+        { "file": "20200817_172541.webp", "sourceItemIds": ["model-328"] },
+        { "file": "20200817_172622.webp", "sourceItemIds": ["model-329"] },
+        { "file": "20211111_170005.webp", "sourceItemIds": ["model-330"] }
+      ]
+    },
+    {
+      "id": "semitrailer-vacuum-24-1",
+      "purpose": "vacuum",
+      "designation": "24/1",
+      "photoCount": 14,
+      "photos": [
+        { "file": "ППЦВ-24 -1-.webp", "sourceItemIds": ["model-311"] },
+        { "file": "ППЦВ-24 -2-.webp", "sourceItemIds": ["model-312"] },
+        { "file": "IMG_0066.webp", "sourceItemIds": ["model-314"] },
+        { "file": "ППЦВ-24 -2-_0.webp", "sourceItemIds": ["model-613"] },
+        { "file": "ППЦВ-24 -1-_0.webp", "sourceItemIds": ["model-614"] },
+        { "file": "ППЦВ-24 -2-_1.webp", "sourceItemIds": ["model-615"] },
+        { "file": "ППЦВ-24 -2-_2.webp", "sourceItemIds": ["model-617"] },
+        { "file": "IMG_0232_0.webp", "sourceItemIds": ["model-618"] },
+        { "file": "IMG_0231_0.webp", "sourceItemIds": ["model-619"] },
+        { "file": "IMG_0234_1.webp", "sourceItemIds": ["model-620"] },
+        { "file": "IMG_0231.webp", "sourceItemIds": ["model-621"] },
+        { "file": "20200817_172541.webp", "sourceItemIds": ["model-622"] },
+        { "file": "IMG_0234_0.webp", "sourceItemIds": ["model-623"] },
+        { "file": "IMG_0232.webp", "sourceItemIds": ["model-624"] }
+      ]
+    },
+    {
+      "id": "semitrailer-vacuum-30-1",
+      "purpose": "vacuum",
+      "designation": "30/1",
+      "photoCount": 4,
+      "photos": [
+        { "file": "IMG_0229_0.webp", "sourceItemIds": ["model-307"] },
+        { "file": "IMG_0232_1.webp", "sourceItemIds": ["model-308"] },
+        { "file": "IMG_0234.webp", "sourceItemIds": ["model-309"] },
+        { "file": "IMG_0234_2.webp", "sourceItemIds": ["model-310"] }
+      ]
+    }
+  ]
+}

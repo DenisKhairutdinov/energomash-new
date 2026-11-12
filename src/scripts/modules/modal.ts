@@ -82,6 +82,9 @@ export const initModal = (): void => {
   const modelName = dialog.querySelector('[data-modal-model]')
   const kindField = dialog.querySelector<HTMLInputElement>('[name="kind"]')
   const modelField = dialog.querySelector<HTMLInputElement>('[name="model"]')
+  const configurationField = dialog.querySelector<HTMLInputElement>('[name="configuration"]')
+  const configurationText = dialog.querySelector<HTMLElement>('[data-modal-configuration]')
+  const configurationRow = dialog.querySelector<HTMLElement>('[data-modal-configuration-row]')
 
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) {
@@ -96,6 +99,7 @@ export const initModal = (): void => {
 
     const kind = opener.dataset['modalOpen'] ?? 'call'
     const model = opener.dataset['modalModel'] ?? ''
+    const configuration = opener.dataset['modalConfiguration'] ?? ''
     const content = KINDS[kind] ?? KINDS['call']
 
     if (title && text && content) {
@@ -114,8 +118,37 @@ export const initModal = (): void => {
     if (modelName) {
       modelName.textContent = model
     }
+    if (configurationField) configurationField.value = configuration
+    if (configurationText) {
+      configurationText.replaceChildren()
+      for (const line of configuration.split('\n').filter((line) => line.trim())) {
+        const separator = line.indexOf(':')
+        const label = separator >= 0 ? line.slice(0, separator).trim() : 'Параметр'
+        const value = separator >= 0 ? line.slice(separator + 1).trim() : line
+        const row = document.createElement('div')
+        const term = document.createElement('dt')
+        const description = document.createElement('dd')
+        term.textContent = label
+        if (label === 'Опции') {
+          row.classList.add('modal__configuration-options')
+          const list = document.createElement('ul')
+          for (const option of value.split('; ')) {
+            const item = document.createElement('li')
+            item.textContent = option
+            list.append(item)
+          }
+          description.append(list)
+        } else {
+          description.textContent = value
+        }
+        row.append(term, description)
+        configurationText.append(row)
+      }
+    }
+    setHidden(configurationRow, configuration === '')
+    dialog.classList.toggle('modal--configuration', configuration !== '')
 
-    setHidden(modelRow, model === '')
+    setHidden(modelRow, model === '' || configuration !== '')
     setHidden(dialog.querySelector('[data-form-done]'), true)
     getLenis()?.stop()
     dialog.showModal()

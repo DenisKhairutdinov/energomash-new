@@ -86,7 +86,7 @@
     <main id="main">
       {% block content %}{% endblock %}
     </main>
-    {% if pageClass != "home" %}{% include "request.njk" %}{% endif %}
+    {% if pageClass != "home" and pageClass != "catalog-new" and not hideRequest %}{% include "request.njk" %}{% endif %}
     {% include "footer.njk" %}
     {% include "modal-request.njk" %}
   </body>
