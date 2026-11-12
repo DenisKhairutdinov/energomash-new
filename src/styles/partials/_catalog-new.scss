@@ -42,9 +42,10 @@
   }
 
   .new-catalog__toggle {
+    // При vertical-rl block-end — слева, inline-start — сверху.
     position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 100%;
+    inset-block-end: 100%;
+    inset-inline-start: 0;
     display: flex;
     gap: 0.75rem;
     align-items: center;
