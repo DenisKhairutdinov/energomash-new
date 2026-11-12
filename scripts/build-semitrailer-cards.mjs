@@ -158,13 +158,19 @@ const categories = catalog.purposes.flatMap(({ value, label }) => {
     card.sourceItems.sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }))
     const details = semitrailerCharacteristics[value]
     if (details) {
+      const sourceDetails = sourceCharacteristicsFor(card)
       card.briefCharacteristics = {
         title: details.briefCharacteristics.title,
-        items: details.briefCharacteristics.items.map((item) => {
-          if (!item.byVolume) return structuredClone(item)
+        items: details.briefCharacteristics.items.flatMap((item) => {
           const characteristic = structuredClone(item)
           delete characteristic.byVolume
-          return { ...characteristic, ...axleCountsFor(value, card.volume) }
+          delete characteristic.fromSource
+          if (item.fromSource) {
+            const source = sourceDetails.items.find((entry) => entry.id === item.id)
+            return source ? [{ ...source, ...characteristic, values: source.values }] : []
+          }
+          if (item.byVolume) return [{ ...characteristic, ...axleCountsFor(value, card.volume) }]
+          return [characteristic]
         }),
       }
       card.optionalEquipment = structuredClone(details.optionalEquipment)
@@ -179,8 +185,14 @@ const categories = catalog.purposes.flatMap(({ value, label }) => {
         groups: full.groups.map((group) => ({
           id: group.id,
           title: group.title,
-          items: group.items.map(
-            ({ label, value, briefId, field, suffix = '', valueLabels = {} }) => {
+          items: group.items.flatMap(
+            ({ label, value, briefId, field, when, optional, suffix = '', valueLabels = {} }) => {
+              if (when) {
+                const choices =
+                  card.briefCharacteristics.items.find((item) => item.id === when.briefId)
+                    ?.values ?? []
+                if (!choices.some((choice) => when.values.includes(choice))) return []
+              }
               let values = value ? [value] : []
               if (field) {
                 assert(['volume', 'sections', 'availableSsuMm'].includes(field), field)
@@ -190,11 +202,14 @@ const categories = catalog.purposes.flatMap(({ value, label }) => {
                 values =
                   card.briefCharacteristics.items.find((item) => item.id === briefId)?.values ?? []
               }
+              if (optional && !values.length) return []
               assert(values.length, `Нет значения полной характеристики: ${card.id}, ${label}`)
-              return {
-                label,
-                value: values.map((item) => `${valueLabels[item] ?? item}${suffix}`).join(' / '),
-              }
+              return [
+                {
+                  label,
+                  value: values.map((item) => `${valueLabels[item] ?? item}${suffix}`).join(' / '),
+                },
+              ]
             },
           ),
         })),
@@ -281,9 +296,12 @@ for (const category of categories) {
       '| --- | --- |',
     )
     for (const item of details.briefCharacteristics.items) {
-      lines.push(
-        `| ${escapeCell(item.label)} | ${escapeCell(item.byVolume ? 'Индивидуально по объёму, см. колонку «Осей»' : item.values.join('; '))} |`,
-      )
+      const variants = item.byVolume
+        ? 'Индивидуально по объёму, см. колонку «Осей»'
+        : item.fromSource
+          ? 'Из исходных модификаций конкретной карточки'
+          : item.values.join('; ')
+      lines.push(`| ${escapeCell(item.label)} | ${escapeCell(variants)} |`)
     }
     lines.push(
       '',
@@ -313,7 +331,7 @@ for (const category of categories) {
         ? [
             card.briefCharacteristics.items
               .find((item) => item.id === 'axleCount')
-              .values.join(', ') || 'Требует уточнения',
+              ?.values.join(', ') || 'Требует уточнения',
           ]
         : []),
       heights,

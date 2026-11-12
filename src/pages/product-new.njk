@@ -9,8 +9,9 @@
   {% for category in semitrailerCards.categories %}
   {% for card in category.cards %}
     {% set modelName = category.modelPrefix + "-" + card.designation %}
-    {% set configurable = category.purpose == "fuel" %}
-    <article class="pdp new-product{% if configurable %} new-product--configurable{% endif %}{% if card.fullCharacteristics %} new-product--full-specifications{% endif %}" data-new-product="{{ card.id }}" hidden>
+    {% set configOptions = card.optionalEquipment.configItems or card.optionalEquipment.items %}
+    {% set configurable = category.purpose in ["fuel", "oil", "tech-water", "vacuum"] %}
+    <article class="pdp new-product{% if configurable %} new-product--configurable{% endif %}{% if category.purpose == 'oil' %} new-product--oil{% elif category.purpose == 'tech-water' %} new-product--tech-water{% elif category.purpose == 'vacuum' %} new-product--vacuum{% endif %}{% if card.fullCharacteristics %} new-product--full-specifications{% endif %}" data-new-product="{{ card.id }}" hidden>
       <section class="pdp__hero" aria-labelledby="product-title-{{ card.id }}">
         <div class="pdp__gallery"><div class="pdp__stage">
           {% if card.photos.length %}<img class="pdp__photo" src="/src/assets/catalog-cards/{{ card.id }}/{{ card.photos[0] }}" alt="{{ category.typeLabel }} {{ modelName }}" width="1600" height="1000" loading="lazy" />{% else %}<span class="drawing drawing--ppc"></span><span>Фото скоро появится</span>{% endif %}
@@ -20,14 +21,16 @@
           <div class="pdp__intro"><p class="pdp__type">{{ category.label }}</p><h1 class="pdp__title" id="product-title-{{ card.id }}">{{ modelName }}</h1></div>
           <dl class="pdp__specs"><div class="pdp__spec"><dt>Объём</dt><dd>{{ card.volume }} м³</dd></div><div class="pdp__spec"><dt>Секций</dt><dd>{{ card.sections }}</dd></div></dl>
           {% if configurable %}
-          <form class="cfilter new-product__config" id="config-{{ card.id }}" data-product-config aria-label="Выбор комплектации">
+          {% set configGroupRows = (card.briefCharacteristics.items.length / 2) | round(0, 'ceil') %}
+          {% if category.purpose == 'vacuum' %}{% set configGroupRows = configGroupRows + 1 %}{% endif %}
+          <form class="cfilter new-product__config{% if category.purpose == 'oil' %} new-product__config--oil{% endif %}" id="config-{{ card.id }}" data-product-config aria-label="Выбор комплектации" style="--config-group-rows: {{ configGroupRows }}; --config-option-rows: {{ (configOptions.length / 2) | round(0, 'ceil') }}">
             <input type="hidden" data-config-fixed data-config-label="Объём" value="{{ card.volume }} м³" />
             <input type="hidden" data-config-fixed data-config-label="Количество секций" value="{{ card.sections }}" />
             {% for characteristic in card.briefCharacteristics.items %}
               {% set choices = characteristic.values %}
               {% set unit = "" %}
               {% if characteristic.id == "ssuHeight" %}{% set choices = card.availableSsuMm %}{% set unit = " мм" %}{% endif %}
-              <div class="cfilter__block new-product__config-group{% if loop.last %} new-product__config-group--wide{% endif %}" role="group" aria-labelledby="label-{{ card.id }}-{{ characteristic.id }}" data-config-group data-config-label="{{ characteristic.label }}"{% if choices.length == 1 %} data-config-value="{{ choices[0] }}{{ unit }}"{% endif %}>
+              <div class="cfilter__block new-product__config-group{% if (loop.last and loop.length % 2 == 1) or (category.purpose == 'vacuum' and characteristic.id in ['pump', 'dangerousGoodsEquipment']) %} new-product__config-group--wide{% endif %}" role="group" aria-labelledby="label-{{ card.id }}-{{ characteristic.id }}" data-config-group data-config-id="{{ characteristic.id }}" data-config-label="{{ characteristic.label }}"{% if choices.length == 1 %} data-config-value="{{ choices[0] }}{{ unit }}"{% endif %}>
                 <p class="cfilter__label" id="label-{{ card.id }}-{{ characteristic.id }}">{{ characteristic.label }}</p>
                 <div class="cfilter__options new-product__config-options new-product__config-options--switch{% if choices.length == 1 %} new-product__config-options--single{% endif %}" style="--switch-count: {{ choices.length }}">
                 {% if choices.length == 1 %}
@@ -36,18 +39,18 @@
                     {% for value in choices %}
                       <label class="chip">
                         <input class="chip__input" type="radio" name="{{ characteristic.id }}" value="{{ value }}{{ unit }}"{% if loop.first %} checked{% endif %} />
-                        <span class="chip__label">{{ value }}{{ unit }}</span>
+                        <span class="chip__label">{% if characteristic.id == "suspension" and value == "Пневматическая" %}Пневмо{% else %}{{ value }}{% endif %}{{ unit }}</span>
                       </label>
                     {% endfor %}
                 {% endif %}
                 </div>
               </div>
             {% endfor %}
-            {% if card.optionalEquipment.items.length %}
+            {% if configOptions.length %}
               <p class="cfilter__label new-product__options-label" id="options-label-{{ card.id }}">Опции</p>
               <div class="new-product__optional-filter" role="group" aria-labelledby="options-label-{{ card.id }}">
-                {% set optionLabels = ["Насос СВН-80А", "Узел выдачи топлива", "Алюминиевые крылья", "Передняя подъёмная ось"] %}
-                {% for option in card.optionalEquipment.items %}
+                {% set optionLabels = card.optionalEquipment.labels %}
+                {% for option in configOptions %}
                   <label class="chip" title="{{ option }}"><input class="chip__input" type="checkbox" name="options" value="{{ option }}" aria-label="{{ option }}" data-config-option /><span class="chip__label">{{ optionLabels[loop.index0] or option }}</span></label>
                 {% endfor %}
               </div>

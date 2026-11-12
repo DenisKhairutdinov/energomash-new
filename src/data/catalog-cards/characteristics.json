@@ -1,5 +1,81 @@
 {
   "semitrailerCharacteristics": {
+    "vacuum": {
+      "briefCharacteristics": {
+        "title": "Краткие характеристики",
+        "items": [
+          {
+            "id": "crossSection",
+            "label": "Сечение",
+            "values": ["Круг"]
+          },
+          {
+            "id": "suspension",
+            "label": "Подвеска",
+            "values": ["Пневмо", "Рессорная"]
+          },
+          {
+            "id": "brakes",
+            "label": "Тормоза",
+            "values": ["Дисковые", "Барабанные"]
+          },
+          {
+            "id": "axleCount",
+            "label": "Количество осей",
+            "byVolume": true
+          },
+          {
+            "id": "axles",
+            "label": "Оси",
+            "values": ["BPW", "PLT"]
+          },
+          {
+            "id": "tyres",
+            "label": "Шины",
+            "values": ["385/65R22,5", "425/85R21"]
+          },
+          {
+            "id": "construction",
+            "label": "Особенность конструкции",
+            "values": ["Рамная"]
+          },
+          {
+            "id": "ssuHeight",
+            "label": "Высота ССУ",
+            "fromSource": true
+          },
+          {
+            "id": "material",
+            "label": "Материал",
+            "values": ["Сталь 09Г2С"]
+          },
+          {
+            "id": "thickness",
+            "label": "Толщина",
+            "values": ["5 мм"]
+          },
+          {
+            "id": "pump",
+            "label": "Насос",
+            "values": ["ВР-8/3", "PNR-124", "PVT-200"]
+          },
+          {
+            "id": "dangerousGoodsEquipment",
+            "label": "Оборудование для перевозки ЛВЖ (ДОПОГ)",
+            "values": ["В наличии"]
+          }
+        ]
+      },
+      "optionalEquipment": {
+        "title": "Опции",
+        "items": []
+      },
+      "axleCountsByVolume": {
+        "20": [2],
+        "24": [2],
+        "30": [3]
+      }
+    },
     "fuel": {
       "briefCharacteristics": {
         "title": "Краткие характеристики",
@@ -68,6 +144,12 @@
           "Узел выдачи топлива (счётчик ППО-25, фильтр, рукав ДУ25 длиной 6 м, раздаточный кран ДУ20)",
           "Алюминиевые крылья",
           "Передняя подъёмная ось"
+        ],
+        "labels": [
+          "Насос СВН-80А",
+          "Узел выдачи топлива",
+          "Алюминиевые крылья",
+          "Передняя подъёмная ось"
         ]
       },
       "axleCountsByVolume": {
@@ -84,6 +166,164 @@
         "35": [3],
         "37": [3],
         "40": [3]
+      }
+    },
+    "oil": {
+      "briefCharacteristics": {
+        "title": "Краткие характеристики",
+        "items": [
+          {
+            "id": "shape",
+            "label": "Тип сечения цистерны",
+            "values": ["Чемодан", "Круглое"]
+          },
+          {
+            "id": "suspension",
+            "label": "Подвеска",
+            "fromSource": true
+          },
+          {
+            "id": "brakes",
+            "label": "Тормозная система",
+            "values": ["Дисковые", "Барабанные"]
+          },
+          {
+            "id": "axleCount",
+            "label": "Количество осей",
+            "fromSource": true
+          },
+          {
+            "id": "axle",
+            "label": "Оси",
+            "fromSource": true
+          },
+          {
+            "id": "tyres",
+            "label": "Шины",
+            "fromSource": true
+          },
+          {
+            "id": "construction",
+            "label": "Особенность конструкции",
+            "fromSource": true
+          },
+          {
+            "id": "ssuHeight",
+            "label": "Высота ССУ",
+            "fromSource": true
+          },
+          {
+            "id": "material",
+            "label": "Материал цистерны",
+            "values": ["Сталь 09Г2С"]
+          },
+          {
+            "id": "thickness",
+            "label": "Толщина обечайки и днищ",
+            "values": ["4 мм", "5 мм"]
+          },
+          {
+            "id": "insulated",
+            "label": "Термоизоляция",
+            "values": ["Нет", "100 мм (ППУ)"]
+          },
+          {
+            "id": "dangerousGoodsEquipment",
+            "label": "Оборудование для перевозки ЛВЖ (ДОПОГ)",
+            "values": ["В наличии"]
+          }
+        ]
+      },
+      "optionalEquipment": {
+        "title": "Опции",
+        "items": [
+          "Насосная установка СЦЛ-01А с гидравлическим приводом",
+          "Мотопомпа",
+          "Электроподогрев сливного люка",
+          "Алюминиевые крылья",
+          "Инструментальный ящик",
+          "Термоизоляция 100 мм (ППУ)"
+        ],
+        "configItems": [
+          "Насосная установка СЦЛ-01А с гидравлическим приводом",
+          "Мотопомпа",
+          "Электроподогрев сливного люка",
+          "Алюминиевые крылья",
+          "Инструментальный ящик"
+        ]
+      }
+    },
+    "tech-water": {
+      "briefCharacteristics": {
+        "title": "Краткие характеристики",
+        "items": [
+          {
+            "id": "shape",
+            "label": "Тип сечения цистерны",
+            "values": ["Чемодан", "Круглое"]
+          },
+          {
+            "id": "suspension",
+            "label": "Подвеска",
+            "fromSource": true
+          },
+          {
+            "id": "brakes",
+            "label": "Тормозная система",
+            "values": ["Дисковые", "Барабанные"]
+          },
+          {
+            "id": "axleCount",
+            "label": "Количество осей",
+            "fromSource": true
+          },
+          {
+            "id": "axle",
+            "label": "Оси",
+            "fromSource": true
+          },
+          {
+            "id": "tyres",
+            "label": "Шины",
+            "fromSource": true
+          },
+          {
+            "id": "construction",
+            "label": "Особенность конструкции",
+            "fromSource": true
+          },
+          {
+            "id": "ssuHeight",
+            "label": "Высота ССУ",
+            "fromSource": true
+          },
+          {
+            "id": "material",
+            "label": "Материал цистерны",
+            "values": ["Сталь 09Г2С"]
+          },
+          {
+            "id": "thickness",
+            "label": "Толщина обечайки и днищ",
+            "values": ["4 мм", "5 мм"]
+          },
+          {
+            "id": "insulated",
+            "label": "Термоизоляция",
+            "values": ["Нет", "100 мм (ППУ)"]
+          }
+        ]
+      },
+      "optionalEquipment": {
+        "title": "Опции",
+        "items": [
+          "Насосная установка СЦЛ-01А с гидравлическим приводом",
+          "Мотопомпа",
+          "Электроподогрев сливного люка",
+          "Внутреннее антикоррозийное покрытие цистерны",
+          "Алюминиевые крылья",
+          "Инструментальный ящик"
+        ]
       }
     }
   }

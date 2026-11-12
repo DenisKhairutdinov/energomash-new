@@ -462,17 +462,23 @@
 
     display: grid;
     grid-template:
-      repeat(6, auto minmax(0, calc(var(--tab-indicator-max-height) + 6px)))
-      auto repeat(2, minmax(0, calc(var(--tab-indicator-max-height) + 6px))) auto / repeat(
-        2,
-        minmax(0, 1fr)
-      );
+      repeat(
+        var(--config-group-rows, 6),
+        auto minmax(0, calc(var(--tab-indicator-max-height) + 6px))
+      )
+      auto repeat(
+        var(--config-option-rows, 2),
+        minmax(0, calc(var(--tab-indicator-max-height) + 6px))
+      )
+      auto / repeat(2, minmax(0, 1fr));
     gap: 0.25rem;
     align-content: start;
     align-items: stretch;
+    align-self: start;
     min-inline-size: 0;
     min-block-size: 0;
     padding: 0;
+    margin: 0;
   }
 
   .new-product__config .new-product__config-group {
@@ -726,6 +732,56 @@
     + .chip__label {
     outline: 2px solid var(--c-black);
     outline-offset: -2px;
+  }
+
+  :is(.new-product--oil, .new-product--tech-water, .new-product--vacuum) .pdp__hero {
+    block-size: auto;
+    min-block-size: 100svh;
+    max-block-size: none;
+  }
+
+  :is(.new-product--oil, .new-product--tech-water, .new-product--vacuum) .pdp__side {
+    grid-template-rows: repeat(5, auto);
+    align-content: start;
+    overflow: visible;
+  }
+
+  :is(.new-product--oil, .new-product--tech-water) .new-product__config {
+    grid-template-areas: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--config-group-rows, 6), auto auto);
+    grid-auto-rows: auto;
+  }
+
+  :is(.new-product--oil, .new-product--tech-water) .new-product__config-options--switch,
+  :is(.new-product--oil, .new-product--tech-water) .new-product__optional-filter .chip {
+    max-block-size: none;
+  }
+
+  :is(.new-product--oil, .new-product--tech-water) .new-product__config-options--switch::before {
+    max-block-size: none;
+  }
+
+  :is(.new-product--oil, .new-product--tech-water) .new-product__config .chip .chip__label {
+    min-block-size: 2.5rem;
+    max-block-size: none;
+  }
+
+  .new-product--vacuum .new-product__config {
+    grid-template-areas: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows:
+      repeat(
+        var(--config-group-rows, 6),
+        auto minmax(0, calc(var(--tab-indicator-max-height) + 6px))
+      )
+      auto;
+  }
+
+  @media (width < 900px) {
+    :is(.new-product--oil, .new-product--tech-water, .new-product--vacuum) .pdp__hero {
+      grid-template-rows: 18svh auto;
+    }
   }
 
   @media (width < 600px) {
