@@ -682,6 +682,42 @@
     margin-block: 1.5rem;
   }
 
+  .new-product .new-product__thumbs {
+    inset-block-end: 1rem;
+    inset-inline: 1rem;
+    inline-size: max-content;
+    max-inline-size: calc(100% - 2rem);
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .new-product__thumbs > li {
+    flex: 0 0 auto;
+  }
+
+  .new-product__thumbs .pdp__thumb {
+    display: block;
+  }
+
+  .new-product__thumbs .pdp__thumb.is-active,
+  .new-product__thumbs .pdp__thumb:focus-visible {
+    outline: 2px solid var(--c-white);
+    outline-offset: -2px;
+  }
+
+  @media (width < 900px) {
+    .new-product .new-product__thumbs {
+      inset-block-end: 0.5rem;
+      inset-inline: 0.5rem;
+      max-inline-size: calc(100% - 1rem);
+      padding: 0.25rem;
+    }
+
+    .new-product__thumbs .pdp__thumb {
+      inline-size: 3.5rem;
+    }
+  }
+
   .new-product__config .new-product__options-label {
     grid-column: 1 / -1;
   }

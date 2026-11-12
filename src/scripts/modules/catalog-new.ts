@@ -208,10 +208,58 @@ const syncFilterTabs = (root: HTMLElement): void => {
   }
 }
 
+const initProductGallery = (product: HTMLElement): void => {
+  const gallery = product.querySelector<HTMLElement>('[data-product-gallery]')
+  const main = gallery?.querySelector<HTMLImageElement>('[data-gallery-photo]')
+  if (!gallery || !main) return
+  const thumbs = [...gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-thumb]')]
+  const label = main.alt
+  const select = (index: number): void => {
+    const button = thumbs[index]
+    const photo = button?.querySelector<HTMLImageElement>('img')
+    if (!button || !photo) return
+    main.src = photo.currentSrc || photo.src
+    main.alt = `${label} — фото ${String(index + 1)}`
+    for (const thumb of thumbs) {
+      const active = thumb === button
+      thumb.classList.toggle('is-active', active)
+      thumb.setAttribute('aria-pressed', String(active))
+    }
+  }
+  for (const [index, button] of thumbs.entries()) {
+    button.addEventListener('click', () => {
+      select(index)
+    })
+    button.addEventListener('keydown', (event) => {
+      let next: number
+      switch (event.key) {
+        case 'ArrowRight':
+          next = (index + 1) % thumbs.length
+          break
+        case 'ArrowLeft':
+          next = (index + thumbs.length - 1) % thumbs.length
+          break
+        case 'Home':
+          next = 0
+          break
+        case 'End':
+          next = thumbs.length - 1
+          break
+        default:
+          return
+      }
+      event.preventDefault()
+      select(next)
+      thumbs[next]?.focus()
+    })
+  }
+}
+
 export const initNewProduct = (): void => {
   const products = [...document.querySelectorAll<HTMLElement>('[data-new-product]')]
   if (!products.length) return
   for (const product of products) {
+    initProductGallery(product)
     const config = product.querySelector<HTMLFormElement>('[data-product-config]')
     if (!config) continue
     const referenceTile = product.querySelector<HTMLElement>('.pdp__specs .pdp__spec')

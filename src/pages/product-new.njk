@@ -13,9 +13,18 @@
     {% set configurable = category.purpose in ["fuel", "oil", "tech-water", "vacuum"] %}
     <article class="pdp new-product{% if configurable %} new-product--configurable{% endif %}{% if category.purpose == 'oil' %} new-product--oil{% elif category.purpose == 'tech-water' %} new-product--tech-water{% elif category.purpose == 'vacuum' %} new-product--vacuum{% endif %}{% if card.fullCharacteristics %} new-product--full-specifications{% endif %}" data-new-product="{{ card.id }}" hidden>
       <section class="pdp__hero" aria-labelledby="product-title-{{ card.id }}">
-        <div class="pdp__gallery"><div class="pdp__stage">
-          {% if card.photos.length %}<img class="pdp__photo" src="/src/assets/catalog-cards/{{ card.id }}/{{ card.photos[0] }}" alt="{{ category.typeLabel }} {{ modelName }}" width="1600" height="1000" loading="lazy" />{% else %}<span class="drawing drawing--ppc"></span><span>Фото скоро появится</span>{% endif %}
-        </div></div>
+        <div class="pdp__gallery" data-product-gallery>
+          <div class="pdp__stage">
+            {% if card.photos.length %}<img class="pdp__photo" data-gallery-photo src="/src/assets/catalog-cards/{{ card.id }}/{{ card.photos[0] }}" alt="{{ category.typeLabel }} {{ modelName }}" width="1600" height="1000" loading="lazy" />{% else %}<span class="drawing drawing--ppc"></span><span>Фото скоро появится</span>{% endif %}
+          </div>
+          {% if card.photos.length > 1 %}
+          <ul class="pdp__thumbs new-product__thumbs" aria-label="Фотографии {{ modelName }}">
+            {% for photo in card.photos %}
+            <li><button class="pdp__thumb{% if loop.first %} is-active{% endif %}" type="button" data-gallery-thumb aria-label="Фото {{ loop.index }} из {{ card.photos.length }}" aria-pressed="{% if loop.first %}true{% else %}false{% endif %}"><img src="/src/assets/catalog-cards/{{ card.id }}/{{ photo }}" alt="" width="120" height="80" loading="lazy" decoding="async" /></button></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
         <div class="pdp__side">
           <a class="pdp__back" href="/catalog-new.html?purpose={{ category.purpose }}">← Каталог</a>
           <div class="pdp__intro"><p class="pdp__type">{{ category.label }}</p><h1 class="pdp__title" id="product-title-{{ card.id }}">{{ modelName }}</h1></div>
