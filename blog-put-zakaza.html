@@ -57,9 +57,9 @@
       }
     </script>
     <script type="module" crossorigin src="/energomash-new/assets/modulepreload-polyfill-P2Xu9kJm.js"></script>
-    <script type="module" crossorigin src="/energomash-new/assets/main-BwPMalmH.js"></script>
+    <script type="module" crossorigin src="/energomash-new/assets/main-s6-MQKUq.js"></script>
     <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-QTRMr-PK.css">
-    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CAd6TiuR.css">
+    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CZdPs_yV.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Можно ли купить технику без предоплаты?","acceptedAnswer":{"@type":"Answer","text":"Порядок оплаты фиксируется договором. Условия уточняет менеджер при подготовке предложения."}},{"@type":"Question","name":"Как быстро придёт коммерческое предложение?","acceptedAnswer":{"@type":"Answer","text":"Обычно в короткий срок после уточнения задачи. Для заказной техники может потребоваться больше времени на расчёты."}},{"@type":"Question","name":"Можно ли забрать технику самому?","acceptedAnswer":{"@type":"Answer","text":"Да, полуприцепы доезжают с тягачом заказчика. Приёмка описана в статье «Приёмка техники на заводе» ."}},{"@type":"Question","name":"Что входит в пакет документов?","acceptedAnswer":{"@type":"Answer","text":"ОТТС, сертификаты соответствия, паспорт, гарантийный талон. Подробнее на странице «Сертификаты и документы» ."}}]}</script>
   </head>
   <body class="page page--article">
@@ -544,7 +544,7 @@
     </div>
   </header>
   <figure class="ap__cover">
-    <img src="/energomash-new/assets/IMG_4443_0-DwI1SaYi.webp" width="2400" height="1000" alt="" decoding="async" data-parallax="0.05" />
+    <img src="/energomash-new/assets/IMG_4443-DwI1SaYi.webp" width="2400" height="1000" alt="" decoding="async" data-parallax="0.05" />
   </figure>
 
   <div class="ap__sec">
@@ -856,12 +856,17 @@
         <p class="modal__model" hidden data-modal-model-row>
           Модель: <strong data-modal-model></strong>
         </p>
+        <div class="modal__configuration" data-modal-configuration-row hidden>
+          <h3 class="modal__configuration-title">Комплектация</h3>
+          <dl class="modal__configuration-grid" data-modal-configuration></dl>
+        </div>
         <a class="modal__phone" href="tel:88001012200">8 (800) 101-22-00</a>
       </div>
     </div>
     <form class="modal__form" action="#" method="post" novalidate data-request-form>
       <input type="hidden" name="kind" value="call" />
       <input type="hidden" name="model" value="" />
+      <input type="hidden" name="configuration" value="" />
       <label class="field">
         <span class="field__label">Имя</span>
         <input class="field__control" type="text" name="name" autocomplete="name" />

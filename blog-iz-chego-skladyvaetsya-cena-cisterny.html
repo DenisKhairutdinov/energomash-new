@@ -57,9 +57,9 @@
       }
     </script>
     <script type="module" crossorigin src="/energomash-new/assets/modulepreload-polyfill-P2Xu9kJm.js"></script>
-    <script type="module" crossorigin src="/energomash-new/assets/main-BwPMalmH.js"></script>
+    <script type="module" crossorigin src="/energomash-new/assets/main-s6-MQKUq.js"></script>
     <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-QTRMr-PK.css">
-    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CAd6TiuR.css">
+    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CZdPs_yV.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Почему похожие модели стоят по-разному?","acceptedAnswer":{"@type":"Answer","text":"Различаются оси, подвеска, число секций, оборудование и материалы. Сравнивайте комплектацию, а не только объём."}},{"@type":"Question","name":"Что лучше сэкономить, а что нет?","acceptedAnswer":{"@type":"Answer","text":"Экономить стоит на опциях, которые вам не нужны. Не стоит экономить на безопасности: тормоза, допуск, заземление."}},{"@type":"Question","name":"Где посмотреть цену?","acceptedAnswer":{"@type":"Answer","text":"Стоимость конкретной модели запросите у менеджера: в карточке модели есть кнопка «Узнать стоимость». Для техники из наличия цену назовут быстро."}},{"@type":"Question","name":"Влияет ли срок на цену?","acceptedAnswer":{"@type":"Answer","text":"Техника из наличия отгружается за несколько дней. Заказная техника изготавливается от четырёх недель, цена зависит от комплектации."}}]}</script>
   </head>
   <body class="page page--article">
@@ -847,12 +847,17 @@
         <p class="modal__model" hidden data-modal-model-row>
           Модель: <strong data-modal-model></strong>
         </p>
+        <div class="modal__configuration" data-modal-configuration-row hidden>
+          <h3 class="modal__configuration-title">Комплектация</h3>
+          <dl class="modal__configuration-grid" data-modal-configuration></dl>
+        </div>
         <a class="modal__phone" href="tel:88001012200">8 (800) 101-22-00</a>
       </div>
     </div>
     <form class="modal__form" action="#" method="post" novalidate data-request-form>
       <input type="hidden" name="kind" value="call" />
       <input type="hidden" name="model" value="" />
+      <input type="hidden" name="configuration" value="" />
       <label class="field">
         <span class="field__label">Имя</span>
         <input class="field__control" type="text" name="name" autocomplete="name" />

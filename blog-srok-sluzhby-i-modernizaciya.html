@@ -57,9 +57,9 @@
       }
     </script>
     <script type="module" crossorigin src="/energomash-new/assets/modulepreload-polyfill-P2Xu9kJm.js"></script>
-    <script type="module" crossorigin src="/energomash-new/assets/main-BwPMalmH.js"></script>
+    <script type="module" crossorigin src="/energomash-new/assets/main-s6-MQKUq.js"></script>
     <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-QTRMr-PK.css">
-    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CAd6TiuR.css">
+    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CZdPs_yV.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Сколько служит цистерна?","acceptedAnswer":{"@type":"Answer","text":"Срок зависит от продукта, дорог, нагрузок и обслуживания. При правильной эксплуатации техника работает много лет."}},{"@type":"Question","name":"Можно ли добавить нижний налив на старую цистерну?","acceptedAnswer":{"@type":"Answer","text":"Да, но доработку согласуйте с заводом и учитывайте допуск и гарантию."}},{"@type":"Question","name":"Когда выгоднее менять технику?","acceptedAnswer":{"@type":"Answer","text":"Когда стоимость ремонта близка к цене новой машины, а кузов имеет коррозионный износ или деформации."}},{"@type":"Question","name":"Куда обратиться за оценкой состояния?","acceptedAnswer":{"@type":"Answer","text":"Позвоните по телефону 8 (800) 101-22-00 или оставьте заявку на сайте: специалисты подскажут по фото и документам."}}]}</script>
   </head>
   <body class="page page--article">
@@ -847,12 +847,17 @@
         <p class="modal__model" hidden data-modal-model-row>
           Модель: <strong data-modal-model></strong>
         </p>
+        <div class="modal__configuration" data-modal-configuration-row hidden>
+          <h3 class="modal__configuration-title">Комплектация</h3>
+          <dl class="modal__configuration-grid" data-modal-configuration></dl>
+        </div>
         <a class="modal__phone" href="tel:88001012200">8 (800) 101-22-00</a>
       </div>
     </div>
     <form class="modal__form" action="#" method="post" novalidate data-request-form>
       <input type="hidden" name="kind" value="call" />
       <input type="hidden" name="model" value="" />
+      <input type="hidden" name="configuration" value="" />
       <label class="field">
         <span class="field__label">Имя</span>
         <input class="field__control" type="text" name="name" autocomplete="name" />

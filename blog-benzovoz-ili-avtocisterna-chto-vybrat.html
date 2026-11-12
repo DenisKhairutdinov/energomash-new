@@ -57,9 +57,9 @@
       }
     </script>
     <script type="module" crossorigin src="/energomash-new/assets/modulepreload-polyfill-P2Xu9kJm.js"></script>
-    <script type="module" crossorigin src="/energomash-new/assets/main-BwPMalmH.js"></script>
+    <script type="module" crossorigin src="/energomash-new/assets/main-s6-MQKUq.js"></script>
     <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-QTRMr-PK.css">
-    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CAd6TiuR.css">
+    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CZdPs_yV.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Можно ли использовать автоцистерну и полуприцеп одновременно?","acceptedAnswer":{"@type":"Answer","text":"Да, многие парки используют оба типа техники под разные задачи: полуприцепы возят топливо до склада, автоцистерны развозят его по объектам."}},{"@type":"Question","name":"Какая техника дешевле?","acceptedAnswer":{"@type":"Answer","text":"Сравнивайте комплекты: полуприцеп вместе с тягачом и автоцистерну на шасси. Цена зависит от оборудования, шасси и срока поставки."}},{"@type":"Question","name":"Что лучше для АЗС?","acceptedAnswer":{"@type":"Answer","text":"Для доставки на АЗС чаще используют полуприцепы с несколькими секциями, чтобы возить разные виды топлива за один рейс."}},{"@type":"Question","name":"Нужен ли ДОПОГ для обеих машин?","acceptedAnswer":{"@type":"Answer","text":"Да, при перевозке бензина, дизельного топлива и других опасных грузов техника должна быть допущена по ДОПОГ. Подробнее в статье «ДОПОГ и регламенты» ."}}]}</script>
   </head>
   <body class="page page--article">
@@ -844,12 +844,17 @@
         <p class="modal__model" hidden data-modal-model-row>
           Модель: <strong data-modal-model></strong>
         </p>
+        <div class="modal__configuration" data-modal-configuration-row hidden>
+          <h3 class="modal__configuration-title">Комплектация</h3>
+          <dl class="modal__configuration-grid" data-modal-configuration></dl>
+        </div>
         <a class="modal__phone" href="tel:88001012200">8 (800) 101-22-00</a>
       </div>
     </div>
     <form class="modal__form" action="#" method="post" novalidate data-request-form>
       <input type="hidden" name="kind" value="call" />
       <input type="hidden" name="model" value="" />
+      <input type="hidden" name="configuration" value="" />
       <label class="field">
         <span class="field__label">Имя</span>
         <input class="field__control" type="text" name="name" autocomplete="name" />

@@ -57,9 +57,9 @@
       }
     </script>
     <script type="module" crossorigin src="/energomash-new/assets/modulepreload-polyfill-P2Xu9kJm.js"></script>
-    <script type="module" crossorigin src="/energomash-new/assets/main-BwPMalmH.js"></script>
+    <script type="module" crossorigin src="/energomash-new/assets/main-s6-MQKUq.js"></script>
     <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-QTRMr-PK.css">
-    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CAd6TiuR.css">
+    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CZdPs_yV.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Почему зимой отказывают тормоза?","acceptedAnswer":{"@type":"Answer","text":"Чаще всего из-за конденсата в пневмосистеме: влага замерзает в клапанах и трубках."}},{"@type":"Question","name":"Можно ли возить мазут без подогрева?","acceptedAnswer":{"@type":"Answer","text":"В сильные морозы продукт густеет, и слив затягивается. Нужны изоляция и подогрев."}},{"@type":"Question","name":"Как избежать замерзания арматуры?","acceptedAnswer":{"@type":"Answer","text":"Смазывать морозостойкой смазкой и после слива удалять остатки продукта из арматуры."}},{"@type":"Question","name":"Нужна ли особая подготовка шасси?","acceptedAnswer":{"@type":"Answer","text":"Да, подготовка шасси проводится по рекомендациям его производителя: масла, аккумуляторы, система охлаждения."}}]}</script>
   </head>
   <body class="page page--article">
@@ -871,12 +871,17 @@
         <p class="modal__model" hidden data-modal-model-row>
           Модель: <strong data-modal-model></strong>
         </p>
+        <div class="modal__configuration" data-modal-configuration-row hidden>
+          <h3 class="modal__configuration-title">Комплектация</h3>
+          <dl class="modal__configuration-grid" data-modal-configuration></dl>
+        </div>
         <a class="modal__phone" href="tel:88001012200">8 (800) 101-22-00</a>
       </div>
     </div>
     <form class="modal__form" action="#" method="post" novalidate data-request-form>
       <input type="hidden" name="kind" value="call" />
       <input type="hidden" name="model" value="" />
+      <input type="hidden" name="configuration" value="" />
       <label class="field">
         <span class="field__label">Имя</span>
         <input class="field__control" type="text" name="name" autocomplete="name" />

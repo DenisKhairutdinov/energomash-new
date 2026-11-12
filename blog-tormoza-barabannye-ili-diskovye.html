@@ -57,9 +57,9 @@
       }
     </script>
     <script type="module" crossorigin src="/energomash-new/assets/modulepreload-polyfill-P2Xu9kJm.js"></script>
-    <script type="module" crossorigin src="/energomash-new/assets/main-BwPMalmH.js"></script>
+    <script type="module" crossorigin src="/energomash-new/assets/main-s6-MQKUq.js"></script>
     <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-QTRMr-PK.css">
-    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CAd6TiuR.css">
+    <link rel="stylesheet" crossorigin href="/energomash-new/assets/main-CZdPs_yV.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Можно ли заменить барабанные тормоза на дисковые?","acceptedAnswer":{"@type":"Answer","text":"Замена связана с заменой оси и согласованием с заводом. Практичнее заказать нужную ось сразу."}},{"@type":"Question","name":"Дольше ли служат дисковые тормоза?","acceptedAnswer":{"@type":"Answer","text":"Колодки на дисковых тормозах изнашиваются равномерно и заменяются быстрее. Общий срок зависит от условий эксплуатации и нагрузок."}},{"@type":"Question","name":"Какие оси стоят на моделях завода?","acceptedAnswer":{"@type":"Answer","text":"В каталоге есть модели на осях BPW и PLT. Тип оси указан в характеристиках и доступен в фильтре «Оси»."}},{"@type":"Question","name":"Как часто менять колодки?","acceptedAnswer":{"@type":"Answer","text":"Интервал указан в сервисной книжке и зависит от пробега и нагрузки. Проверяйте износ при каждом ТО."}}]}</script>
   </head>
   <body class="page page--article">
@@ -848,12 +848,17 @@
         <p class="modal__model" hidden data-modal-model-row>
           Модель: <strong data-modal-model></strong>
         </p>
+        <div class="modal__configuration" data-modal-configuration-row hidden>
+          <h3 class="modal__configuration-title">Комплектация</h3>
+          <dl class="modal__configuration-grid" data-modal-configuration></dl>
+        </div>
         <a class="modal__phone" href="tel:88001012200">8 (800) 101-22-00</a>
       </div>
     </div>
     <form class="modal__form" action="#" method="post" novalidate data-request-form>
       <input type="hidden" name="kind" value="call" />
       <input type="hidden" name="model" value="" />
+      <input type="hidden" name="configuration" value="" />
       <label class="field">
         <span class="field__label">Имя</span>
         <input class="field__control" type="text" name="name" autocomplete="name" />
