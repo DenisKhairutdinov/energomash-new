@@ -384,7 +384,9 @@ export const initHeader = (): void => {
 
   const update = (): void => {
     const y = window.scrollY
-    const isOpen = header.classList.contains('is-open')
+    const isOpen =
+      header.classList.contains('is-open') ||
+      header.querySelector('.menu__item:is(:hover, :focus-within) > .menu__dropdown') !== null
 
     header.classList.toggle('is-solid', y > SOLID_AFTER)
     header.classList.toggle('is-hidden', !isOpen && y > HIDE_AFTER && y > lastY)
